@@ -79,6 +79,10 @@ int main() {
 #endif
 
     while (1) {
+        if (drivers->remote.isConnected()) {
+            // hello mr. debugger how are u
+            printf("remote connected");
+        }
         // do this as fast as you can
         PROFILE(drivers->profiler, updateIo, (drivers));
 

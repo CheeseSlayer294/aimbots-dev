@@ -20,9 +20,32 @@ void RunShooterCommand::initialize() {
     // No initialization needed
 }
 
+float rpmTarget = 0.0f;
+
 void RunShooterCommand::execute() {
-    // declare fixed 8500 RPM target until command is descheduled
-    shooter->ForAllShooterMotors(&ShooterSubsystem::setTargetRPM, 10000.0f);
+    switch (drivers->remote.getSwitch(Remote::Switch::LEFT_SWITCH)) {
+        case Remote::SwitchState::DOWN:
+            rpmTarget = 7500.0f;
+            break;
+
+        case Remote::SwitchState::MID:
+            rpmTarget = 8750.0f;
+            break;
+
+        case Remote::SwitchState::UP:
+            rpmTarget = 10000.0f;
+            break;
+
+        default:
+            rpmTarget = 150.0f;
+            break;
+    }
+
+    // if (drivers->remote.getChannel(Remote::Channel::LEFT_VERTICAL) < -0.9f) {
+    //     rpmTarget =
+    // }
+
+    shooter->ForAllShooterMotors(&ShooterSubsystem::setTargetRPM, rpmTarget);
 
     shooter->ForAllShooterMotors(&ShooterSubsystem::updateMotorVelocityPID);
 }

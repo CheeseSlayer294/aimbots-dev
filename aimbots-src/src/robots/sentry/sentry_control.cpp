@@ -22,11 +22,11 @@
 #include "subsystems/gimbal/gimbal.hpp"
 #include "subsystems/gimbal/gimbal_control_command.hpp"
 //
+#include "subsystems/shooter/brake_shooter_command.hpp"
 #include "subsystems/shooter/run_shooter_command.hpp"
 #include "subsystems/shooter/shooter.hpp"
-#include "subsystems/shooter/stop_shooter_comprised_command.hpp"
 #include "subsystems/shooter/stop_shooter_command.hpp"
-#include "subsystems/shooter/brake_shooter_command.hpp"
+#include "subsystems/shooter/stop_shooter_comprised_command.hpp"
 
 using namespace src::Chassis;
 using namespace src::Feeder;
@@ -56,13 +56,15 @@ ShooterSubsystem shooter(drivers());
 GimbalChassisRelativeController gimbalController(&gimbal);
 
 // Define commands here ---------------------------------------------------
-ChassisDriveCommand chassisDriveCommand(drivers(), &chassis);
-GimbalControlCommand gimbalControlCommand(drivers(), &gimbal, &gimbalController, 0.3f, 0.3f);
+// ChassisDriveCommand chassisDriveCommand(drivers(), &chassis);
+// GimbalControlCommand gimbalControlCommand(drivers(), &gimbal, &gimbalController, 0.3f, 0.3f);
 RunFeederCommand runFeederCommand(drivers(), &feeder);
 StopFeederCommand stopFeederCommand(drivers(), &feeder);
-RunShooterCommand runShooterCommand(drivers(), &shooter);
+RunShooterCommand runShooterSpeed1Command(drivers(), &shooter);
+RunShooterCommand runShooterSpeed2Command(drivers(), &shooter);
+RunShooterCommand runShooterSpeed3Command(drivers(), &shooter);
 RunShooterCommand runShooterWithFeederCommand(drivers(), &shooter);
-//BrakeShooterCommand brakeStopShooterCommand(drivers(), &shooter);
+// BrakeShooterCommand brakeStopShooterCommand(drivers(), &shooter);
 StopShooterComprisedCommand stopShooterComprisedCommand(drivers(), &shooter);
 
 // Define command mappings here -------------------------------------------
@@ -94,9 +96,9 @@ void registerSubsystems(src::Drivers *drivers) {
 
 // Initialize subsystems here ---------------------------------------------
 void initializeSubsystems() {
-    chassis.initialize();
-    feeder.initialize();
-    gimbal.initialize();
+    // chassis.initialize();
+    // feeder.initialize();
+    // gimbal.initialize();
     shooter.initialize();
 }
 
