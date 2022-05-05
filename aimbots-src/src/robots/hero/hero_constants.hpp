@@ -37,9 +37,9 @@ static constexpr float POSITION_PID_MAX_OUTPUT = 16000.0f;
  */
 static constexpr float WHEEL_RADIUS = 0.076;
 
-static constexpr float WHEELBASE_WIDTH = 0.364f;  // 2022 Hero width
+static constexpr float WHEELBASE_WIDTH = 0.364f;  // 2022 Season Hero Width
 
-static constexpr float WHEELBASE_LENGTH = 0.457f; // 2022 Hero length
+static constexpr float WHEELBASE_LENGTH = 0.457f; // 2022 Season Hero Length
 
 static constexpr float GIMBAL_X_OFFSET = 0.0f;
 static constexpr float GIMBAL_Y_OFFSET = 0.0f;
