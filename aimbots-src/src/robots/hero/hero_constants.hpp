@@ -43,7 +43,7 @@ static constexpr SmoothPIDConfig FEEDER_VELOCITY_PID_CONFIG = {
     .ki = 0.0f,
     .kd = 0.8f,
     .maxICumulative = 10.0f,
-    .maxOutput = M2006_MAX_OUTPUT,
+    .maxOutput = M3508_MAX_OUTPUT,
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 1.0f,
     .tQProportionalKalman = 1.0f,
@@ -56,9 +56,9 @@ static constexpr SmoothPIDConfig FEEDER_VELOCITY_PID_CONFIG = {
  * @brief Position PID constants
  */
 static constexpr SmoothPIDConfig YAW_POSITION_PID_CONFIG = {
-    .kp = 600.0f,
+    .kp = 2000.0f,
     .ki = 0.0f,
-    .kd = 500.0f,
+    .kd = 100.0f,
     .maxICumulative = 10.0f,
     .maxOutput = GM6020_MAX_OUTPUT,
     .tQDerivativeKalman = 1.0f,
@@ -98,8 +98,6 @@ static constexpr SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG = {
 };
 
 // Used to reverse Feeder Motor direction, should only be 1 or -1
-static constexpr float FEEDER_MOTOR_DIRECTION = -1;
-static constexpr float YAW_MOTOR_DIRECTION = -1;
 
 static constexpr MotorID LEFT_BACK_WHEEL_ID = MotorID::MOTOR1;
 static constexpr MotorID LEFT_FRONT_WHEEL_ID = MotorID::MOTOR2;
@@ -118,8 +116,11 @@ static constexpr CANBus CHASSIS_BUS = CANBus::CAN_BUS2;
 static constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS1;
 static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS1;
 
-static constexpr bool SHOOTER_1_DIRECTION = false;
-static constexpr bool SHOOTER_2_DIRECTION = true;
+static constexpr bool SHOOTER_1_DIRECTION = true;
+static constexpr bool SHOOTER_2_DIRECTION = false;
+
+static constexpr float FEEDER_MOTOR_DIRECTION = true;
+static constexpr float YAW_MOTOR_DIRECTION = -1;
 
 // Hopper constants
 static constexpr tap::gpio::Pwm::Pin HOPPER_PIN = tap::gpio::Pwm::C1;
@@ -134,6 +135,8 @@ static constexpr float HOPPER_MAX_ANGLE = 270.0f;
 
 static constexpr float HOPPER_OPEN_ANGLE = 60.0f;
 static constexpr float HOPPER_CLOSED_ANGLE = 155.0f;
+
+static constexpr float FEEDER_SPEED = 1000.0f;
 
 static constexpr uint32_t HOPPER_MIN_ACTION_DELAY = 1000;  // Minimum time in ms between hopper lid flips
 
