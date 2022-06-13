@@ -2,6 +2,7 @@
 
 #if defined(TARGET_AERIAL)
 #include "robots/aerial/aerial_constants.hpp"
+#include "robots/aerial/aerial_control_interface.hpp"
 
 #elif defined(TARGET_ENGINEER)
 #include "robots/engineer/engineer_constants.hpp"
