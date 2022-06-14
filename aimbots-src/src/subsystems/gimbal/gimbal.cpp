@@ -31,6 +31,8 @@ void GimbalSubsystem::initialize() {
     pitchMotor.setDesiredOutput(0);
 }
 
+float yawDebug, pitchDebug;
+
 void GimbalSubsystem::refresh() {
     if (yawMotor.isMotorOnline()) {
         // Update subsystem state to stay up-to-date with reality
@@ -49,6 +51,10 @@ void GimbalSubsystem::refresh() {
         // Flush whatever our current output is to the motors
         pitchMotor.setDesiredOutput(desiredPitchMotorOutput);
     }
+
+    //pls delete!1
+    yawDebug = getCurrentYawAngleFromCenter(AngleUnit::Degrees);
+    pitchDebug = getCurrentPitchAngleFromCenter(AngleUnit::Degrees);
 }
 
 void GimbalSubsystem::setYawMotorOutput(float output) {

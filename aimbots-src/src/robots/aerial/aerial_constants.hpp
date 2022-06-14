@@ -101,7 +101,7 @@ static constexpr SmoothPIDConfig PITCH_POSITION_PID_CONFIG = {
 
 static constexpr float FLYWHEEL_DEFAULT_RPM = 8000.0f;
 
-static constexpr float FEEDER_DEFAULT_RPM = 500.0f;
+static constexpr float FEEDER_DEFAULT_RPM = 1500.0f;
 
 static constexpr float YAW_INPUT_DIRECTION = -1;
 
@@ -109,7 +109,7 @@ static constexpr int DEFAULT_BURST_LENGTH = 10;  // balls
 
 // CAN Bus 1
 static constexpr MotorID RAIL_WHEEL_ID = MotorID::MOTOR3;
-static constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR5;
+static constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR8;
 static constexpr MotorID PITCH_MOTOR_ID = MotorID::MOTOR6;
 static constexpr MotorID FEEDER_ID = MotorID::MOTOR8;
 
@@ -120,9 +120,9 @@ static constexpr MotorID LEFT_FRONT_WHEEL_ID = MotorID::MOTOR2;
 static constexpr MotorID RIGHT_FRONT_WHEEL_ID = MotorID::MOTOR3;
 static constexpr MotorID RIGHT_BACK_WHEEL_ID = MotorID::MOTOR4;
 
-static constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS1;
+static constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS2;
 
-static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS2;
+static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS1;
 
 static constexpr CANBus FEED_BUS = CANBus::CAN_BUS1;
 
@@ -133,7 +133,7 @@ static constexpr MotorID SHOOTER_3_ID = MotorID::MOTOR3;
 static constexpr MotorID SHOOTER_4_ID = MotorID::MOTOR4;
 
 static constexpr bool SHOOTER_1_DIRECTION = true;
-static constexpr bool SHOOTER_2_DIRECTION = true;
+static constexpr bool SHOOTER_2_DIRECTION = false;
 static constexpr bool SHOOTER_3_DIRECTION = false;
 static constexpr bool SHOOTER_4_DIRECTION = false;
 
@@ -170,7 +170,7 @@ static const Matrix<float, 1, 3> ROBOT_STARTING_POSITION = left_sentry_rail_pole
 static constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f) * (44.0f / 18.0f);
 
 // Values specific for Sentry hardware setup
-static constexpr float YAW_START_ANGLE = 61.0f;
+static constexpr float YAW_START_ANGLE = -61.0f;
 static constexpr float PITCH_START_ANGLE = 220.0f;
 
 static constexpr float PITCH_SOFTSTOP_LOW = 270.0f;

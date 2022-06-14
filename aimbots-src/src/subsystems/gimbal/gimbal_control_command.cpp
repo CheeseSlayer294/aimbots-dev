@@ -27,7 +27,7 @@ GimbalControlCommand::GimbalControlCommand(src::Drivers* drivers,
 void GimbalControlCommand::initialize() {}
 
 void GimbalControlCommand::execute() {
-#ifdef TARGET_SENTRY
+#if defined TARGET_SENTRY || TARGET_AERIAL
     float targetYawAngle = 0.0f;
     targetYawAngle = gimbal->getTargetYawAngle(AngleUnit::Degrees) -
                      userInputYawSensitivityFactor * drivers->controlOperatorInterface.getGimbalYawInput();
