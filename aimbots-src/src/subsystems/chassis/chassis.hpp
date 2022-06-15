@@ -133,10 +133,14 @@ namespace src::Chassis {
 #endif
         src::Drivers* drivers;
         float desiredRotation = 0.0f;
+        // float swerve_angle = 0.0f;
+        // float swerve_speed_x = 0.0f;
+        // float swerve_speed_y = 0.0f;
 
 #ifdef TARGET_SENTRY
         DJIMotor railWheel;
         SmoothPID railWheelVelPID;
+
 
 #else
         DJIMotor leftBackWheel, leftFrontWheel, rightFrontWheel, rightBackWheel;

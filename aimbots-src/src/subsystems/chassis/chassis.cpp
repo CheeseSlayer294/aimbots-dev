@@ -3,6 +3,7 @@
 #include "drivers.hpp"
 #include "tap/communication/gpio/leds.hpp"
 #include "utils/common_types.hpp"
+#include "utils/robot_specific_inc.hpp"
 
 using namespace tap::algorithms;
 
@@ -169,7 +170,43 @@ void ChassisSubsystem::calculateMecanum(float x, float y, float r, float maxWhee
     desiredRotation = r;
 }
 
-void ChassisSubsystem::calculateSwerve(float, float, float, float) {}
+void ChassisSubsystem::calculateSwerve(float x, float y, float r, float maxWheelSpeed) {
+    // float theta = fieldRelativeInformant->getYaw();
+    // float temp = y*cos(theta)+x*sin(theta);
+    // x = -y*sin(theta)+x*cos(theta);
+    // y = temp;
+    
+    float wheelbaseCenterDist = sqrtf(powf(WHEELBASE_WIDTH / 2.0f, 2.0f) + powf(WHEELBASE_LENGTH / 2.0f, 2.0f));
+
+
+    float a = x - r*(WHEELBASE_LENGTH/wheelbaseCenterDist);
+    float b = x + r*(WHEELBASE_LENGTH/wheelbaseCenterDist);
+    float c = y + r*(WHEELBASE_WIDTH/wheelbaseCenterDist);
+    float d = y - r*(WHEELBASE_WIDTH/wheelbaseCenterDist);
+
+    targetRPMs[LF][0] = limitVal<float>(
+        sqrtf(powf(b,2.0f)+ powf(d,2.0f)),
+        -maxWheelSpeed,
+        maxWheelSpeed);
+    targetRPMs[LF][1] = atan2f(d,b)*180 / M_PI;
+    targetRPMs[RF][0] = limitVal<float>(
+        sqrtf(powf(b,2.0f)+powf(c,2.0f)),
+        -maxWheelSpeed,
+        maxWheelSpeed);
+    targetRPMs[RF][1] = atan2f(c,b)*180 / M_PI;
+    targetRPMs[LB][0] = limitVal<float>(
+        sqrtf(powf(a,2.0f) + powf(d,2.0f)),
+        -maxWheelSpeed,
+        maxWheelSpeed);
+    targetRPMs[LB][1] = atan2f(d,a)*180 / M_PI;
+    targetRPMs[RB][0] = limitVal<float>(
+        sqrtf(powf(a,2.0f) + powf(c,2.0f)),
+        -maxWheelSpeed,
+        maxWheelSpeed);
+    targetRPMs[RB][1] = atan2f(c,a)*180 / M_PI;
+
+
+}
 
 void ChassisSubsystem::calculateRail(float x, float maxWheelSpeed) {
     targetRPMs[RAIL][0] = limitVal<float>(x, -maxWheelSpeed, maxWheelSpeed);
