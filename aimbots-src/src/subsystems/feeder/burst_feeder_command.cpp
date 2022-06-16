@@ -1,5 +1,9 @@
 #include "burst_feeder_command.hpp"
 
+#ifndef TARGET_ENGINEER
+
+#ifndef TARGET_SWERVE_ENGINEER
+
 namespace src::Feeder {
 BurstFeederCommand::BurstFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder)
     : drivers(drivers), feeder(feeder), speed(0) {
@@ -34,3 +38,6 @@ bool BurstFeederCommand::isFinished() const {
     return elapsedTotal >= feeder->getBurstLength();
 }
 }  // namespace src::Feeder
+
+#endif
+#endif

@@ -83,7 +83,9 @@
         "span": "cpp",
         "stop_token": "cpp",
         "filesystem": "cpp",
-        "semaphore": "cpp"
+        "semaphore": "cpp",
+        "__config": "cpp",
+        "__nullptr": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "C_Cpp.default.includePath": [
