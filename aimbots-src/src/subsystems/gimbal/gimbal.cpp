@@ -1,5 +1,6 @@
 #include "gimbal.hpp"
 
+
 static inline float wrappedEncoderValueToRadians(int64_t encoderValue) {
     return (M_TWOPI * static_cast<float>(encoderValue)) / DJIMotor::ENC_RESOLUTION;
 }

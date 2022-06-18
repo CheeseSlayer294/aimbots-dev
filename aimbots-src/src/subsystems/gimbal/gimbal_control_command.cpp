@@ -37,10 +37,14 @@ void GimbalControlCommand::execute() {
     controller->runYawController(AngleUnit::None, 0.0f);
 #endif
 
+#ifndef TARGET_ENGINEER
+#ifndef TARGET_SWERVE_ENGINEER
     float targetPitchAngle = 0.0f;
     targetPitchAngle = gimbal->getTargetPitchAngle(AngleUnit::Degrees) -
                        userInputPitchSensitivityFactor * drivers->controlOperatorInterface.getGimbalPitchInput();
     controller->runPitchController(AngleUnit::Degrees, targetPitchAngle);
+#endif
+#endif
 }
 
 bool GimbalControlCommand::isReady() { return true; }

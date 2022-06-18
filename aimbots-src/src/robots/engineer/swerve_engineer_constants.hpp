@@ -174,6 +174,13 @@ enum WheelRPMIndex {  // index used to easily navigate wheel matrices
     RB = 3,
 };
 
+
+static constexpr float YAW_START_ANGLE = 163.0f;
+static constexpr float PITCH_START_ANGLE = 117.0f;
+static constexpr float PITCH_SOFTSTOP_LOW = 134.0f;
+static constexpr float PITCH_SOFTSTOP_HIGH = 74.0f;
+
+
 /**
  * Max wheel speed, measured in RPM of the 3508 motor shaft.
  */

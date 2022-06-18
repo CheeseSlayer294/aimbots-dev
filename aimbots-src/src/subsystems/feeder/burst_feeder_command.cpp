@@ -1,8 +1,8 @@
 #include "burst_feeder_command.hpp"
 
-#ifndef TARGET_ENGINEER
+// #ifndef TARGET_ENGINEER
 
-#ifndef TARGET_SWERVE_ENGINEER
+// #ifndef TARGET_SWERVE_ENGINEER
 
 namespace src::Feeder {
 BurstFeederCommand::BurstFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder)
@@ -39,5 +39,5 @@ bool BurstFeederCommand::isFinished() const {
 }
 }  // namespace src::Feeder
 
-#endif
-#endif
+// #endif
+// #endif
