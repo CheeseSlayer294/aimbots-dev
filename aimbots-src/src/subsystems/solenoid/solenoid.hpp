@@ -6,16 +6,18 @@
 #include "utils/common_types.hpp"
 #include <string>
 
-#if defined(TARGET_SWERVE_ENGINEER) && defined(TARGET_ENGINEER)
+// #if defined(TARGET_SWERVE_ENGINEER) && defined(TARGET_ENGINEER)
+
+using C1 = Board::PWMOutPinC1;
+using C2 = Board::PWMOutPinC2;
+using C3 = Board::PWMOutPinC3;
+
 
 namespace src::Solenoid{
 
-
-
-
 class SolenoidSubsytem : public tap::control::Subsystem{
     private:
-        src::Drivers* drivers;
+        tap::Drivers* drivers;
         std::string rxPin;
 
         bool currSwitchState;
@@ -31,22 +33,22 @@ class SolenoidSubsytem : public tap::control::Subsystem{
          * @param function pointer to a member function of DJIMotor
          * @param args arguments to pass to the member function
         */
-        template <class... Args>
-            void ForAllSolenoids(void (DJIMotor::*func)(Args...), Args... args) {
-                for (auto i = 0; i < SOLeNOID_COUNT; i++) {
-                    (solenoid[i][0]->*func)(args...);
-                }
-            }       
+        // template <class... Args>
+        //     void ForAllSolenoids(void (DJIMotor::*func)(Args...), Args... args) {
+        //         for (auto i = 0; i < SOLeNOID_COUNT; i++) {
+        //             (solenoid[i][0]->*func)(args...);
+        //         }
+        //     }       
 
-        mokable void initialize();
+        void initialize();
         void refresh();
 
-        void readSolenoid();
-        void updateSolenoid();
+        void solenoidRead();
+        void solenoidWrite(bool value, std::string pin);
 
 
 
 };
 }//namespace src::Solonoid
 
-#endif
+// #endif

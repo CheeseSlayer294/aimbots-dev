@@ -6,17 +6,17 @@
 #include "utils/common_types.hpp"
 #include "subsystems/solenoid/solenoid.hpp"
 
-#if defined(TARGET_SWERVE_ENGINEER) && defined(TARGET_ENGINEER)
+// #if defined(TARGET_SWERVE_ENGINEER) && defined(TARGET_ENGINEER)
 
 namespace src::Solenoid{
     class SolenoidController : public TapCommand{
         private:
             src::Drivers* drivers;
-            Solenoid* solenoid;
+            SolenoidSubsytem* solenoid;
 
 
         public:
-            SolenoidController(tap::Drivers* drivers, Solenoid* solenoid);
+            SolenoidController(src::Drivers* drivers, SolenoidSubsytem* solenoid);
             
             void initialize() override;
 
@@ -31,4 +31,4 @@ namespace src::Solenoid{
 
 }//namespace src::Solenoid
 
-#endif
+// #endif

@@ -14,6 +14,10 @@
 #include "subsystems/chassis/chassis.hpp"
 #include "subsystems/chassis/chassis_manual_drive_command.hpp"
 
+
+#include "subsystems/solenoid/solenoid.hpp"
+#include "subsystems/solenoid/solenoid_controller.hpp"
+
 using namespace src::Chassis;
 
 /*
@@ -31,6 +35,7 @@ namespace EngineerControl {
 
 // Define subsystems here ------------------------------------------------
 ChassisSubsystem chassis(drivers());
+SolenoidSubsytem solenoid(drivers());
 
 // Define commands here ---------------------------------------------------
 ChassisManualDriveCommand chassisManualDriveCommand(drivers(), &chassis);
@@ -44,11 +49,13 @@ HoldCommandMapping leftSwitchUp(
 // Register subsystems here -----------------------------------------------
 void registerSubsystems(src::Drivers *drivers) {
     drivers->commandScheduler.registerSubsystem(&chassis);
+    drivers->commandScheduler.registerSubsystem(&solenoid);
 }
 
 // Initialize subsystems here ---------------------------------------------
 void initializeSubsystems() {
     chassis.initialize();
+    solenoid.initialize();
 }
 
 // Set default command here -----------------------------------------------

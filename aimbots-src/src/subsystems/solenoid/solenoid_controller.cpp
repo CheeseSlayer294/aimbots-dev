@@ -1,21 +1,21 @@
 #include "subsystems/solenoid/solenoid_controller.hpp"
 
 
-#if defined(TARGET_SWERVE_ENGINEER) && defined(TARGET_ENGINEER)
+// #if defined(TARGET_SWERVE_ENGINEER) && defined(TARGET_ENGINEER)
 
 namespace src::Solenoid{
-    SolenoidController::SolenoidController(tap::Drivers* drivers, Solenoid* solenoid) {
+    SolenoidController::SolenoidController(src::Drivers* drivers, SolenoidSubsytem* solenoid) {
         this->drivers = drivers;
         this->solenoid = solenoid;
         addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(solenoid));
     };
 
-    void SolenoidController::intialize(){
-
+    void SolenoidController::initialize(){
+        solenoid->initialize();
     }
 
     void SolenoidController::execute(){
-        solenoid->updateSolenoid();
+        solenoid->solenoidWrite(true, " ");
     }
 
     void SolenoidController::end(bool interrupted){
@@ -34,4 +34,4 @@ namespace src::Solenoid{
 
 };//namespace src::Solenoid    
 
-#endif
+// #endif
