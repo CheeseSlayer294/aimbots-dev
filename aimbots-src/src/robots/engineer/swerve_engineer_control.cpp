@@ -13,8 +13,14 @@
 //
 #include "subsystems/chassis/chassis.hpp"
 #include "subsystems/chassis/chassis_manual_drive_command.hpp"
+//
+#include "subsystems/grabber/grabber.hpp"
+#include "subsystems/grabber/open_grabber_command.hpp"
+#include "subsystems/grabber/close_grabber_command.hpp"
+#include "subsystems/grabber/toggle_grabber_command.hpp"
 
 using namespace src::Chassis;
+using namespace src::Grabber;
 
 /*
  * NOTE: We are using the DoNotUse_getDrivers() function here
@@ -31,9 +37,11 @@ namespace EngineerControl {
 
 // Define subsystems here ------------------------------------------------
 ChassisSubsystem chassis(drivers());
+GrabberSubsystem grabber(drivers());
 
 // Define commands here ---------------------------------------------------
 ChassisManualDriveCommand chassisManualDriveCommand(drivers(), &chassis);
+ToggleGrabberCommand toggleGrabberCommand(drivers(), &grabber);
 
 // Define command mappings here -------------------------------------------
 HoldCommandMapping leftSwitchUp(
@@ -41,14 +49,21 @@ HoldCommandMapping leftSwitchUp(
     {&chassisManualDriveCommand},
     RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
 
+HoldCommandMapping rightSwitchUp(
+    drivers(),
+    {&toggleGrabberCommand},
+    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP));
+
 // Register subsystems here -----------------------------------------------
 void registerSubsystems(src::Drivers *drivers) {
     drivers->commandScheduler.registerSubsystem(&chassis);
+    drivers->commandScheduler.registerSubsystem(&grabber);
 }
 
 // Initialize subsystems here ---------------------------------------------
 void initializeSubsystems() {
     chassis.initialize();
+    grabber.initialize();
 }
 
 // Set default command here -----------------------------------------------
@@ -68,6 +83,7 @@ void startupCommands(src::Drivers *drivers) {
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
     drivers->commandMapper.addMap(&leftSwitchUp);
+    drivers->commandMapper.addMap(&rightSwitchUp);
 }
 
 }  // namespace StandardControl

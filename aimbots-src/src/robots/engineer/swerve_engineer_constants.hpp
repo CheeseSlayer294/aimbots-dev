@@ -3,6 +3,7 @@
 #include "utils/math/matrix_helpers.hpp"
 
 #define SWERVE 
+#define ENGINEER
 
 static constexpr uint8_t DRIVEN_WHEEL_COUNT = 4;
 static constexpr uint8_t MOTORS_PER_WHEEL = 2;
@@ -226,3 +227,20 @@ static_assert(WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE >= 0);
  * we start slowing down translational speed.
  */
 static constexpr float MIN_ROTATION_THRESHOLD = 800.0f;
+
+static constexpr tap::gpio::Pwm::Pin GRABBER_RIGHT_PIN = tap::gpio::Pwm::C3;
+static constexpr tap::gpio::Pwm::Pin GRABBER_LEFT_PIN = tap::gpio::Pwm::C2;
+
+
+static constexpr float GRABBER_PWM_RAMP_SPEED = 0.01f;  // pwm percent per millisecond
+
+static constexpr float GRABBER_MIN_PWM = DS3218_MIN_PWM;
+static constexpr float GRABBER_MAX_PWM = DS3218_MAX_PWM;
+
+static constexpr float GRABBER_MIN_ANGLE = 0.0f;
+static constexpr float GRABBER_MAX_ANGLE = 270.0f;
+
+static constexpr float GRABBER_OPEN_ANGLE = 60.0f;
+static constexpr float GRABBER_CLOSED_ANGLE = 155.0f;
+
+static constexpr uint32_t GRABBER_MIN_ACTION_DELAY = 1000;
