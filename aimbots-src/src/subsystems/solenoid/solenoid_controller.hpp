@@ -13,10 +13,15 @@ namespace src::Solenoid{
         private:
             src::Drivers* drivers;
             SolenoidSubsytem* solenoid;
+            std::string pin;
 
+
+        bool C1LastState;
+        bool C2LastState;
+        bool C3LastState;  
 
         public:
-            SolenoidController(src::Drivers* drivers, SolenoidSubsytem* solenoid);
+            SolenoidController(src::Drivers* drivers, SolenoidSubsytem* solenoid, std::string pin);
             
             void initialize() override;
 

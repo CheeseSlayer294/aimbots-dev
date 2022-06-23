@@ -19,6 +19,7 @@
 #include "subsystems/solenoid/solenoid_controller.hpp"
 
 using namespace src::Chassis;
+using namespace src::Solenoid;
 
 /*
  * NOTE: We are using the DoNotUse_getDrivers() function here
@@ -39,12 +40,20 @@ SolenoidSubsytem solenoid(drivers());
 
 // Define commands here ---------------------------------------------------
 ChassisManualDriveCommand chassisManualDriveCommand(drivers(), &chassis);
+SolenoidController solenoidControllerC1(drivers(), &solenoid, "C1");
+SolenoidController solenoidControllerC2(drivers(), &solenoid, "C2");
+SolenoidController solenoidControllerC3(drivers(), &solenoid, "C3");
 
 // Define command mappings here -------------------------------------------
 HoldCommandMapping leftSwitchUp(
     drivers(),
     {&chassisManualDriveCommand},
     RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
+
+HoldCommandMapping rightSwitchUp(
+    drivers(),
+    {&solenoidControllerC1},
+    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP));
 
 // Register subsystems here -----------------------------------------------
 void registerSubsystems(src::Drivers *drivers) {
@@ -75,6 +84,7 @@ void startupCommands(src::Drivers *drivers) {
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
     drivers->commandMapper.addMap(&leftSwitchUp);
+    drivers->commandMapper.addMap(&rightSwitchUp);
 }
 
 }  // namespace StandardControl

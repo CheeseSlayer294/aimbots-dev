@@ -18,14 +18,14 @@ namespace src::Solenoid{
 class SolenoidSubsytem : public tap::control::Subsystem{
     private:
         tap::Drivers* drivers;
-        std::string rxPin;
+        // std::string rxPin;
 
-        bool currSwitchState;
-        bool prevSwitchState;
-        
+        bool C1State;
+        bool C2State;
+        bool C3State;        
 
     public:
-        SolenoidSubsytem(tap::Drivers* driver);
+        SolenoidSubsytem(src::Drivers* driver);
 
         /**
          * Allows user to call a DJIMotor member function on all shooter motors
