@@ -15,6 +15,7 @@
 #include "subsystems/feeder/feeder.hpp"
 #include "subsystems/feeder/run_feeder_command.hpp"
 #include "subsystems/feeder/stop_feeder_command.hpp"
+#include "subsystems/feeder/unjam_feeder_command.hpp"
 //
 #include "subsystems/gimbal/controllers/gimbal_chassis_relative_controller.hpp"
 #include "subsystems/gimbal/gimbal.hpp"
@@ -54,11 +55,13 @@ GimbalChassisRelativeController gimbalController(&gimbal);
 
 // Define commands here ---------------------------------------------------
 GimbalControlCommand gimbalControlCommand(drivers(), &gimbal, &gimbalController, USER_JOYSTICK_YAW_SCALAR, USER_JOYSTICK_PITCH_SCALAR);
+GimbalControlCommand gimbalControlCommandTwo(drivers(), &gimbal, &gimbalController, USER_JOYSTICK_YAW_SCALAR, USER_JOYSTICK_PITCH_SCALAR);
 GimbalChaseCommand gimbalChaseCommand(drivers(), &gimbal, &gimbalController);
 
 RunFeederCommand runFeederCommand(drivers(), &feeder);
 StopFeederCommand stopFeederCommand(drivers(), &feeder);
 BurstFeederCommand burstFeederCommand(drivers(), &feeder);
+UnjamFeederCommand unjamFeederCommand(drivers(), &feeder);
 
 RunShooterCommand runShooterCommand(drivers(), &shooter);
 RunShooterCommand runShooterWithFeederCommand(drivers(), &shooter);
@@ -70,6 +73,11 @@ HoldCommandMapping leftSwitchMid(
     drivers(),
     {&gimbalControlCommand},
     RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::MID));
+
+HoldCommandMapping leftSwitchUp(
+    drivers(),
+    {&unjamFeederCommand,&gimbalControlCommandTwo},
+    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
 
 // Runs shooter only
 HoldCommandMapping rightSwitchMid(
@@ -115,6 +123,7 @@ void startupCommands(src::Drivers *) {
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
     drivers->commandMapper.addMap(&leftSwitchMid);
+    drivers->commandMapper.addMap(&leftSwitchUp);
     drivers->commandMapper.addMap(&rightSwitchUp);
     drivers->commandMapper.addMap(&rightSwitchMid);
 }

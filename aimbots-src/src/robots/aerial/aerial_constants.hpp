@@ -56,10 +56,10 @@ static constexpr SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG = {
 
 static constexpr SmoothPIDConfig FEEDER_VELOCITY_PID_CONFIG = {
     .kp = 20.0f,
-    .ki = 0.01f,
-    .kd = 0.0f,
+    .ki = 0.0f,
+    .kd = 0.8f,
     .maxICumulative = 10.0f,
-    .maxOutput = M3508_MAX_OUTPUT,
+    .maxOutput = M2006_MAX_OUTPUT,
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 1.0f,
     .tQProportionalKalman = 1.0f,
@@ -170,13 +170,13 @@ static const Matrix<float, 1, 3> ROBOT_STARTING_POSITION = left_sentry_rail_pole
 static constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f) * (44.0f / 18.0f);
 
 // Values specific for Sentry hardware setup
-static constexpr float YAW_START_ANGLE = -61.0f;
+static constexpr float YAW_START_ANGLE = 151.0f;
 static constexpr float PITCH_START_ANGLE = 220.0f;
 
-static constexpr float PITCH_SOFTSTOP_LOW = 270.0f;
-static constexpr float PITCH_SOFTSTOP_HIGH = 155.0f;
+static constexpr float PITCH_SOFTSTOP_LOW = -105.0f;
+static constexpr float PITCH_SOFTSTOP_HIGH = -170.0f;
 
-static constexpr float YAW_FRONT_ANGLE = 61.0f;
+static constexpr float YAW_FRONT_ANGLE = 151.0f;
 static constexpr float PITCH_HORIZON_ANGLE = 220.0f;
 
 // PITCH PATROL FUNCTION CONSTANTS
