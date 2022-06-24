@@ -211,3 +211,20 @@ static_assert(WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE >= 0);
  * we start slowing down translational speed.
  */
 static constexpr float MIN_ROTATION_THRESHOLD = 800.0f;
+
+
+static constexpr tap::gpio::Pwm::Pin SOLENOID_HORIZONTAL_PIN = tap::gpio::Pwm::C5;
+static constexpr tap::gpio::Pwm::Pin SOLENOID_GRABBER_PIN = tap::gpio::Pwm::C4;
+
+static constexpr float SOLENOID_PWM_RAMP_SPEED = 0.01f;  // pwm percent per millisecond
+
+static constexpr float SOLENOID_MIN_PWM = DS3218_MIN_PWM;
+static constexpr float SOLENOID_MAX_PWM = DS3218_MAX_PWM;
+
+static constexpr float SOLENOID_MIN_ANGLE = 0.0f;
+static constexpr float SOLENOID_MAX_ANGLE = 270.0f;
+
+static constexpr float SOLENOID_OPEN_ANGLE = 60.0f;
+static constexpr float SOLENOID_CLOSED_ANGLE = 155.0f;
+
+static constexpr uint32_t SOLENOID_MIN_ACTION_DELAY = 1000;

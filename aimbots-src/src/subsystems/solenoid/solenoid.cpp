@@ -1,45 +1,56 @@
 #include "subsystems/solenoid/solenoid.hpp"
 
-// #if defined(TARGET_SWERVE_ENGINEER) && defined(TARGET_ENGINEER)
+#include "tap/algorithms/math_user_utils.hpp"
+#include "tap/architecture/clock.hpp"
+#include "tap/drivers.hpp"
+#include "tap/errors/create_errors.hpp"
 
-namespace src::Solenoid{
-
-SolenoidSubsytem::SolenoidSubsytem(src::Drivers* driver)  :
-    Subsystem(drivers) {};
-
-void SolenoidSubsytem::initialize() {
-    C1::configure(modm::platform::Gpio::InputType::PullDown);
-    C2::configure(modm::platform::Gpio::InputType::PullDown);
-    C3::configure(modm::platform::Gpio::InputType::PullDown);
-    C1State = false;
-    C2State = false;
-    C3State = false;
-
-}
-
-void SolenoidSubsytem::refresh() {
-    solenoidWrite(C1State, "C1");
-    solenoidWrite(C2State, "C2");
-    solenoidWrite(C3State, "C3");
-}
-
-void SolenoidSubsytem::solenoidWrite(bool value, std::string pin) {
-    if (pin == "C1") {
-        C1::set(value);
-        C1State = value;
-    } else if (pin == "C2") {
-        C2::set(value);
-        C2State = value;
-    } else if (pin == "C3") {
-        C3::set(value);
-        C3State = value;
+ namespace src::Solenoid{
+    Solenoid::Solenoid(
+    Drivers *drivers,
+    tap::gpio::Pwm::Pin pwmPin,
+    float maximumPwm,
+    float minimumPwm,
+    float pwmRampSpeed)
+    : drivers(drivers),
+      pwmOutputRamp(0.0f),
+      maxPwm(tap::algorithms::limitVal<float>(maximumPwm, 0.0f, 1.0f)),
+      minPwm(tap::algorithms::limitVal<float>(minimumPwm, 0.0f, 1.0f)),
+      pwmRampSpeed(pwmRampSpeed),
+      prevTime(0),
+      solenoidPin(pwmPin)
+{
+    if (maxPwm < minPwm)
+    {
+        minPwm = 0.0f;
+        maxPwm = 1.0f;
+        RAISE_ERROR(drivers, "min Solenoid PWM > max Solenoid PWM");
     }
-    // C1::set(value);
 }
 
-void SolenoidSubsytem::solenoidRead(){
-
+void Solenoid::setTargetPwm(float pwm)
+{
+    pwmOutputRamp.setTarget(tap::algorithms::limitVal<float>(pwm, minPwm, maxPwm));
+    prevTime = tap::arch::clock::getTimeMilliseconds();
 }
 
+void Solenoid::updateSendPwmRamp()
+{
+    uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
+    pwmOutputRamp.update(pwmRampSpeed * (currTime - prevTime));
+    prevTime = currTime;
+    currentPwm = pwmOutputRamp.getValue();
+    drivers->pwm.write(pwmOutputRamp.getValue(), solenoidPin);
 }
-// #endif
+
+float Solenoid::getPWM() const { return currentPwm; }
+
+float Solenoid::getMinPWM() const { return minPwm; }
+
+float Solenoid::getMaxPWM() const { return maxPwm; }
+
+bool Solenoid::isRampTargetMet() const { return pwmOutputRamp.isTargetReached();
+    
+ }
+
+ }; // namespace src::Solenoid

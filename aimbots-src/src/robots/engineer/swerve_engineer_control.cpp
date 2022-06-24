@@ -15,8 +15,12 @@
 #include "subsystems/chassis/chassis_manual_drive_command.hpp"
 
 
-#include "subsystems/solenoid/solenoid.hpp"
-#include "subsystems/solenoid/solenoid_controller.hpp"
+// #include "subsystems/solenoid/solenoid.hpp"
+#include "subsystems/solenoid/solenoid_subsystem.hpp"
+#include "subsystems/solenoid/toggle_solenoid_command.hpp"
+#include "subsystems/solenoid/solenoid_extend_command.hpp"
+#include "subsystems/solenoid/solenoid_closed_command.hpp"
+
 
 using namespace src::Chassis;
 using namespace src::Solenoid;
@@ -40,21 +44,30 @@ SolenoidSubsytem solenoid(drivers());
 
 // Define commands here ---------------------------------------------------
 ChassisManualDriveCommand chassisManualDriveCommand(drivers(), &chassis);
-SolenoidController solenoidControllerC1(drivers(), &solenoid, "C1");
-SolenoidController solenoidControllerC2(drivers(), &solenoid, "C2");
-SolenoidController solenoidControllerC3(drivers(), &solenoid, "C3");
+
+ToggleSolenoidCommand ToggleHorizontalSolenoidCommand(drivers(), &solenoid,"horizontal");
+ToggleSolenoidCommand ToggleGrabberSolenoidCommand(drivers(), &solenoid,"grabber");
+ClosedSolenoidCommand CloseHorizontalSolenoidCommand(drivers(), &solenoid,"horizontal");
+ClosedSolenoidCommand CloseGrabberSolenoidCommand(drivers(), &solenoid,"grabber");
+ExtendSolenoidCommand ExtendHorizontalSolenoidCommand(drivers(), &solenoid,"horizontal");
+ExtendSolenoidCommand ExtendGrabberSolenoidCommand(drivers(), &solenoid,"grabber");
+
 
 // Define command mappings here -------------------------------------------
 HoldCommandMapping leftSwitchUp(
     drivers(),
-    {&chassisManualDriveCommand},
+    {&chassisManualDriveCommand, &ToggleHorizontalSolenoidCommand,&ToggleGrabberSolenoidCommand},
     RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
 
 HoldCommandMapping rightSwitchUp(
     drivers(),
-    {&solenoidControllerC1},
+    {&ExtendGrabberSolenoidCommand,&ExtendGrabberSolenoidCommand},
     RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP));
 
+HoldCommandMapping rightSwitchMid(
+    drivers(),
+    {&CloseGrabberSolenoidCommand,&CloseGrabberSolenoidCommand},
+    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::MID));
 // Register subsystems here -----------------------------------------------
 void registerSubsystems(src::Drivers *drivers) {
     drivers->commandScheduler.registerSubsystem(&chassis);
@@ -84,7 +97,8 @@ void startupCommands(src::Drivers *drivers) {
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
     drivers->commandMapper.addMap(&leftSwitchUp);
-    drivers->commandMapper.addMap(&rightSwitchUp);
+    drivers->commandMapper.addMap(&rightSwitchUp);\
+    drivers->commandMapper.addMap(&rightSwitchMid);
 }
 
 }  // namespace StandardControl
@@ -99,5 +113,6 @@ namespace src::Control {
         EngineerControl::registerIOMappings(drivers);
     }
 }  // namespace src::Control
+
 
 #endif  //TARGET_ENGINEER

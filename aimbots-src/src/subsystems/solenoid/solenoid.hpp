@@ -8,47 +8,77 @@
 
 // #if defined(TARGET_SWERVE_ENGINEER) && defined(TARGET_ENGINEER)
 
-using C1 = Board::PWMOutPinC1;
-using C2 = Board::PWMOutPinC2;
-using C3 = Board::PWMOutPinC3;
-
 
 namespace src::Solenoid{
 
-class SolenoidSubsytem : public tap::control::Subsystem{
-    private:
-        tap::Drivers* drivers;
-        // std::string rxPin;
+class Solenoid{
+public:
+Solenoid(
+        Drivers *drivers,
+        tap::gpio::Pwm::Pin currpwmPinPort,
+        float maximumPwm,
+        float minimumPwm,
+        float pwmRampSpeed);
 
-        bool C1State;
-        bool C2State;
-        bool C3State;        
+    /**
+     * Limits `pwmOutputRamp` to `minPwm` and `maxPwm`, then sets ramp output
+     * to the limited value. Do not repeatedly call (i.e. only call in a `Command`'s
+     * `initialize` function, for example).
+     */
+    void setTargetPwm(float PWM);
 
-    public:
-        SolenoidSubsytem(src::Drivers* driver);
+    /**
+     * Updates the `pwmOutputRamp` object and then sets the output PWM to the updated
+     * ramp value.
+     */
+    void updateSendPwmRamp();
 
-        /**
-         * Allows user to call a DJIMotor member function on all shooter motors
-         *
-         * @param function pointer to a member function of DJIMotor
-         * @param args arguments to pass to the member function
-        */
-        // template <class... Args>
-        //     void ForAllSolenoids(void (DJIMotor::*func)(Args...), Args... args) {
-        //         for (auto i = 0; i < SOLeNOID_COUNT; i++) {
-        //             (solenoid[i][0]->*func)(args...);
-        //         }
-        //     }       
+    /**
+     * @return The current PWM output to the servo.
+     */
+    float getPWM() const;
 
-        void initialize();
-        void refresh();
+    /**
+     * @return The minimum PWM output (as a duty cycle).
+     */
+    float getMinPWM() const;
 
-        void solenoidRead();
-        void solenoidWrite(bool value, std::string pin);
+    /**
+     * @return The maximum PWM output (as a duty cycle).
+     */
+    float getMaxPWM() const;
 
+    /**
+     * @return `true` if the ramp has met the desired PWM value (set with `setTargetPwm`).
+     *      Use this to estimate when a servo movement is complete.
+     */
+    bool isRampTargetMet() const;
 
+private:
+    Drivers *drivers;
 
-};
-}//namespace src::Solonoid
+    /// Used to change servo speed. See construtctor for detail.
+    tap::algorithms::Ramp pwmOutputRamp;
+
+    /// The max PWM the servo can handle.
+    float maxPwm;
+
+    /// The min PWM the servo can handle.
+    float minPwm;
+
+    /// Current PWM output.
+    float currentPwm;
+
+    /// Desired speed of the ramp in PWM / ms
+    float pwmRampSpeed;
+
+    /// Used to calculate the ramp dt.
+    uint32_t prevTime = 0;
+
+    /// The PWM pin that the solenoid is attached to.
+    tap::gpio::Pwm::Pin solenoidPin;
+};  // class Solenoid
+
+};//namespace src::Solonoid
 
 // #endif

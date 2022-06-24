@@ -4,24 +4,19 @@
 #include "tap/control/subsystem.hpp"
 #include "tap/communication/gpio/pwm.hpp"  //maybe not
 #include "utils/common_types.hpp"
-#include "subsystems/solenoid/solenoid.hpp"
+#include "subsystems/solenoid/solenoid_subsystem.hpp"
 
 // #if defined(TARGET_SWERVE_ENGINEER) && defined(TARGET_ENGINEER)
 
 namespace src::Solenoid{
-    class SolenoidController : public TapCommand{
+    class ToggleSolenoidCommand : public TapCommand{
         private:
             src::Drivers* drivers;
             SolenoidSubsytem* solenoid;
-            std::string pin;
-
-
-        bool C1LastState;
-        bool C2LastState;
-        bool C3LastState;  
+            std::string solenoidName;
 
         public:
-            SolenoidController(src::Drivers* drivers, SolenoidSubsytem* solenoid, std::string pin);
+            ToggleSolenoidCommand(src::Drivers* drivers, SolenoidSubsytem* solenoid, std::string solenoidName);
             
             void initialize() override;
 
@@ -30,6 +25,7 @@ namespace src::Solenoid{
             bool isReady() override;
 
             bool isFinished() const override;
+            const char* getName() const override { return "toggle solenoid command"; }
 
 
     };
