@@ -1,4 +1,5 @@
 #pragma once
+#ifdef TARGET_DART
 
 #include "drivers.hpp"
 #include "subsystems/chassis/chassis.hpp"
@@ -27,3 +28,4 @@ class ChassisDriveCommand : public TapCommand {
 };
 
 }  // namespace src::Chassis
+#endif

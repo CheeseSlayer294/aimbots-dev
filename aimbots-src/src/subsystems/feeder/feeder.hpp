@@ -1,5 +1,5 @@
 #pragma once
-
+#ifdef TARGET_DART
 #include "tap/control/subsystem.hpp"
 #include "tap/motor/m3508_constants.hpp"
 #include "utils/common_types.hpp"
@@ -38,3 +38,5 @@ class FeederSubsystem : public tap::control::Subsystem {
 };
 
 }  // namespace src::Feeder
+
+#endif

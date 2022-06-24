@@ -1,5 +1,5 @@
 #pragma once
-
+#ifdef TARGET_DART
 #include "tap/control/chassis/chassis_subsystem_interface.hpp"
 #include "tap/motor/m3508_constants.hpp"
 #include "utils/common_types.hpp"
@@ -174,3 +174,4 @@ class ChassisSubsystem : public tap::control::chassis::ChassisSubsystemInterface
 };
 
 };  // namespace src::Chassis
+#endif

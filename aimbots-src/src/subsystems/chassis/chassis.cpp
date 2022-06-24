@@ -1,3 +1,4 @@
+#ifndef TARGET_DART
 #include "subsystems/chassis/chassis.hpp"
 
 #include <drivers.hpp>
@@ -179,3 +180,4 @@ float ChassisSubsystem::calculateRotationTranslationalGain(float chassisRotation
 }
 
 };  // namespace src::Chassis
+#endif

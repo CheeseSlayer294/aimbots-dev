@@ -1,4 +1,5 @@
 #include "run_feeder_command.hpp"
+#ifdef TARGET_DART
 
 namespace src::Feeder {
 RunFeederCommand::RunFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder)
@@ -34,3 +35,4 @@ bool RunFeederCommand::isFinished() const {
     return false;  // finished condition (button released) or their api is nice and we don't have to
 }
 }  // namespace src::Feeder
+#endif

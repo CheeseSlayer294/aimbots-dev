@@ -1,4 +1,5 @@
 #include "chassis_rel_drive.hpp"
+#ifdef TARGET_DART
 
 #include "utils/robot_specific_inc.hpp"
 
@@ -68,3 +69,4 @@ void onExecute(src::Drivers* drivers, ChassisSubsystem* chassis) {
     // chassis->setDesiredOutputs(0, 0, 0);
 }
 }  // namespace src::Chassis::Movement::Relative
+#endif

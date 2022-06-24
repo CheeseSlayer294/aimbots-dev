@@ -1,5 +1,5 @@
 #include "subsystems/feeder/feeder.hpp"
-
+#ifndef TARGET_DART
 // static float pidOut;
 namespace src::Feeder {
 
@@ -37,3 +37,4 @@ void FeederSubsystem::setDesiredOutput() {  // takes the input from the velocity
     feederMotor.setDesiredOutput(static_cast<int32_t>(desiredOutput));
 }
 }  // namespace src::Feeder
+#endif

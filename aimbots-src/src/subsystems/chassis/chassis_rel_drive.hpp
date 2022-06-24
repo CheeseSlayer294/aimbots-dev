@@ -1,4 +1,5 @@
 #pragma once
+#ifdef TARGET_DART
 
 #include <drivers.hpp>
 #include <subsystems/chassis/chassis.hpp>
@@ -14,3 +15,4 @@ void calculateUserDesiredMovement(
 
 void onExecute(src::Drivers* drivers, ChassisSubsystem* chassis);
 }  // namespace src::Chassis::Movement::Relative
+#endif

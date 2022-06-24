@@ -1,4 +1,5 @@
 #include "stop_feeder_command.hpp"
+#ifdef TARGET_DART
 
 namespace src::Feeder {
 StopFeederCommand::StopFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder)
@@ -32,3 +33,4 @@ bool StopFeederCommand::isFinished() const {
     return false;
 }
 }  // namespace src::Feeder
+#endif

@@ -17,6 +17,8 @@ enum MotorIndex {
     BOT_RIGHT = 1,
     TOP_LEFT = 2,
     BOT_LEFT = 3,
+    MID_LEFT = 4,
+    MID_RIGHT = 5,
 };
 
 class ShooterSubsystem : public tap::control::Subsystem {
@@ -103,6 +105,11 @@ class ShooterSubsystem : public tap::control::Subsystem {
 #ifdef TARGET_SENTRY
     DJIMotor flywheel3, flywheel4;
     SmoothPID flywheel3PID, flywheel4PID;
+
+#endif
+#ifdef TARGET_DART
+    DJIMotor flywheel3, flywheel4, flywheel5, flywheel6;
+    SmoothPID flywheel3PID, flywheel4PID, flywheel5PID, flywheel6PID;
 #endif
 
     Matrix<float, SHOOTER_MOTOR_COUNT, 1> targetRPMs;

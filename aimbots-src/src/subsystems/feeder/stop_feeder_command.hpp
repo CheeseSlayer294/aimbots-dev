@@ -1,4 +1,5 @@
 #pragma once
+#ifdef TARGET_DART
 
 #include "drivers.hpp"
 #include "subsystems/feeder/feeder.hpp"
@@ -27,3 +28,4 @@ class StopFeederCommand : public TapCommand {
 };
 
 }  // namespace src::Feeder
+#endif

@@ -1,4 +1,6 @@
+
 #include "chassis_drive_command.hpp"
+#ifdef TARGET_DART
 
 #include <subsystems/chassis/chassis_rel_drive.hpp>
 
@@ -27,3 +29,4 @@ bool ChassisDriveCommand::isFinished() const {
 }
 
 }  // namespace src::Chassis
+#endif
