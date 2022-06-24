@@ -22,6 +22,10 @@
 #elif defined(TARGET_SWERVE_STANDARD)
 #include "robots/standard/swerve_standard_constants.hpp"
 
+#elif defined(TARGET_DART)
+#include "robots/dart/dart_constants.hpp"
+#include "robots/dart/dart_control_interface.hpp"
+
 // #else
 // #include "robots/standard/standard_constants.hpp"
 // #define TARGET_UNDEFINED

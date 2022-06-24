@@ -1,5 +1,6 @@
 #include "subsystems/feeder/feeder.hpp"
-
+#ifndef TARGET_DART
+// static float pidOut;
 namespace src::Feeder {
 
 FeederSubsystem::FeederSubsystem(src::Drivers* drivers)
@@ -90,3 +91,4 @@ bool FeederSubsystem::isBarrelHeatAcceptable(float maxPercentage) {
 }
 
 }  // namespace src::Feeder
+#endif

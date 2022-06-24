@@ -1,4 +1,5 @@
 #pragma once
+#ifdef TARGET_DART
 
 #include "drivers.hpp"
 #include "subsystems/feeder/feeder.hpp"
@@ -37,3 +38,4 @@ class FullAutoFeederCommand : public TapCommand {
 };
 
 }  // namespace src::Feeder
+#endif

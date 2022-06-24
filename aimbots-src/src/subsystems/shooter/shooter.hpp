@@ -3,6 +3,7 @@
 
 #include "tap/architecture/clock.hpp"
 #include "tap/control/subsystem.hpp"
+
 #include "utils/common_types.hpp"
 #include "utils/robot_constants.hpp"
 
@@ -16,11 +17,12 @@ enum MotorIndex {
     BOT_RIGHT = 1,
     TOP_LEFT = 2,
     BOT_LEFT = 3,
-#endif
+    MID_LEFT = 4,
+    MID_RIGHT = 5,
 };
 
 class ShooterSubsystem : public tap::control::Subsystem {
-   public:
+public:
     ShooterSubsystem(tap::Drivers* drivers);
 
     /**
@@ -101,9 +103,9 @@ class ShooterSubsystem : public tap::control::Subsystem {
     }
 
 #ifndef ENV_UNIT_TESTS
-   private:
+private:
 #else
-   public:
+public:
 #endif
 
     DJIMotor flywheel1, flywheel2;
@@ -112,6 +114,11 @@ class ShooterSubsystem : public tap::control::Subsystem {
 #ifdef TARGET_SENTRY
     DJIMotor flywheel3, flywheel4;
     SmoothPID flywheel3PID, flywheel4PID;
+
+#endif
+#ifdef TARGET_DART
+    DJIMotor flywheel3, flywheel4, flywheel5, flywheel6;
+    SmoothPID flywheel3PID, flywheel4PID, flywheel5PID, flywheel6PID;
 #endif
 
     Matrix<float, SHOOTER_MOTOR_COUNT, 1> targetRPMs;
