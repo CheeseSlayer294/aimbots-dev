@@ -32,12 +32,15 @@
 #include "subsystems/hopper/hopper.hpp"
 #include "subsystems/hopper/open_hopper_command.hpp"
 #include "subsystems/hopper/toggle_hopper_command.hpp"
+//
+#include "subsystems/hud_display/hud_display.hpp"
 
 using namespace src::Chassis;
 using namespace src::Feeder;
 using namespace src::Gimbal;
 using namespace src::Shooter;
 using namespace src::Hopper;
+using namespace src::HUD_Display;
 
 /*
  * NOTE: We are using the DoNotUse_getDrivers() function here
@@ -59,6 +62,7 @@ FeederSubsystem feeder(drivers());
 GimbalSubsystem gimbal(drivers());
 ShooterSubsystem shooter(drivers());
 HopperSubsystem hopper(drivers());
+HUD_DisplaySubsystem hud_display(drivers());
 
 // Robot Specific Controllers ------------------------------------------------
 GimbalChassisRelativeController gimbalController(&gimbal);
@@ -111,6 +115,7 @@ void registerSubsystems(src::Drivers *drivers) {
     drivers->commandScheduler.registerSubsystem(&gimbal);
     drivers->commandScheduler.registerSubsystem(&shooter);
     drivers->commandScheduler.registerSubsystem(&hopper);
+    drivers->commandScheduler.registerSubsystem(&hud_display);
 }
 
 // Initialize subsystems here ---------------------------------------------
@@ -120,6 +125,7 @@ void initializeSubsystems() {
     gimbal.initialize();
     shooter.initialize();
     hopper.initialize();
+    hud_display.initialize();
 }
 
 // Set default command here -----------------------------------------------
