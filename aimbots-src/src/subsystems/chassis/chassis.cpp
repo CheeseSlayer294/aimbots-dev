@@ -201,25 +201,25 @@ void ChassisSubsystem::calculateSwerve(float x, float y, float r, float maxWheel
         sqrtf(powf(b,2.0f)+ powf(d,2.0f)),
         -maxWheelSpeed,
         maxWheelSpeed);
-    targetRPMs[LF][1] = atan2f(d,b)*180 / M_PI;
+    targetRPMs[LF][1] = 0; //atan2f(d,b)*(180 / M_PI)/360 * 8191;
     oneYaw = targetRPMs[LF][1];
     targetRPMs[RF][0] = limitVal<float>(
         sqrtf(powf(b,2.0f)+powf(c,2.0f)),
         -maxWheelSpeed,
         maxWheelSpeed);
-    targetRPMs[RF][1] = atan2f(c,b)*180 / M_PI;
+    targetRPMs[RF][1] = 0; //atan2f(c,b)*(180 / M_PI)/360 * 8191;
     twoYaw = targetRPMs[LF][1];
     targetRPMs[LB][0] = limitVal<float>(
         sqrtf(powf(a,2.0f) + powf(d,2.0f)),
         -maxWheelSpeed,
         maxWheelSpeed);
-    targetRPMs[LB][1] = atan2f(d,a)*180 / M_PI;
+    targetRPMs[LB][1] = 0; //atan2f(d,a)*(180 / M_PI)/360 * 8191;
     threeYaw = targetRPMs[LB][1];
     targetRPMs[RB][0] = limitVal<float>(
         sqrtf(powf(a,2.0f) + powf(c,2.0f)),
         -maxWheelSpeed,
         maxWheelSpeed);
-    targetRPMs[RB][1] = atan2f(c,a)*180 / M_PI;
+    targetRPMs[RB][1] = 0; //atan2f(c,a)*(180 / M_PI)/360 * 8191;
     fourYaw = targetRPMs[RB][1];
 
 
