@@ -2,11 +2,10 @@
 #include "utils/common_types.hpp"
 #include "utils/math/matrix_helpers.hpp"
 
-#define SWERVE 
+#define SWERVE
 
 static constexpr uint8_t DRIVEN_WHEEL_COUNT = 4;
 static constexpr uint8_t MOTORS_PER_WHEEL = 2;
-
 
 static constexpr uint8_t SHOOTER_MOTOR_COUNT = 0;
 
@@ -40,7 +39,7 @@ static constexpr SmoothPIDConfig CHASSIS_VELOCITY_PID_CONFIG = {
 };
 
 static constexpr SmoothPIDConfig CHASSIS_YAW_PID_CONFIG = {
-    .kp = 100.0f,
+    .kp = 10.0f,
     .ki = 0.0f,
     .kd = 1.0f,
     .maxICumulative = 10.0f,
@@ -119,7 +118,6 @@ static constexpr float YAW_INPUT_DIRECTION = -1;
 
 static constexpr int DEFAULT_BURST_LENGTH = 0;  // balls
 
-
 /**
  * This max output is measured in the c620 robomaster translated current.
  * Per the datasheet, the controllable current range is -16384 ~ 0 ~ 16384.
@@ -147,9 +145,9 @@ static constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f);
 
 // static constexpr float YAW_START_ANGLE = M_PI_2;
 // static constexpr float PITCH_START_ANGLE = M_PI_2;
-// #error "DM Richard on Discord if you see this (or just calculate the pitch stop limits yourself idc)"
-// static constexpr float PITCH_SOFTSTOP_LOW = 0.0f;
-// static constexpr float PITCH_SOFTSTOP_HIGH = 0.0f;
+// #error "DM Richard on Discord if you see this (or just calculate the pitch stop limits yourself
+// idc)" static constexpr float PITCH_SOFTSTOP_LOW = 0.0f; static constexpr float
+// PITCH_SOFTSTOP_HIGH = 0.0f;
 
 static constexpr CANBus CHASSIS_BUS = CANBus::CAN_BUS2;
 
@@ -162,7 +160,6 @@ static constexpr MotorID LEFT_BACK_YAW_ID = MotorID::MOTOR5;
 static constexpr MotorID LEFT_FRONT_YAW_ID = MotorID::MOTOR6;
 static constexpr MotorID RIGHT_FRONT_YAW_ID = MotorID::MOTOR7;
 static constexpr MotorID RIGHT_BACK_YAW_ID = MotorID::MOTOR8;
-
 
 // CAN Bus 1
 static constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS1;
@@ -182,19 +179,18 @@ static constexpr bool SHOOTER_2_DIRECTION = true;
 
 static constexpr bool FEEDER_DIRECTION = true;
 
-enum WheelRPMIndex {  // index used to easily navigate wheel matrices
+enum WheelRPMIndex
+{  // index used to easily navigate wheel matrices
     LB = 0,
     LF = 1,
     RF = 2,
     RB = 3,
 };
 
-
 static constexpr float YAW_START_ANGLE = 163.0f;
 static constexpr float PITCH_START_ANGLE = 117.0f;
 static constexpr float PITCH_SOFTSTOP_LOW = 134.0f;
 static constexpr float PITCH_SOFTSTOP_HIGH = 74.0f;
-
 
 /**
  * Max wheel speed, measured in RPM of the 3508 motor shaft.
