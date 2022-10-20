@@ -1,5 +1,5 @@
 #pragma once
-#ifdef TARGET_DART
+#ifndef TARGET_DART
 #include "tap/control/chassis/chassis_subsystem_interface.hpp"
 #include "tap/motor/m3508_constants.hpp"
 

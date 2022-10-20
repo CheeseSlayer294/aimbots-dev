@@ -1,5 +1,5 @@
 #include "chassis_rel_drive.hpp"
-#ifdef TARGET_DART
+#ifndef TARGET_DART
 
 #include "utils/robot_specific_inc.hpp"
 

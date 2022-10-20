@@ -1,6 +1,5 @@
 #include "run_feeder_command.hpp"
-#ifdef TARGET_DART
-
+#ifndef TARGET_DART
 namespace src::Feeder {
 RunFeederCommand::RunFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder)
     : drivers(drivers), feeder(feeder), speed(0) {

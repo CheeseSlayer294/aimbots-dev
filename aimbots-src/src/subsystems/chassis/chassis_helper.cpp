@@ -1,5 +1,5 @@
 #include "chassis_helper.hpp"
-
+#ifndef TARGET_DART
 #include "utils/robot_specific_inc.hpp"
 
 int8_t chassisYDesiredWheelspeedWatch = 0;
@@ -42,3 +42,4 @@ void rescaleDesiredInputToPowerLimitedSpeeds(
 }
 
 }  // namespace src::Chassis::Helper
+#endif

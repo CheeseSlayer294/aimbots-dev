@@ -1,5 +1,5 @@
 #include "subsystems/shooter/shooter.hpp"
-
+// #ifndef TARGET_DART
 #include <tap/architecture/clock.hpp>
 #include <tap/communication/gpio/leds.hpp>
 
@@ -24,8 +24,8 @@ ShooterSubsystem::ShooterSubsystem(tap::Drivers* drivers)
     flywheel4(drivers, SHOOTER_4_ID, SHOOTER_BUS, SHOOTER_4_DIRECTION, "Flywheel Four"),
     flywheel3PID(SHOOTER_VELOCITY_PID_CONFIG),
     flywheel4PID(SHOOTER_VELOCITY_PID_CONFIG),
-    flywheel5(drivers, SHOOTER_3_ID, SHOOTER_BUS, SHOOTER_5_DIRECTION, "Flywheel Three"),
-    flywheel6(drivers, SHOOTER_4_ID, SHOOTER_BUS, SHOOTER_6_DIRECTION, "Flywheel Four"),
+    flywheel5(drivers, SHOOTER_5_ID, SHOOTER_BUS, SHOOTER_5_DIRECTION, "Flywheel Three"),
+    flywheel6(drivers, SHOOTER_6_ID, SHOOTER_BUS, SHOOTER_6_DIRECTION, "Flywheel Four"),
     flywheel5PID(SHOOTER_VELOCITY_PID_CONFIG),
     flywheel6PID(SHOOTER_VELOCITY_PID_CONFIG),
 #endif
@@ -141,3 +141,5 @@ void ShooterSubsystem::setDesiredOutputToMotor(MotorIndex motorIdx) {
     }
 }
 };  // namespace src::Shooter
+
+// #endif

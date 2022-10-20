@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef TARGET_DART
 #include "drivers.hpp"
 #include "subsystems/chassis/chassis.hpp"
 #include "subsystems/gimbal/gimbal.hpp"
@@ -31,3 +31,4 @@ class ChassisFollowGimbalCommand : public TapCommand {
 };
 
 }  // namespace src::Chassis
+#endif

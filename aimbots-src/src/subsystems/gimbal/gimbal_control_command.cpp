@@ -1,5 +1,5 @@
 #include "gimbal_control_command.hpp"
-
+// #ifndef TARGET_DART
 #include <tap/architecture/clock.hpp>
 #include <tap/communication/gpio/leds.hpp>
 
@@ -46,3 +46,4 @@ void GimbalControlCommand::end(bool) {
 }
 
 }  // namespace src::Gimbal
+   // #endif

@@ -7,7 +7,7 @@
 #include "utils/robot_constants.hpp"
 
 //#ifndef TARGET_ENGINEER
-
+// #ifndef TARGET_DART
 namespace src::Shooter {
 
 StopShooterCommand::StopShooterCommand(src::Drivers* drivers, ShooterSubsystem* shooter) {
@@ -37,4 +37,4 @@ bool StopShooterCommand::isFinished() const {
 
 }  // namespace src::Shooter
 
-//#endif //#ifndef TARGET_ENGINEER
+// #endif //#ifndef TARGET_ENGINEER

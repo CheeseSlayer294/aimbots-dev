@@ -1,7 +1,5 @@
-
+#ifndef TARGET_DART
 #include "chassis_drive_command.hpp"
-#ifdef TARGET_DART
-
 #include <subsystems/chassis/chassis_rel_drive.hpp>
 
 namespace src::Chassis {

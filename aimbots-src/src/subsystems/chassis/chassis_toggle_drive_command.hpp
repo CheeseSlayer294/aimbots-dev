@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef TARGET_DART
 #include "drivers.hpp"
 #include "subsystems/chassis/chassis.hpp"
 #include "subsystems/chassis/chassis_follow_gimbal_command.hpp"
@@ -33,3 +33,4 @@ class ChassisToggleDriveCommand : public TapComprisedCommand {
 };
 
 }  // namespace src::Chassis
+#endif

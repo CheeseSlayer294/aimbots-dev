@@ -1,5 +1,5 @@
 #include "stop_shooter_comprised_command.hpp"
-
+// #ifndef TARGET_DART
 #include "drivers.hpp"
 #include "tap/communication/gpio/leds.hpp"
 #include "tap/control/subsystem.hpp"
@@ -60,3 +60,4 @@ bool StopShooterComprisedCommand::isFinished() const {
 }
 
 }  // namespace src::Shooter
+// #endif

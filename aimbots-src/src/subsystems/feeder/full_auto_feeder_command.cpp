@@ -1,5 +1,5 @@
 #include "full_auto_feeder_command.hpp"
-
+#ifndef TARGET_DART
 namespace src::Feeder {
 
 FullAutoFeederCommand::FullAutoFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder, float speed, float acceptableHeatThreshold)
@@ -37,3 +37,4 @@ bool FullAutoFeederCommand::isReady() { return feeder->isBarrelHeatAcceptable(ac
 bool FullAutoFeederCommand::isFinished() const { return !feeder->isBarrelHeatAcceptable(acceptableHeatThreshold); }
 
 }  // namespace src::Feeder
+#endif

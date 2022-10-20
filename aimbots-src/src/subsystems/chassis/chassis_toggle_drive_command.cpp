@@ -1,4 +1,5 @@
 #include "chassis_toggle_drive_command.hpp"
+#ifndef TARGET_DART
 
 namespace src::Chassis {
 
@@ -43,3 +44,4 @@ bool ChassisToggleDriveCommand::isReady() { return true; }
 bool ChassisToggleDriveCommand::isFinished() const { return false; }
 
 }  // namespace src::Chassis
+#endif

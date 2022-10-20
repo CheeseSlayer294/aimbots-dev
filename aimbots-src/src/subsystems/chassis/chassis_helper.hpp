@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef TARGET_DART
 #include <drivers.hpp>
 #include <subsystems/chassis/chassis.hpp>
 
@@ -23,3 +23,4 @@ void rescaleDesiredInputToPowerLimitedSpeeds(
     float* desiredRotation);
 
 }  // namespace src::Chassis::Helper
+#endif

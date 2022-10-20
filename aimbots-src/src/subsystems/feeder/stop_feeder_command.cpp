@@ -1,6 +1,5 @@
 #include "stop_feeder_command.hpp"
-#ifdef TARGET_DART
-
+#ifndef TARGET_DART
 namespace src::Feeder {
 
 StopFeederCommand::StopFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder) : drivers(drivers), feeder(feeder) {

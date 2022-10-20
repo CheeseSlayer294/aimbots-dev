@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef TARGET_DART
 #include "drivers.hpp"
 #include "subsystems/feeder/feeder.hpp"
 #include "tap/communication/gpio/leds.hpp"
@@ -40,3 +40,4 @@ class BurstFeederCommand : public TapCommand {
 };
 
 }  // namespace src::Feeder
+#endif

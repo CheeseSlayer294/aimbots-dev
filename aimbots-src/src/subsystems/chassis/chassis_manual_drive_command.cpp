@@ -1,5 +1,5 @@
 #include "chassis_manual_drive_command.hpp"
-
+#ifndef TARGET_DART
 #include "subsystems/chassis/chassis_helper.hpp"
 
 namespace src::Chassis {
@@ -34,3 +34,4 @@ bool ChassisManualDriveCommand::isReady() { return true; }
 bool ChassisManualDriveCommand::isFinished() const { return false; }
 
 }  // namespace src::Chassis
+#endif

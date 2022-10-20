@@ -11,12 +11,12 @@
 #include "tap/control/setpoint/commands/calibrate_command.hpp"
 #include "tap/control/toggle_command_mapping.hpp"
 //
-#include "subsystems/chassis/chassis.hpp"
-#include "subsystems/chassis/chassis_drive_command.hpp"
+// #include "subsystems/chassis/chassis.hpp"
+// #include "subsystems/chassis/chassis_drive_command.hpp"
 //
-#include "subsystems/feeder/feeder.hpp"
-#include "subsystems/feeder/run_feeder_command.hpp"
-#include "subsystems/feeder/stop_feeder_command.hpp"
+// #include "subsystems/feeder/feeder.hpp"
+// #include "subsystems/feeder/run_feeder_command.hpp"
+// #include "subsystems/feeder/stop_feeder_command.hpp"
 //
 #include "subsystems/gimbal/controllers/gimbal_chassis_relative_controller.hpp"
 #include "subsystems/gimbal/gimbal.hpp"
@@ -57,7 +57,7 @@ ShooterSubsystem shooter(drivers());
 // RunFeederCommand runFeederCommand(drivers(), &feeder);
 // StopFeederCommand stopFeederCommand(drivers(), &feeder);
 GimbalChassisRelativeController gimbalController(&gimbal);
-GimbalControlCommand gimbalControlCommand(drivers(), &gimbal, &gimbalController, 0.3f, 0.3f);
+// GimbalControlCommand gimbalControlCommand(drivers(), &gimbal, &gimbalController, 0.3f, 0.3f);
 RunShooterCommand runShooterCommand(drivers(), &shooter);
 StopShooterCommand shooterDefaultCommand(drivers(), &shooter);
 

@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-
+// #ifndef TARGET_DART
 #include "tap/architecture/clock.hpp"
 #include "tap/control/subsystem.hpp"
 
@@ -19,6 +19,7 @@ enum MotorIndex {
     BOT_LEFT = 3,
     MID_LEFT = 4,
     MID_RIGHT = 5,
+#endif
 };
 
 class ShooterSubsystem : public tap::control::Subsystem {
@@ -128,3 +129,4 @@ public:
     Matrix<SmoothPID*, SHOOTER_MOTOR_COUNT, 1> velocityPIDs;
 };
 };  // namespace src::Shooter
+// #endif

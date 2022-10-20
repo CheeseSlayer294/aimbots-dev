@@ -1,6 +1,5 @@
 #pragma once
-#ifdef TARGET_DART
-#include "tap/control/subsystem.hpp"
+#ifndef TARGET_DART#include "tap/control/subsystem.hpp"
 #include "tap/motor/m3508_constants.hpp"
 
 #include "informants/limit_switch.hpp"

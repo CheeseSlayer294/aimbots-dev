@@ -7,7 +7,7 @@
 #include "utils/robot_constants.hpp"
 
 //#ifndef TARGET_ENGINEER
-
+// #ifndef TARGET_DART
 namespace src::Shooter {
 
 RunShooterCommand::RunShooterCommand(src::Drivers* drivers, ShooterSubsystem* shooter) {
@@ -75,3 +75,4 @@ bool RunShooterCommand::isFinished() const {
     return false;
 }
 }  // namespace src::Shooter
+// #endif

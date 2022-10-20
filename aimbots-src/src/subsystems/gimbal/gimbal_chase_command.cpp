@@ -1,5 +1,6 @@
 #include "gimbal_chase_command.hpp"
 
+#ifndef TARGET_DART
 namespace src::Gimbal {
 // feed chassis relative controller for sentry, field relative for ground robots
 GimbalChaseCommand::GimbalChaseCommand(src::Drivers* drivers,
@@ -70,3 +71,4 @@ void GimbalChaseCommand::end(bool) {
     gimbal->setPitchMotorOutput(0);
 }
 };  // namespace src::Gimbal
+#endif

@@ -1,5 +1,5 @@
 #pragma once
-
+#ifndef TARGET_DART
 #include <drivers.hpp>
 #include <subsystems/gimbal/controllers/gimbal_chassis_relative_controller.hpp>
 #include <subsystems/gimbal/gimbal.hpp>
@@ -8,10 +8,8 @@
 namespace src::Gimbal {
 
 class GimbalChaseCommand : public tap::control::Command {
-   public:
-    GimbalChaseCommand(src::Drivers*,
-                       GimbalSubsystem*,
-                       GimbalControllerInterface*);
+public:
+    GimbalChaseCommand(src::Drivers*, GimbalSubsystem*, GimbalControllerInterface*);
 
     char const* getName() const override { return "Gimbal Chase Command"; }
 
@@ -22,7 +20,7 @@ class GimbalChaseCommand : public tap::control::Command {
     bool isFinished() const override;
     void end(bool interrupted) override;
 
-   private:
+private:
     src::Drivers* drivers;
 
     GimbalSubsystem* gimbal;
@@ -30,3 +28,4 @@ class GimbalChaseCommand : public tap::control::Command {
 };
 
 }  // namespace src::Gimbal
+#endif
