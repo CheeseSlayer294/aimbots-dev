@@ -74,9 +74,9 @@ static constexpr SmoothPIDConfig FEEDER_VELOCITY_PID_CONFIG = {
  * @brief Position PID constants
  */
 static constexpr SmoothPIDConfig YAW_POSITION_PID_CONFIG = {
-    .kp = 500.0f,
-    .ki = 0.0f,
-    .kd = 700.0f,
+    .kp = 100.0f,
+    .ki = 3.0f,
+    .kd = 80.0f,
     .maxICumulative = 10.0f,
     .maxOutput = GM6020_MAX_OUTPUT,
     .tQDerivativeKalman = 1.0f,
@@ -88,9 +88,9 @@ static constexpr SmoothPIDConfig YAW_POSITION_PID_CONFIG = {
 };
 
 static constexpr SmoothPIDConfig PITCH_POSITION_PID_CONFIG = {
-    .kp = 350.0f,
-    .ki = 1.3f,
-    .kd = 200.0f,
+    .kp = 100.0f,
+    .ki = 3.0f,
+    .kd = 80.0f,
     .maxICumulative = 1000.0f,
     .maxOutput = GM6020_MAX_OUTPUT,
     .tQDerivativeKalman = 1.0f,
@@ -105,8 +105,7 @@ static constexpr float kGRAVITY = 6000.0f;
 static constexpr float HORIZON_OFFSET = -30.0f;
 
 // sentry only has one speed: death
-static constexpr uint16_t shooter_speed_array[2] =
-    {30, 8000};  // {m/s, rpm}
+static constexpr uint16_t shooter_speed_array[2] = {30, 8000};  // {m/s, rpm}
 
 static const Matrix<uint16_t, 1, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);
 
@@ -173,7 +172,8 @@ static constexpr float FULL_RAIL_LENGTH = 2.130f;                               
 static constexpr float FULL_RAIL_LENGTH_CM = 213.0f;                                                    // cm
 static constexpr float USABLE_RAIL_LENGTH = FULL_RAIL_LENGTH - (WHEELBASE_WIDTH + RAIL_POLE_DIAMETER);  // in meters
 
-static const Matrix<float, 1, 3> ROBOT_STARTING_POSITION = left_sentry_rail_pole_location_matrix + robot_starting_rail_location * src::utils::MatrixHelper::xy_rotation_matrix(AngleUnit::Degrees, 45.0f);
+static const Matrix<float, 1, 3> ROBOT_STARTING_POSITION =
+    left_sentry_rail_pole_location_matrix + robot_starting_rail_location * src::utils::MatrixHelper::xy_rotation_matrix(AngleUnit::Degrees, 45.0f);
 
 static constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f) * (44.0f / 18.0f);
 
@@ -183,8 +183,11 @@ static constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f) * (44.0f / 18.0f);
 static constexpr float YAW_START_ANGLE = 61.0f;
 static constexpr float PITCH_START_ANGLE = 152.0f;
 
-static constexpr float PITCH_SOFTSTOP_LOW = 105.42f;
-static constexpr float PITCH_SOFTSTOP_HIGH = 218.84f;
+static constexpr float PITCH_SOFTSTOP_HIGH = -230.0f;
+static constexpr float PITCH_SOFTSTOP_LOW = 14323.0f;
+
+static constexpr float YAW_SOFTSTOP_HIGH = -7600.0f;
+static constexpr float YAW_SOFTSTOP_LOW = 11820.0f;
 
 // PITCH PATROL FUNCTION CONSTANTS
 static constexpr float PITCH_PATROL_AMPLITUDE = 12.5f;  // degrees
@@ -209,8 +212,7 @@ static constexpr int MAX_WHEEL_SPEED_SINGLE_MOTOR = 8000;
 static constexpr int MIN_CHASSIS_POWER = 40;
 static constexpr int MAX_CHASSIS_POWER = 120;
 static constexpr int WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE =
-    (MAX_WHEEL_SPEED_SINGLE_MOTOR - MIN_WHEEL_SPEED_SINGLE_MOTOR) /
-    (MAX_CHASSIS_POWER - MIN_CHASSIS_POWER);
+    (MAX_WHEEL_SPEED_SINGLE_MOTOR - MIN_WHEEL_SPEED_SINGLE_MOTOR) / (MAX_CHASSIS_POWER - MIN_CHASSIS_POWER);
 static_assert(WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE >= 0);
 
 /**
