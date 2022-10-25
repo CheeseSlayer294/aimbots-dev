@@ -108,9 +108,7 @@ void ShooterSubsystem::updateMotorVelocityPID(MotorIndex motorIdx) {
     }
 }
 
-void ShooterSubsystem::setTargetRPM(MotorIndex motorIdx, float targetRPM) {
-    targetRPMs[motorIdx][0] = targetRPM;
-}
+void ShooterSubsystem::setTargetRPM(MotorIndex motorIdx, float targetRPM) { targetRPMs[motorIdx][0] = targetRPM; }
 
 float powerDisplay = 0.0f;
 

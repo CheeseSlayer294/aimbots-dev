@@ -127,6 +127,39 @@ static constexpr uint16_t shooter_speed_array[6] = {
     30,
     9000};
 
+static constexpr uint16_t testbed_standard_speed_array[9] = {
+    15,
+    3900,  // {ball m/s, top wheel rpm, bottom wheel rpm}
+    3900,
+    18,
+    4500,
+    4500,
+    30,
+    9000,
+    9000};
+
+static constexpr uint16_t testbed_topspin_speed_array[9] = {
+    15,
+    3900,  // {ball m/s, top wheel rpm, bottom wheel rpm}
+    1950,
+    18,
+    4500,
+    2250,
+    30,
+    9000,
+    4500};
+
+static constexpr uint16_t testbed_backspin_speed_array[9] = {
+    15,
+    1950,  // {ball m/s, top wheel rpm, bottom wheel rpm}
+    3900,
+    18,
+    2250,
+    4500,
+    30,
+    4500,
+    9000};
+
 static const Matrix<uint16_t, 3, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);
 
 static constexpr float FEEDER_DEFAULT_RPM = 3000.0f;

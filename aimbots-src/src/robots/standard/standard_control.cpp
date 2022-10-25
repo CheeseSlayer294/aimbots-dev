@@ -1,8 +1,9 @@
 #ifdef TARGET_STANDARD
+// STANDARD TESTBED MEANS 17mm SHOOTER
+#include "utils/common_types.hpp"
 
 #include "drivers.hpp"
 #include "drivers_singleton.hpp"
-#include "utils/common_types.hpp"
 //
 #include "tap/control/command_mapper.hpp"
 #include "tap/control/hold_command_mapping.hpp"
@@ -32,6 +33,7 @@
 #include "subsystems/shooter/shooter.hpp"
 #include "subsystems/shooter/stop_shooter_command.hpp"
 #include "subsystems/shooter/stop_shooter_comprised_command.hpp"
+#include "subsystems/shooter/testbed_run_shooter_command.hpp"
 //
 #include "subsystems/hopper/close_hopper_command.hpp"
 #include "subsystems/hopper/hopper.hpp"
@@ -86,6 +88,7 @@ StopFeederCommand stopFeederCommand(drivers(), &feeder);
 
 RunShooterCommand runShooterCommand(drivers(), &shooter);
 RunShooterCommand runShooterWithFeederCommand(drivers(), &shooter);
+TestbedRunShooterCommand testbedRunShooterCommand(drivers(), &shooter);
 StopShooterComprisedCommand stopShooterComprisedCommand(drivers(), &shooter);
 
 OpenHopperCommand openHopperCommand(drivers(), &hopper);
@@ -95,40 +98,30 @@ CloseHopperCommand closeHopperCommand2(drivers(), &hopper);
 ToggleHopperCommand toggleHopperCommand(drivers(), &hopper);
 
 // Define command mappings here -------------------------------------------
-HoldCommandMapping leftSwitchMid(
-    drivers(),
-    {&chassisToggleDriveCommand, &gimbalFieldRelativeControlCommand},
-    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::MID));
+HoldCommandMapping leftSwitchMid(drivers(), {&testbedRunShooterCommand}, RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::MID));
 
 // Enables both chassis and gimbal control and closes hopper
-HoldCommandMapping leftSwitchUp(
-    drivers(),
-    {&chassisTokyoCommand, &gimbalFieldRelativeControlCommand2},
-    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
+HoldCommandMapping leftSwitchUp(drivers(), {&runShooterCommand}, RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
 
 // opens hopper
-HoldCommandMapping rightSwitchDown(
-    drivers(),
-    {&openHopperCommand},
-    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN));
+HoldCommandMapping rightSwitchDown(drivers(), {&closeHopperCommand}, RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN));
 
 // Runs shooter only and closes hopper
 HoldCommandMapping rightSwitchMid(
     drivers(),
-    {&runShooterCommand, &closeHopperCommand},
+    // {&runShooterCommand, &closeHopperCommand},
+    {&closeHopperCommand2},
     RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::MID));
 
 // Runs shooter with feeder and closes hopper
 HoldRepeatCommandMapping rightSwitchUp(
     drivers(),
-    {&runFeederCommand, &runShooterWithFeederCommand, &closeHopperCommand2},
+    // {&runFeederCommand, &runShooterWithFeederCommand, &closeHopperCommand2},
+    {&closeHopperCommand2},
     RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP),
     true);
 
-HoldCommandMapping leftClickMouse(
-    drivers(),
-    {&runFeederCommandFromMouse},
-    RemoteMapState(RemoteMapState::MouseButton::LEFT));
+HoldCommandMapping leftClickMouse(drivers(), {&runFeederCommandFromMouse}, RemoteMapState(RemoteMapState::MouseButton::LEFT));
 
 // HoldCommandMapping rightClickMouse(
 //     drivers(),
