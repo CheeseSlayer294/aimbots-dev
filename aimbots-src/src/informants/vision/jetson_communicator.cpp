@@ -111,8 +111,8 @@ void JetsonCommunicator::updateSerial() {
 
                     // Find the robot-relative target angles calculated at the vision update. Theoretically, we can snap to a target
                     // using just one update from the vision system, and this target is refreshed on every update of the vision system.
-                    visionTargetAngles[0][yaw] = fieldRelativeYawAngleAtVisionUpdate - lastMessage.targetYawOffset;
-                    visionTargetAngles[0][pitch] = chassisRelativePitchAngleAtVisionUpdate - lastMessage.targetPitchOffset;
+                    visionTargetAngles[0][yaw] = fieldRelativeYawAngleAtVisionUpdate + lastMessage.targetYawOffset;
+                    visionTargetAngles[0][pitch] = chassisRelativePitchAngleAtVisionUpdate + lastMessage.targetPitchOffset;
                     // TODO: Explore using predictors to smoothen effect of large time gap between vision updates.
                 }
 
