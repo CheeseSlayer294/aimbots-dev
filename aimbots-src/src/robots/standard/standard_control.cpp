@@ -104,7 +104,11 @@ HoldCommandMapping leftSwitchMid(drivers(), {&testbedRunShooterCommand}, RemoteM
 HoldCommandMapping leftSwitchUp(drivers(), {&runShooterCommand}, RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
 
 // opens hopper
-HoldCommandMapping rightSwitchDown(drivers(), {&closeHopperCommand}, RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN));
+HoldCommandMapping rightSwitchDown(
+    drivers(),
+    // empty mainly so we can keep the switch states
+    {&closeHopperCommand},
+    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN));
 
 // Runs shooter only and closes hopper
 HoldCommandMapping rightSwitchMid(

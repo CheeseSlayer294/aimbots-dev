@@ -31,13 +31,13 @@ void TestbedRunShooterCommand::execute() {
 
     // defaults to slowest usable speed for robot
     uint16_t flywheelRPMTop, flywheelRPMBottom;
-    int temp;
+    int temp = -1;
     if (drivers->remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP) {
         temp = 2;
 
     } else if (drivers->remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::MID) {
         temp = 1;
-    } else {
+    } else if (drivers->remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::DOWN) {
         temp = 0;
     }
     Matrix<uint16_t, 3, 3> CURRENT_SPEED_MATRIX(
@@ -68,11 +68,21 @@ void TestbedRunShooterCommand::execute() {
         default:
             break;
     }
+    LinearInterpolationPredictor currChannelRD;
+    uint32_t updateCounter = drivers->remote.getUpdateCounter();
+    uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
+    uint32_t prevUpdateCounterY = 0;
+    if (prevUpdateCounterY != updateCounter) {
+        currChannelRD.update(drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL), currTime);
+        prevUpdateCounterY = updateCounter;
+    }
 
-    if (drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL) > 0.3) {
+    float analogY = limitVal<float>(currChannelRD.getInterpolatedValue(currTime), -1.0f, 1.0f);
+
+    if (analogY > 0.3) {
         flywheelRPMTop = CURRENT_SPEED_MATRIX[2][1];
         flywheelRPMBottom = CURRENT_SPEED_MATRIX[2][2];
-    } else if (drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL) < 0.3) {
+    } else if (analogY < -0.3) {
         flywheelRPMTop = CURRENT_SPEED_MATRIX[0][1];
         flywheelRPMBottom = CURRENT_SPEED_MATRIX[0][2];
     } else {
