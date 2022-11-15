@@ -5,9 +5,7 @@
 
 namespace src::Gimbal {
 
-GimbalPatrolCommand::GimbalPatrolCommand(src::Drivers* drivers,
-                                         GimbalSubsystem* gimbalSubsystem,
-                                         GimbalChassisRelativeController* gimbalController)
+GimbalPatrolCommand::GimbalPatrolCommand(src::Drivers* drivers, GimbalSubsystem* gimbalSubsystem, GimbalChassisRelativeController* gimbalController)
     : tap::control::Command(),
       drivers(drivers),
       gimbal(gimbalSubsystem),
@@ -27,11 +25,11 @@ void GimbalPatrolCommand::initialize() {
 #ifdef TARGET_SENTRY
     // clang-format off
     static constexpr float xy_field_relative_patrol_location_array[9] = {
-        5.0f, -3.0f, 500.0f, // field coordinate x, y, time spent at this angle
-        -1.425f, -1.131f, 250.0f,
+        17000.0f, 14000.0f, 500.0f, // field coordinate x, y, time spent at this angle
+        1000.425f, 8000.131f, 250.0f,
         // 1.425f, 0.494f, 100.0f,
         // -1.425f, 2.119f, 250.0f,
-        -3.25f, 2.5f, 1000.0f,
+        -2000.25f, 4000.5f, 1000.0f,
     };  // clang-format on
     patrolCoordinates = Matrix<float, 3, 3>(xy_field_relative_patrol_location_array);
 #endif
@@ -106,7 +104,10 @@ float GimbalPatrolCommand::getFieldRelativeYawPatrolAngle(AngleUnit unit) {
     // demoPosition2[0][0] = -3.6675f + 1.0f;
     // demoPosition2[0][1] = -1.6675f + 1.0f;
 
-    float xy_angle = src::utils::MatrixHelper::xy_angle_between_locations(AngleUnit::Radians, drivers->fieldRelativeInformant.getFieldRelativeRobotPosition(), patrolCoordinates.getRow(patrolCoordinateIndex) /*demoPosition2*/);
+    float xy_angle = src::utils::MatrixHelper::xy_angle_between_locations(
+        AngleUnit::Radians,
+        drivers->fieldRelativeInformant.getFieldRelativeRobotPosition(),
+        patrolCoordinates.getRow(patrolCoordinateIndex) /*demoPosition2*/);
     xy_angleDisplay = modm::toDegree(xy_angle);
 #ifdef TARGET_SENTRY
     // if robot is sentry, need to rotate by 45 degrees because sentry rail is at 45 degree angle relative to field
