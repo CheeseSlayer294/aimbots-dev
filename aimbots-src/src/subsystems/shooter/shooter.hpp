@@ -3,6 +3,7 @@
 
 #include "tap/architecture/clock.hpp"
 #include "tap/control/subsystem.hpp"
+
 #include "utils/common_types.hpp"
 #include "utils/robot_constants.hpp"
 
@@ -20,7 +21,7 @@ enum MotorIndex {
 };
 
 class ShooterSubsystem : public tap::control::Subsystem {
-   public:
+public:
     ShooterSubsystem(tap::Drivers* drivers);
 
     /**
@@ -91,6 +92,8 @@ class ShooterSubsystem : public tap::control::Subsystem {
      */
     void setDesiredOutputToMotor(MotorIndex motorIdx);
 
+    float getRightYJoystick(tap::Drivers* drivers);
+
     bool isOnline() const {
         for (auto i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
             if (!motors[i][0]->isMotorOnline()) {
@@ -101,9 +104,9 @@ class ShooterSubsystem : public tap::control::Subsystem {
     }
 
 #ifndef ENV_UNIT_TESTS
-   private:
+private:
 #else
-   public:
+public:
 #endif
 
     DJIMotor flywheel1, flywheel2;

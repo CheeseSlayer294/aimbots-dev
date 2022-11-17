@@ -3,7 +3,12 @@
 #include <tap/architecture/clock.hpp>
 #include <tap/communication/gpio/leds.hpp>
 
+#include "tap/algorithms/linear_interpolation_predictor.hpp"
+#include "tap/util_macros.hpp"
+
 #include "utils/common_types.hpp"
+
+#include "drivers.hpp"
 
 namespace src::Shooter {
 
@@ -121,4 +126,43 @@ void ShooterSubsystem::setDesiredOutputToMotor(MotorIndex motorIdx) {
         motors[motorIdx][0]->setDesiredOutput(desiredOutputs[motorIdx][0]);
     }
 }
+
+float ShooterSubsystem::getRightYJoystick(tap::Drivers* drivers) {
+    using RefSerialRxData = tap::communication::serial::RefSerialData::Rx;
+    uint16_t refSpeedLimit = 0;
+
+    auto refSysRobotTurretData = drivers->refSerial.getRobotData().turret;
+    // refSysRobotTurretDataDisplay = refSysRobotTurretData;
+
+    auto launcherID = refSysRobotTurretData.launchMechanismID;
+    switch (launcherID) {  // gets launcher ID from ref serial, sets speed limit accordingly
+                           // #if defined(TARGET_STANDARD) || defined(TARGET_SENTRY)
+        case RefSerialRxData::MechanismID::TURRET_17MM_1: {
+            refSpeedLimit = refSysRobotTurretData.barrelSpeedLimit17ID1;
+            break;
+        }
+        case RefSerialRxData::MechanismID::TURRET_17MM_2: {
+            refSpeedLimit = refSysRobotTurretData.barrelSpeedLimit17ID2;
+            break;
+        }
+            // #endif
+        case RefSerialRxData::MechanismID::TURRET_42MM: {
+            refSpeedLimit = refSysRobotTurretData.barrelSpeedLimit42;
+            break;
+        }
+        default:
+            break;
+    }
+    LinearInterpolationPredictor currChannelRD;
+    uint32_t updateCounter = drivers->remote.getUpdateCounter();
+    uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
+    uint32_t prevUpdateCounterY = 0;
+    if (prevUpdateCounterY != updateCounter) {
+        currChannelRD.update(drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL), currTime);
+        prevUpdateCounterY = updateCounter;
+    }
+
+    return limitVal<float>(currChannelRD.getInterpolatedValue(currTime), -1.0f, 1.0f);
+}
+
 };  // namespace src::Shooter

@@ -44,42 +44,10 @@ void TestbedRunShooterCommand::execute() {
         temp == 0 ? testbed_standard_speed_array : (temp == 1 ? testbed_backspin_speed_array : testbed_topspin_speed_array));
     flywheelRPMTop = CURRENT_SPEED_MATRIX[0][1];
     flywheelRPMBottom = CURRENT_SPEED_MATRIX[0][2];
-    uint16_t refSpeedLimit = 0;
 
-    auto refSysRobotTurretData = drivers->refSerial.getRobotData().turret;
-    // refSysRobotTurretDataDisplay = refSysRobotTurretData;
+    float analogY = shooter->getRightYJoystick(drivers);
 
-    auto launcherID = refSysRobotTurretData.launchMechanismID;
-    switch (launcherID) {  // gets launcher ID from ref serial, sets speed limit accordingly
-                           // #if defined(TARGET_STANDARD) || defined(TARGET_SENTRY)
-        case RefSerialRxData::MechanismID::TURRET_17MM_1: {
-            refSpeedLimit = refSysRobotTurretData.barrelSpeedLimit17ID1;
-            break;
-        }
-        case RefSerialRxData::MechanismID::TURRET_17MM_2: {
-            refSpeedLimit = refSysRobotTurretData.barrelSpeedLimit17ID2;
-            break;
-        }
-            // #endif
-        case RefSerialRxData::MechanismID::TURRET_42MM: {
-            refSpeedLimit = refSysRobotTurretData.barrelSpeedLimit42;
-            break;
-        }
-        default:
-            break;
-    }
-    LinearInterpolationPredictor currChannelRD;
-    uint32_t updateCounter = drivers->remote.getUpdateCounter();
-    uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
-    uint32_t prevUpdateCounterY = 0;
-    if (prevUpdateCounterY != updateCounter) {
-        currChannelRD.update(drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL), currTime);
-        prevUpdateCounterY = updateCounter;
-    }
-
-    float analogY = limitVal<float>(currChannelRD.getInterpolatedValue(currTime), -1.0f, 1.0f);
-
-    if (analogY > 0.3) {
+    if (analogY > 0.3) {z
         flywheelRPMTop = CURRENT_SPEED_MATRIX[2][1];
         flywheelRPMBottom = CURRENT_SPEED_MATRIX[2][2];
     } else if (analogY < -0.3) {
