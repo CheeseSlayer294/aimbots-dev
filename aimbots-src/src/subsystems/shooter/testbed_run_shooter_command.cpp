@@ -47,7 +47,7 @@ void TestbedRunShooterCommand::execute() {
 
     float analogY = shooter->getRightYJoystick(drivers);
 
-    if (analogY > 0.3) {z
+    if (analogY > 0.3) {
         flywheelRPMTop = CURRENT_SPEED_MATRIX[2][1];
         flywheelRPMBottom = CURRENT_SPEED_MATRIX[2][2];
     } else if (analogY < -0.3) {
