@@ -9,20 +9,31 @@
 
 namespace utils::Music {
 
-static constexpr uint32_t NOTE_Bb = 466;
-static constexpr uint32_t NOTE_B = 494;
-static constexpr uint32_t NOTE_C = 523;
-static constexpr uint32_t NOTE_Eb = 622;
-static constexpr uint32_t NOTE_E = 659;
-static constexpr uint32_t NOTE_F = 699;
-static constexpr uint32_t NOTE_Gb = 740;
-static constexpr uint32_t NOTE_G = 784;
-static constexpr uint32_t NOTE_Ab2 = 880;
-static constexpr uint32_t NOTE_Bb2 = 932;
-static constexpr uint32_t NOTE_B2 = 988;
-static constexpr uint32_t NOTE_C2 = 1047;
-static constexpr uint32_t NOTE_Eb2 = 1244;
+// built around A = 440 Hz
+static constexpr uint32_t NOTE_Ab4 = 415;
+static constexpr uint32_t NOTE_A4 = 440;
+static constexpr uint32_t NOTE_Bb4 = 469;
+static constexpr uint32_t NOTE_B4 = 494;
+static constexpr uint32_t NOTE_C5 = 523;
+static constexpr uint32_t NOTE_Db5 = 554;
+static constexpr uint32_t NOTE_D5 = 588;
+static constexpr uint32_t NOTE_Eb5 = 622;
+static constexpr uint32_t NOTE_E5 = 659;
+static constexpr uint32_t NOTE_F5 = 699;
+static constexpr uint32_t NOTE_Gb5 = 740;
+static constexpr uint32_t NOTE_G5 = 784;
+static constexpr uint32_t NOTE_Ab5 = 830;
+static constexpr uint32_t NOTE_A5 = 880;
+static constexpr uint32_t NOTE_Bb5 = 932;
+static constexpr uint32_t NOTE_B5 = 988;
+static constexpr uint32_t NOTE_C6 = 1047;
+static constexpr uint32_t NOTE_Db6 = 1108;
+static constexpr uint32_t NOTE_D6 = 1174;
+static constexpr uint32_t NOTE_Eb6 = 1244;
+static constexpr uint32_t NOTE_E6 = 1318;
+static constexpr uint32_t NOTE_F6 = 1396;
 
+// Windows XP Startup BPM
 static constexpr uint32_t XP_BPM = 110;
 static constexpr uint32_t XP_MS_PER_16th = (uint32_t)(((1.0f / XP_BPM) * 60.0f * 1000.0f) / 4.0f);
 
@@ -36,25 +47,11 @@ static uint32_t lastXPFreq = 0;
 static bool xpTuneFinished = false;
 
 static MusicNote xpStartupNotes[16] = {
-    {NOTE_Eb2},
-    {NOTE_Eb2},
-    {NOTE_Eb2},
-    {NOTE_Eb},
-
-    {NOTE_Bb2},
-    {0},
-    {NOTE_Ab2},
-    {NOTE_Ab2},
-
-    {NOTE_Eb},
-    {0},
-    {NOTE_Eb2},
-    {NOTE_Eb2},
-
-    {NOTE_Bb2},
-    {NOTE_Bb2},
-    {0},
-    {0}};
+    {NOTE_Eb6},{NOTE_Eb6},{NOTE_Eb6},{NOTE_Eb5},
+    {NOTE_Bb5},{0},{NOTE_Ab5},{NOTE_Ab5},
+    {NOTE_Eb5},{0},{NOTE_Eb6},{NOTE_Eb6},
+    {NOTE_Bb5},{NOTE_Bb5},{0},{0}
+    };
 
 static constexpr size_t XP_NOTE_COUNT = sizeof(xpStartupNotes) / sizeof(MusicNote);
 
@@ -73,6 +70,8 @@ void continuePlayingXPStartupTune(src::Drivers* drivers) {
     }
 }
 
+// Tokyo Drift Theme
+
 static constexpr uint32_t TD_BPM = 120;
 static constexpr uint32_t TD_MS_PER_16th = (uint32_t)(((1.0f / TD_BPM) * 60.0f * 1000.0f) / 4.0f);
 
@@ -81,25 +80,11 @@ static uint32_t currentTDNote = 0;
 static uint32_t lastTDFreq = 0;
 
 static MusicNote tokyoDriftNotes[16] = {
-    {NOTE_Bb},
-    {NOTE_Bb},
-    {NOTE_Bb},
-    {NOTE_B},
-
-    {NOTE_B},
-    {NOTE_B},
-    {NOTE_Eb},
-    {NOTE_Eb},
-
-    {NOTE_Bb},
-    {0},
-    {0},
-    {0},
-
-    {NOTE_Bb},
-    {0},
-    {0},
-    {0}};
+    {NOTE_Bb4},{NOTE_Bb4},{NOTE_Bb4},{NOTE_B4},
+    {NOTE_B4},{NOTE_B4},{NOTE_Eb5},{NOTE_Eb5},
+    {NOTE_Bb5},{0},{0},{0},
+    {NOTE_Bb5},{0},{0},{0}
+    };
 
 static constexpr size_t TD_NOTE_COUNT = sizeof(tokyoDriftNotes) / sizeof(MusicNote);
 
@@ -116,45 +101,82 @@ void continuePlayingTokyoDriftTune(src::Drivers* drivers) {
     }
 }
 
-static bool isPacManDone = false;
+// PacMan Theme (currently broken because of note renaming)
 
-static constexpr uint32_t PM_BPM = 130;
-static constexpr uint32_t PM_MS_PER_16th = (uint32_t)(((1.0f / TD_BPM) * 60.0f * 1000.0f) / 4.0f);
+// static bool isPacManDone = false;
 
-static uint32_t lastPMTime = 0;
-static uint32_t currentPMNote = 0;
-static uint32_t lastPMFreq = 0;
+// static constexpr uint32_t PM_BPM = 130;
+// static constexpr uint32_t PM_MS_PER_16th = (uint32_t)(((1.0f / PM_BPM) * 60.0f * 1000.0f) / 4.0f);
 
-static MusicNote pacManNotes[] = {{NOTE_B},  {NOTE_B2}, {NOTE_Gb}, {NOTE_Eb},
+// static uint32_t lastPMTime = 0;
+// static uint32_t currentPMNote = 0;
+// static uint32_t lastPMFreq = 0;
 
-                                  {NOTE_B2}, {0},       {NOTE_Eb}, {0},
+// static MusicNote pacManNotes[] = {{NOTE_B4},  {NOTE_B5}, {NOTE_Gb5}, {NOTE_Eb5},
 
-                                  {NOTE_C},  {NOTE_C2}, {NOTE_G},  {NOTE_E},
+//                                   {NOTE_B5}, {0},       {NOTE_Eb5}, {0},
 
-                                  {NOTE_C2}, {0},       {NOTE_E},  {0},
+//                                   {NOTE_C5},  {NOTE_C6}, {NOTE_G5},  {NOTE_E5},
 
-                                  {NOTE_B},  {NOTE_B2}, {NOTE_Gb}, {NOTE_Eb},
+//                                   {NOTE_C2}, {0},       {NOTE_E},  {0},
 
-                                  {NOTE_B2}, {0},       {NOTE_Eb}, {0},
+//                                   {NOTE_B},  {NOTE_B2}, {NOTE_Gb}, {NOTE_Eb},
 
-                                  {NOTE_Eb}, {NOTE_Eb}, {NOTE_F},  {NOTE_F},
+//                                   {NOTE_B2}, {0},       {NOTE_Eb}, {0},
 
-                                  {NOTE_G},  {NOTE_G},  {NOTE_B2}, {}};
+//                                   {NOTE_Eb}, {NOTE_Eb}, {NOTE_F},  {NOTE_F},
 
-static constexpr size_t PM_NOTE_COUNT = sizeof(pacManNotes) / sizeof(MusicNote);
+//                                   {NOTE_G},  {NOTE_G},  {NOTE_B2}, {0}};
 
-void playPacMan(src::Drivers* drivers) {
-    if (isPacManDone) return;
-    if (lastPMTime == 0) lastPMTime = tap::arch::clock::getTimeMilliseconds();
+// static constexpr size_t PM_NOTE_COUNT = sizeof(pacManNotes) / sizeof(MusicNote);
+
+// void playPacMan(src::Drivers* drivers) {
+//     if (isPacManDone) return;
+//     if (lastPMTime == 0) lastPMTime = tap::arch::clock::getTimeMilliseconds();
+//     uint32_t currentTime = tap::arch::clock::getTimeMilliseconds();
+//     uint32_t timeSinceLast = currentTime - lastPMTime;
+
+//     if (timeSinceLast >= PM_MS_PER_16th) {
+//         lastPMTime = tap::arch::clock::getTimeMilliseconds();
+//         if (lastPMFreq != pacManNotes[currentPMNote].frequency) tap::buzzer::playNote(&drivers->pwm, pacManNotes[currentPMNote].frequency);
+//         lastPMFreq = pacManNotes[currentPMNote].frequency;
+//         currentPMNote++;
+//         isPacManDone = currentPMNote == PM_NOTE_COUNT;
+//     }
+// }
+
+// Chainsaw Man theme
+
+static bool isChainSawDone = false;
+
+static constexpr uint32_t CHNSW_BPM = 200;
+static constexpr uint32_t CHNSW_MS_PER_8th = (uint32_t)(((1.0f / CHNSW_BPM) * 60.0f * 1000.0f) / 2.0f); // easier for this song
+
+static uint32_t lastCHNSWTime = 0;
+static uint32_t currentCHNSWNote = 0;
+static uint32_t lastCHNSWFreq = 0;
+
+static MusicNote chainSawNotes[70] = {
+                            {NOTE_Gb5},{NOTE_Gb5},
+                    {NOTE_Db5},{NOTE_Db5},{NOTE_Eb5},{NOTE_Eb5},{NOTE_E5},{NOTE_Gb5},{NOTE_Gb5},{NOTE_Db5},
+                    {NOTE_Db5},{NOTE_E5},{NOTE_E5},{NOTE_E5},{NOTE_A4},{NOTE_A4},{NOTE_A4},{NOTE_A4},
+                    {NOTE_Ab4},{NOTE_Ab4},
+};
+
+static constexpr size_t CHNSW_NOTE_COUNT = sizeof(chainSawNotes) / sizeof(MusicNote);
+
+void playChainSawMan(src::Drivers* drivers) {
+    if (isChainSawDone) return;
+    if (lastCHNSWTime == 0) lastCHNSWTime = tap::arch::clock::getTimeMilliseconds();
     uint32_t currentTime = tap::arch::clock::getTimeMilliseconds();
-    uint32_t timeSinceLast = currentTime - lastPMTime;
+    uint32_t timeSinceLast = currentTime - lastCHNSWTime;
 
-    if (timeSinceLast >= PM_MS_PER_16th) {
-        lastPMTime = tap::arch::clock::getTimeMilliseconds();
-        if (lastPMFreq != pacManNotes[currentPMNote].frequency) tap::buzzer::playNote(&drivers->pwm, pacManNotes[currentPMNote].frequency);
-        lastPMFreq = pacManNotes[currentPMNote].frequency;
-        currentPMNote++;
-        isPacManDone = currentPMNote == PM_NOTE_COUNT;
+    if (timeSinceLast >= CHNSW_MS_PER_8th) {
+        lastCHNSWTime = tap::arch::clock::getTimeMilliseconds();
+        if (lastCHNSWFreq != chainSawNotes[currentCHNSWNote].frequency) tap::buzzer::playNote(&drivers->pwm, chainSawNotes[currentCHNSWNote].frequency);
+        lastCHNSWFreq = chainSawNotes[currentCHNSWNote].frequency;
+        currentCHNSWNote++;
+        isChainSawDone = currentCHNSWNote == CHNSW_NOTE_COUNT;
     }
 }
 

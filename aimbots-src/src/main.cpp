@@ -148,7 +148,8 @@ static void updateIo(src::Drivers *drivers) {
     drivers->cvCommunicator.updateSerial();
 
     // utils::Music::continuePlayingXPStartupTune(drivers);
-    utils::Music::playPacMan(drivers);
+    // utils::Music::playPacMan(drivers);
+    utils::Music::playChainSawMan(drivers);
 
     imuStatus = drivers->fieldRelativeInformant.getImuState();
 
