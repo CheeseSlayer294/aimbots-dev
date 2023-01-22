@@ -6,7 +6,7 @@ namespace utils::Music {
 
 void continuePlayingXPStartupTune(src::Drivers* drivers);
 
-void playPacMan(src::Drivers* drivers);
+// void playPacMan(src::Drivers* drivers);
 
 void playChainSawMan(src::Drivers* drivers);
 

@@ -10,6 +10,10 @@
 namespace utils::Music {
 
 // built around A = 440 Hz
+static constexpr uint32_t NOTE_E4 = 330;
+static constexpr uint32_t NOTE_F4 = 340;
+static constexpr uint32_t NOTE_Gb4 = 370;
+static constexpr uint32_t NOTE_G4 = 392;
 static constexpr uint32_t NOTE_Ab4 = 415;
 static constexpr uint32_t NOTE_A4 = 440;
 static constexpr uint32_t NOTE_Bb4 = 469;
@@ -101,49 +105,49 @@ void continuePlayingTokyoDriftTune(src::Drivers* drivers) {
     }
 }
 
-// PacMan Theme (currently broken because of note renaming)
+// PacMan Theme
 
-// static bool isPacManDone = false;
+static bool isPacManDone = false;
 
-// static constexpr uint32_t PM_BPM = 130;
-// static constexpr uint32_t PM_MS_PER_16th = (uint32_t)(((1.0f / PM_BPM) * 60.0f * 1000.0f) / 4.0f);
+static constexpr uint32_t PM_BPM = 130;
+static constexpr uint32_t PM_MS_PER_16th = (uint32_t)(((1.0f / PM_BPM) * 60.0f * 1000.0f) / 4.0f);
 
-// static uint32_t lastPMTime = 0;
-// static uint32_t currentPMNote = 0;
-// static uint32_t lastPMFreq = 0;
+static uint32_t lastPMTime = 0;
+static uint32_t currentPMNote = 0;
+static uint32_t lastPMFreq = 0;
 
-// static MusicNote pacManNotes[] = {{NOTE_B4},  {NOTE_B5}, {NOTE_Gb5}, {NOTE_Eb5},
+static MusicNote pacManNotes[] = {{NOTE_B4},  {NOTE_B5}, {NOTE_Gb5}, {NOTE_Eb5},
 
-//                                   {NOTE_B5}, {0},       {NOTE_Eb5}, {0},
+                                  {NOTE_B5}, {0},       {NOTE_Eb5}, {0},
 
-//                                   {NOTE_C5},  {NOTE_C6}, {NOTE_G5},  {NOTE_E5},
+                                  {NOTE_C5},  {NOTE_C6}, {NOTE_G5},  {NOTE_E5},
 
-//                                   {NOTE_C2}, {0},       {NOTE_E},  {0},
+                                  {NOTE_C6}, {0},       {NOTE_E5},  {0},
 
-//                                   {NOTE_B},  {NOTE_B2}, {NOTE_Gb}, {NOTE_Eb},
+                                  {NOTE_B4},  {NOTE_B5}, {NOTE_G5}, {NOTE_E5},
 
-//                                   {NOTE_B2}, {0},       {NOTE_Eb}, {0},
+                                  {NOTE_B5}, {0},       {NOTE_Eb5}, {0},
 
-//                                   {NOTE_Eb}, {NOTE_Eb}, {NOTE_F},  {NOTE_F},
+                                  {NOTE_Eb5}, {NOTE_Eb5}, {NOTE_F5},  {NOTE_F5},
 
-//                                   {NOTE_G},  {NOTE_G},  {NOTE_B2}, {0}};
+                                  {NOTE_G5},  {NOTE_G5},  {NOTE_B5}, {0}};
 
-// static constexpr size_t PM_NOTE_COUNT = sizeof(pacManNotes) / sizeof(MusicNote);
+static constexpr size_t PM_NOTE_COUNT = sizeof(pacManNotes) / sizeof(MusicNote);
 
-// void playPacMan(src::Drivers* drivers) {
-//     if (isPacManDone) return;
-//     if (lastPMTime == 0) lastPMTime = tap::arch::clock::getTimeMilliseconds();
-//     uint32_t currentTime = tap::arch::clock::getTimeMilliseconds();
-//     uint32_t timeSinceLast = currentTime - lastPMTime;
+void playPacMan(src::Drivers* drivers) {
+    if (isPacManDone) return;
+    if (lastPMTime == 0) lastPMTime = tap::arch::clock::getTimeMilliseconds();
+    uint32_t currentTime = tap::arch::clock::getTimeMilliseconds();
+    uint32_t timeSinceLast = currentTime - lastPMTime;
 
-//     if (timeSinceLast >= PM_MS_PER_16th) {
-//         lastPMTime = tap::arch::clock::getTimeMilliseconds();
-//         if (lastPMFreq != pacManNotes[currentPMNote].frequency) tap::buzzer::playNote(&drivers->pwm, pacManNotes[currentPMNote].frequency);
-//         lastPMFreq = pacManNotes[currentPMNote].frequency;
-//         currentPMNote++;
-//         isPacManDone = currentPMNote == PM_NOTE_COUNT;
-//     }
-// }
+    if (timeSinceLast >= PM_MS_PER_16th) {
+        lastPMTime = tap::arch::clock::getTimeMilliseconds();
+        if (lastPMFreq != pacManNotes[currentPMNote].frequency) tap::buzzer::playNote(&drivers->pwm, pacManNotes[currentPMNote].frequency);
+        lastPMFreq = pacManNotes[currentPMNote].frequency;
+        currentPMNote++;
+        isPacManDone = currentPMNote == PM_NOTE_COUNT;
+    }
+}
 
 // Chainsaw Man theme
 
@@ -156,11 +160,18 @@ static uint32_t lastCHNSWTime = 0;
 static uint32_t currentCHNSWNote = 0;
 static uint32_t lastCHNSWFreq = 0;
 
-static MusicNote chainSawNotes[70] = {
-                            {NOTE_Gb5},{NOTE_Gb5},
-                    {NOTE_Db5},{NOTE_Db5},{NOTE_Eb5},{NOTE_Eb5},{NOTE_E5},{NOTE_Gb5},{NOTE_Gb5},{NOTE_Db5},
-                    {NOTE_Db5},{NOTE_E5},{NOTE_E5},{NOTE_E5},{NOTE_A4},{NOTE_A4},{NOTE_A4},{NOTE_A4},
-                    {NOTE_Ab4},{NOTE_Ab4},
+static MusicNote chainSawNotes[72] = {
+                    {NOTE_Ab5},{NOTE_Ab5},
+                    {NOTE_Db5},{NOTE_Db5},{NOTE_Eb5},{NOTE_Eb5},{NOTE_E5},{NOTE_Gb5},{NOTE_Gb5},{NOTE_A4},
+                    {NOTE_A4},{NOTE_E5},{NOTE_E5},{NOTE_E5},{NOTE_A4},{NOTE_A4},{NOTE_A4},{NOTE_A4},
+                    {NOTE_Ab4},{NOTE_Ab4},{NOTE_Eb5},{NOTE_Eb5},{NOTE_Ab4},{NOTE_Gb4},{NOTE_Gb4},{NOTE_Ab4},
+                    {NOTE_Ab4},{NOTE_Db5},{NOTE_Db5},{NOTE_Db5},{0},{0},{NOTE_Ab4},{NOTE_Ab4},
+                    {NOTE_Gb4},{NOTE_E4},{NOTE_Gb4},{NOTE_Gb4},{NOTE_Ab4},{NOTE_Ab4},{NOTE_Bb4},
+                    {NOTE_B4},{NOTE_B4},{NOTE_A4},{NOTE_Ab4},{NOTE_Gb4},{NOTE_Gb4},{NOTE_Db5},{NOTE_Db5},
+                    {NOTE_Db5},{NOTE_Db5},{NOTE_B4},{NOTE_A4},{NOTE_Ab4},{NOTE_E5},{NOTE_E5},{NOTE_Eb5},
+                    {NOTE_Eb5},{NOTE_Eb5},{NOTE_Eb5},{NOTE_Eb5},{0},{0},{NOTE_Ab5},{NOTE_Ab5},
+                    {NOTE_Db5},{NOTE_Db5},{NOTE_Db5},{NOTE_Db5}
+
 };
 
 static constexpr size_t CHNSW_NOTE_COUNT = sizeof(chainSawNotes) / sizeof(MusicNote);
