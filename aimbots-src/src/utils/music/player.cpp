@@ -153,8 +153,8 @@ void playPacMan(src::Drivers* drivers) {
 
 static bool isChainSawDone = false;
 
-static constexpr uint32_t CHNSW_BPM = 200;
-static constexpr uint32_t CHNSW_MS_PER_8th = (uint32_t)(((1.0f / CHNSW_BPM) * 60.0f * 1000.0f) / 2.0f); // easier for this song
+static constexpr uint32_t CHNSW_BPM = 350;
+static constexpr uint32_t CHNSW_MS_PER_8th = (uint32_t)(((1.0f / CHNSW_BPM) * 60.0f * 1000.0f) / 2.0f); // halves the overall size of the note array
 
 static uint32_t lastCHNSWTime = 0;
 static uint32_t currentCHNSWNote = 0;
