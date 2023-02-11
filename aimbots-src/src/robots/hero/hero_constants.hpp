@@ -118,13 +118,24 @@ static constexpr SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG = {
     .errorDerivativeFloor = 0.0f,
 };
 
-// hero stuff, just saving here until we regenerate hero code from standards lol
-static constexpr uint16_t shooter_speed_array[4] = {10, 3900, 16, 6500};
+static constexpr uint16_t shooter_speed_array[4] = {
+    10,3900, // {ball m/s, flywheel rpm}
+    16,6500};
 
+static constexpr uint16_t testbed_standard_speed_array[6] = {
+    10,3900,3900,  // {ball m/s, top wheel rpm, bottom wheel rpm}
+    16,6500,6500};
+
+static constexpr uint16_t testbed_topspin_speed_array[6] = {
+    10,4200,1950,  // {ball m/s, top wheel rpm, bottom wheel rpm}
+    16,6850,4950};
+
+static constexpr uint16_t testbed_backspin_speed_array[6] = {
+    10,1950,4200,  // {ball m/s, top wheel rpm, bottom wheel rpm}
+    16,4950,6850};
 static const Matrix<uint16_t, 2, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);
 
-static constexpr float FEEDER_DEFAULT_RPM = 500.0f;
-
+static constexpr float FEEDER_DEFAULT_RPM = 500.0f; // using a M3508
 static constexpr int DEFAULT_BURST_LENGTH = 5;  // balls
 
 // CAN Bus 2

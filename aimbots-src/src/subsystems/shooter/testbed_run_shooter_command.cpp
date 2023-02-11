@@ -10,7 +10,7 @@
 
 //#ifndef TARGET_ENGINEER
 
-// compile to standard specifically for 17mm shooter testbed
+// compile to standard specifically for 42mm shooter testbed
 
 namespace src::Shooter {
 
@@ -34,13 +34,12 @@ void TestbedRunShooterCommand::execute() {
     int temp = -1;
     if (drivers->remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP) {
         temp = 2;
-
     } else if (drivers->remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::MID) {
         temp = 1;
     } else if (drivers->remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::DOWN) {
         temp = 0;
     }
-    Matrix<uint16_t, 3, 3> CURRENT_SPEED_MATRIX(
+    Matrix<uint16_t, 2, 3> CURRENT_SPEED_MATRIX(
         temp == 0 ? testbed_standard_speed_array : (temp == 1 ? testbed_backspin_speed_array : testbed_topspin_speed_array));
     flywheelRPMTop = CURRENT_SPEED_MATRIX[0][1];
     flywheelRPMBottom = CURRENT_SPEED_MATRIX[0][2];
@@ -48,14 +47,15 @@ void TestbedRunShooterCommand::execute() {
     float analogY = shooter->getRightYJoystick(drivers);
 
     if (analogY > 0.3) {
-        flywheelRPMTop = CURRENT_SPEED_MATRIX[2][1];
-        flywheelRPMBottom = CURRENT_SPEED_MATRIX[2][2];
-    } else if (analogY < -0.3) {
-        flywheelRPMTop = CURRENT_SPEED_MATRIX[0][1];
-        flywheelRPMBottom = CURRENT_SPEED_MATRIX[0][2];
-    } else {
         flywheelRPMTop = CURRENT_SPEED_MATRIX[1][1];
         flywheelRPMBottom = CURRENT_SPEED_MATRIX[1][2];
+    } // else if (analogY < -0.3) {
+    //     flywheelRPMTop = CURRENT_SPEED_MATRIX[0][1];
+    //     flywheelRPMBottom = CURRENT_SPEED_MATRIX[0][2];
+    // } 
+    else {
+        flywheelRPMTop = CURRENT_SPEED_MATRIX[0][1];
+        flywheelRPMBottom = CURRENT_SPEED_MATRIX[0][2];
     }
 
     // shooter->ForAllShooterMotors(&ShooterSubsystem::setTargetRPM, static_cast<float>(flywheelRPM));
