@@ -129,8 +129,8 @@ static constexpr uint16_t shooter_speed_array[6] = {
 
 static const Matrix<uint16_t, 3, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);
 
-static constexpr float FEEDER_DEFAULT_RPM = 3000.0f;
-static constexpr float feeder_speed_array[3] = {1500.0f, 3000.0f, 4500.0f};
+static constexpr float FEEDER_DEFAULT_RPM = 3000.0f;    // Feeder RPM = 3000.0f
+// static constexpr float feeder_speed_array[3] = {1500.0f, 3000.0f, 4500.0f};
 // static const Matrix<float, 3> FEEDER_SPEED_MATRIX(feeder_speed_array);
 static constexpr int DEFAULT_BURST_LENGTH = 5;  // balls
 
