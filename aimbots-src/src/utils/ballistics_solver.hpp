@@ -4,7 +4,7 @@
 
 #include "tap/algorithms/ballistics.hpp"
 
-#include "src/informants/vision/jetson_communicator.hpp"
+#include "informants/vision/jetson_communicator.hpp"
 
 namespace src::Gimbal {
 class GimbalSubsystem;

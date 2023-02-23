@@ -53,7 +53,8 @@ void GimbalSubsystem::refresh() {
     if (yawMotor.isMotorOnline()) {
         // Update subsystem state to stay up-to-date with reality
         uint16_t currentYawEncoderPosition = yawMotor.getEncoderWrapped();
-        currentChassisRelativeYawAngle.setValue(wrappedEncoderValueToRadians(currentYawEncoderPosition));
+        currentChassisRelativeYawAngle.setValue(
+            wrappedEncoderValueToRadians(currentYawEncoderPosition) - modm::toRadian(YAW_START_ANGLE));
 
 #ifdef TARGET_HERO
         // This code just assumes that we're starting at our
@@ -82,8 +83,7 @@ void GimbalSubsystem::refresh() {
         currentFieldRelativeYawAngle.setValue(currentChassisRelativeYawAngle.getValue());
 #else
         currentFieldRelativeYawAngle.setValue(
-            currentChassisRelativeYawAngle.getValue() + drivers->fieldRelativeInformant.getChassisYaw() -
-            modm::toRadian(YAW_START_ANGLE));
+            currentChassisRelativeYawAngle.getValue() + drivers->fieldRelativeInformant.getChassisYaw());
 #endif
 
         currentYawAngleDisplay = modm::toDegree(currentChassisRelativeYawAngle.getValue());
@@ -103,7 +103,8 @@ void GimbalSubsystem::refresh() {
     if (pitchMotor.isMotorOnline()) {
         // Update subsystem state to stay up-to-date with reality
         uint16_t currentPitchEncoderPosition = pitchMotor.getEncoderWrapped();
-        currentChassisRelativePitchAngle.setValue(wrappedEncoderValueToRadians(currentPitchEncoderPosition));
+        currentChassisRelativePitchAngle.setValue(
+            wrappedEncoderValueToRadians(currentPitchEncoderPosition) - modm::toRadian(PITCH_START_ANGLE));
 
         pitchChassisRelativeDisplay = modm::toDegree(currentChassisRelativePitchAngle.getValue());
 
@@ -148,15 +149,6 @@ float GimbalSubsystem::getCurrentPitchAngleFromChassisCenter(AngleUnit unit) con
                (unit == AngleUnit::Degrees) ? -180.0f : -M_PI,
                (unit == AngleUnit::Degrees) ? 180.0f : M_PI)
         .getValue();
-}
-
-GimbalSubsystem::aimAngles GimbalSubsystem::aimAtPoint(float x, float y, float z) {
-    aimAngles a;
-
-    a.pitch = atan2(z, sqrt((x * x) + (y * y)));
-    a.yaw = atan2(x, y);
-
-    return a;
 }
 
 }  // namespace src::Gimbal

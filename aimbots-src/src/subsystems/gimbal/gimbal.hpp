@@ -18,10 +18,6 @@ namespace src::Gimbal {
 
 class GimbalSubsystem : public tap::control::Subsystem {
 public:
-    struct aimAngles {
-        double pitch, yaw;
-    };
-
     GimbalSubsystem(src::Drivers*);
 
     void initialize() override;
@@ -33,8 +29,6 @@ public:
 
     void setYawMotorOutput(float output);
     void setPitchMotorOutput(float output);
-
-    aimAngles aimAtPoint(float x, float y, float z);
 
     inline float getTargetChassisRelativeYawAngle(AngleUnit unit) const {
         return (unit == AngleUnit::Degrees) ? modm::toDegree(targetChassisRelativeYawAngle) : targetChassisRelativeYawAngle;
