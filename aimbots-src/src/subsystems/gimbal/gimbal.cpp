@@ -54,7 +54,7 @@ void GimbalSubsystem::refresh() {
         // Update subsystem state to stay up-to-date with reality
         uint16_t currentYawEncoderPosition = yawMotor.getEncoderWrapped();
         currentChassisRelativeYawAngle.setValue(
-            wrappedEncoderValueToRadians(currentYawEncoderPosition) - modm::toRadian(YAW_START_ANGLE));
+            wrappedEncoderValueToRadians(currentYawEncoderPosition));
 
 #ifdef TARGET_HERO
         // This code just assumes that we're starting at our
@@ -83,7 +83,7 @@ void GimbalSubsystem::refresh() {
         currentFieldRelativeYawAngle.setValue(currentChassisRelativeYawAngle.getValue());
 #else
         currentFieldRelativeYawAngle.setValue(
-            currentChassisRelativeYawAngle.getValue() + drivers->fieldRelativeInformant.getChassisYaw());
+            currentChassisRelativeYawAngle.getValue() + drivers->fieldRelativeInformant.getChassisYaw() - modm::toRadian(YAW_START_ANGLE));
 #endif
 
         currentYawAngleDisplay = modm::toDegree(currentChassisRelativeYawAngle.getValue());
@@ -104,7 +104,7 @@ void GimbalSubsystem::refresh() {
         // Update subsystem state to stay up-to-date with reality
         uint16_t currentPitchEncoderPosition = pitchMotor.getEncoderWrapped();
         currentChassisRelativePitchAngle.setValue(
-            wrappedEncoderValueToRadians(currentPitchEncoderPosition) - modm::toRadian(PITCH_START_ANGLE));
+            wrappedEncoderValueToRadians(currentPitchEncoderPosition));
 
         pitchChassisRelativeDisplay = modm::toDegree(currentChassisRelativePitchAngle.getValue());
 

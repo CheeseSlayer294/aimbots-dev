@@ -20,7 +20,7 @@ void GimbalChassisRelativeController::runYawController(AngleUnit unit, float tar
 
     float positionControllerError =
         modm::toDegree(
-            gimbal->getCurrentChassisRelativeYawAngleAsContiguousFloat()
+            gimbal->getCurrentYawAngleFromChassisCenter(AngleUnit::Radians)
                 .difference(gimbal->getTargetChassisRelativeYawAngle(AngleUnit::Radians)));
 
     float yawPositionPIDOutput = yawPositionPID.runController(positionControllerError, gimbal->getYawMotorRPM());

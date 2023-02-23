@@ -241,8 +241,8 @@ static constexpr float PITCH_START_ANGLE = 51.1f;
 // static constexpr float PITCH_SOFTSTOP_LOW = 346.0f;
 // static constexpr float PITCH_SOFTSTOP_HIGH = 44.75f;
 
-static constexpr float PITCH_SOFTSTOP_LOW = 346.0f;
-static constexpr float PITCH_SOFTSTOP_HIGH = 90.0f;
+static constexpr float PITCH_SOFTSTOP_LOW = 360.0f;
+static constexpr float PITCH_SOFTSTOP_HIGH = 50.0f;
 
 static constexpr float CHASSIS_VELOCITY_YAW_FEEDFORWARD = 0.0f;
 

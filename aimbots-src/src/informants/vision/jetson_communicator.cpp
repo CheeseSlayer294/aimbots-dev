@@ -114,7 +114,7 @@ void JetsonCommunicator::updateSerial() {
                     visionTargetPosition.setZ(lastMessage.targetZ);
 
                     drivers->enemyDataConverter.updateEnemyInfo(visionTargetPosition, lastMessage.delay);
-                    lastPlateKinematicState = drivers->enemyDataConverter.calculateBestGuess(3);
+                    lastPlateKinematicState = drivers->enemyDataConverter.calculateBestGuess(1);
                     lastFoundTargetTime = tap::arch::clock::getTimeMicroseconds();
                 }
 
