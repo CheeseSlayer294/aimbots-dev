@@ -1,6 +1,6 @@
 #include "subsystems/shooter/shooter.hpp"
 
-#ifndef ENGINEER
+#ifdef SHOOTER
 
 #include <tap/architecture/clock.hpp>
 #include <tap/communication/gpio/leds.hpp>

@@ -1,5 +1,5 @@
 #include "subsystems/feeder/feeder.hpp"
-#ifndef ENGINEER
+#ifdef FEEDER
 namespace src::Feeder {
 
 FeederSubsystem::FeederSubsystem(src::Drivers* drivers)

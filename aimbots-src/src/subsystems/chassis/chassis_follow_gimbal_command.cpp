@@ -1,5 +1,5 @@
 #include "utils/robot_specific_inc.hpp"
-#ifndef ENGINEER
+#if defined(CHASSIS) && defined(GIMBAL)
 #ifdef TOKYO_COMPATIBLE
 
 #include <subsystems/chassis/chassis_helper.hpp>

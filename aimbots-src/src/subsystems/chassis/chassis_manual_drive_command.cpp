@@ -1,3 +1,5 @@
+#ifdef CHASSIS
+
 #include "chassis_manual_drive_command.hpp"
 
 #include "subsystems/chassis/chassis_helper.hpp"
@@ -34,3 +36,4 @@ bool ChassisManualDriveCommand::isReady() { return true; }
 bool ChassisManualDriveCommand::isFinished() const { return false; }
 
 }  // namespace src::Chassis
+#endif

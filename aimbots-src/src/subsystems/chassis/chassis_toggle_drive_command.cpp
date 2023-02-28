@@ -1,5 +1,5 @@
 #include "chassis_toggle_drive_command.hpp"
-#ifndef ENGINEER
+#if defined(CHASSIS) && defined(GIMBAL)
 namespace src::Chassis {
 
 ChassisToggleDriveCommand::ChassisToggleDriveCommand(src::Drivers* drivers, ChassisSubsystem* chassis, Gimbal::GimbalSubsystem* gimbal)

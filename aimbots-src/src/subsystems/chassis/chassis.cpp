@@ -1,3 +1,5 @@
+#if defined(SWERVE) || defined(OMNI) || defined(MECANUM)
+
 #include "subsystems/chassis/chassis.hpp"
 
 #include "tap/communication/gpio/leds.hpp"
@@ -155,6 +157,7 @@ void ChassisSubsystem::setTargetRPMs(float x, float, float) {
         ChassisSubsystem::getMaxRefWheelSpeed(
             drivers->refSerial.getRefSerialReceivingData(),
             drivers->refSerial.getRobotData().chassis.powerConsumptionLimit));
+}
 #elif defined(SWERVE)
 void ChassisSubsystem::setTargetRPMs(float x, float y, float r) {
     calculateSwerve(
@@ -276,3 +279,4 @@ float ChassisSubsystem::calculateRotationLimitedTranslationalWheelspeed(float ch
     return rTranslationalGain * maxWheelSpeed;
 }
 };  // namespace src::Chassis
+#endif

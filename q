@@ -1,0 +1,4247 @@
+[1mdiff --git a/.vscode/settings.json b/.vscode/settings.json[m
+[1mindex 45d507e8..03143455 100644[m
+[1m--- a/.vscode/settings.json[m
+[1m+++ b/.vscode/settings.json[m
+[36m@@ -110,7 +110,7 @@[m
+         "**/bower_components": true,[m
+         "taproot/**": true,[m
+     },[m
+[31m-    "C_Cpp.errorSquiggles": "EnabledIfIncludesResolve",[m
+[32m+[m[32m    "C_Cpp.errorSquiggles": "Enabled",[m
+     "C_Cpp.default.includePath": [[m
+         "aimbots-src/taproot/src",[m
+         "aimbots-src/src",[m
+[1mdiff --git a/aimbots-src/build_tools/extract_robot_type.py b/aimbots-src/build_tools/extract_robot_type.py[m
+[1mindex 8fa08cd7..9e9260e7 100644[m
+[1m--- a/aimbots-src/build_tools/extract_robot_type.py[m
+[1m+++ b/aimbots-src/build_tools/extract_robot_type.py[m
+[36m@@ -24,7 +24,8 @@[m [mVALID_ROBOT_TYPES   = [ "TARGET_STANDARD",[m
+                         "TARGET_ENGINEER",[m
+                         "TARGET_SWERVE_ENGINEER",[m
+                         "TARGET_SENTRY",[m
+[31m-                        "TARGET_HERO" ][m
+[32m+[m[32m                        "TARGET_HERO",[m
+[32m+[m[32m                        "TARGET_DART" ][m
+ [m
+ def get_robot_type():[m
+     robot_type = ARGUMENTS.get("robot")[m
+[1mdiff --git a/aimbots-src/robot-type/robot_type.hpp b/aimbots-src/robot-type/robot_type.hpp[m
+[1mindex 4926b9a4..60bec5cc 100644[m
+[1m--- a/aimbots-src/robot-type/robot_type.hpp[m
+[1m+++ b/aimbots-src/robot-type/robot_type.hpp[m
+[36m@@ -1,13 +1,11 @@[m
+ #ifndef __ROBOT_TYPE_HPP__[m
+ #define __ROBOT_TYPE_HPP__[m
+[31m-// #define TARGET_STANDARD[m
+[32m+[m[32m#define TARGET_STANDARD[m
+ // #define TARGET_HERO[m
+ // #define TARGET_ENGINEER[m
+ // #define TARGET_AERIAL[m
+ // #define TARGET_SENTRY[m
+ // #define TARGET_SWERVE_STANDARD[m
+[31m-#define TARGET_SWERVE_ENGINEER[m
+[31m-// #define TOKYO_COMPATIBLE[m
+[31m-#define SWERVE[m
+[31m-[m
+[32m+[m[32m// #define TARGET_SWERVE_ENGINEER[m
+[32m+[m[32m#define TARGET_DART[m
+ #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/informants/field_relative_informant.cpp b/aimbots-src/src/informants/field_relative_informant.cpp[m
+[1mindex 9b4d6fa1..e540f1e6 100644[m
+[1m--- a/aimbots-src/src/informants/field_relative_informant.cpp[m
+[1m+++ b/aimbots-src/src/informants/field_relative_informant.cpp[m
+[36m@@ -55,7 +55,9 @@[m [mfloat FieldRelativeInformant::getChassisRoll() {[m
+     return roll;[m
+ }[m
+ [m
+[31m-tap::communication::sensors::imu::ImuInterface::ImuState FieldRelativeInformant::getImuState() { return drivers->bmi088.getImuState(); }[m
+[32m+[m[32mtap::communication::sensors::imu::ImuInterface::ImuState FieldRelativeInformant::getImuState() {[m
+[32m+[m[32m    return drivers->bmi088.getImuState();[m
+[32m+[m[32m}[m
+ [m
+ float FieldRelativeInformant::getGz() {  // yaw[m
+     return -modm::toRadian(drivers->bmi088.getGz());[m
+[36m@@ -105,7 +107,8 @@[m [mvoid FieldRelativeInformant::updateFieldRelativeRobotPosition() {[m
+         // wheelOffset += (currUltrasonicPosition - currWheelMovement) * ULTRASONIC_TRUST_FACTOR;[m
+     }[m
+ [m
+[31m-    railPositionRawDebug = ((UltrasonicDistanceSensor::getRightDistance() + UltrasonicDistanceSensor::getLeftDistance()) / 2.0) / 100.0;  // meters[m
+[32m+[m[32m    railPositionRawDebug =[m
+[32m+[m[32m        ((UltrasonicDistanceSensor::getRightDistance() + UltrasonicDistanceSensor::getLeftDistance()) / 2.0) / 100.0;  // meters[m
+     wheelOffsetDebug = wheelOffset;[m
+ [m
+     // set the current rail position to a position matrix relative to the rail[m
+[36m@@ -113,8 +116,8 @@[m [mvoid FieldRelativeInformant::updateFieldRelativeRobotPosition() {[m
+     robotRailPositionXDisplay = railRelativePosition[0][0];[m
+ [m
+     // rotate the matrix by 45 degrees (rail is mounted at 45 degree angle) and add to the robot's starting position[m
+[31m-    fieldRelativeRobotPosition =[m
+[31m-        railRelativePosition * src::utils::MatrixHelper::rotation_matrix(AngleUnit::Degrees, 45.0f, 2) + left_sentry_rail_pole_location_matrix;[m
+[32m+[m[32m    fieldRelativeRobotPosition = railRelativePosition * src::utils::MatrixHelper::xy_rotation_matrix(AngleUnit::Degrees, 45.0f) +[m
+[32m+[m[32m                                 left_sentry_rail_pole_location_matrix;[m
+ [m
+     robotPositionXDisplay = fieldRelativeRobotPosition[0][0];[m
+     robotPositionYDisplay = fieldRelativeRobotPosition[0][1];[m
+[36m@@ -124,7 +127,8 @@[m [mvoid FieldRelativeInformant::updateFieldRelativeRobotPosition() {[m
+ [m
+ // gets the angle between the robot's current position and the field coordinate[m
+ float FieldRelativeInformant::getXYAngleToFieldCoordinate(AngleUnit unit, Matrix<float, 1, 3> fieldCoordinate) {[m
+[31m-    float xy_angle = src::utils::MatrixHelper::xy_angle_between_locations(AngleUnit::Radians, fieldRelativeRobotPosition, fieldCoordinate);[m
+[32m+[m[32m    float xy_angle =[m
+[32m+[m[32m        src::utils::MatrixHelper::xy_angle_between_locations(AngleUnit::Radians, fieldRelativeRobotPosition, fieldCoordinate);[m
+     if (unit == AngleUnit::Degrees) {[m
+         xy_angle = modm::toDegree(xy_angle);[m
+     }[m
+[1mdiff --git a/aimbots-src/src/robots/dart/dart_constants.hpp b/aimbots-src/src/robots/dart/dart_constants.hpp[m
+[1mnew file mode 100644[m
+[1mindex 00000000..14c29713[m
+[1m--- /dev/null[m
+[1m+++ b/aimbots-src/src/robots/dart/dart_constants.hpp[m
+[36m@@ -0,0 +1,208 @@[m
+[32m+[m[32m#pragma once[m
+[32m+[m[32m#include "utils/common_types.hpp"[m
+[32m+[m
+[32m+[m[32m#define TARGET_DART[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * @brief Defines the number of motors created for the chassis.[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr uint8_t DRIVEN_WHEEL_COUNT = 0;[m
+[32m+[m[32mstatic constexpr uint8_t MOTORS_PER_WHEEL = 0;[m
+[32m+[m
+[32m+[m[32mstatic constexpr uint8_t SHOOTER_MOTOR_COUNT = 6;[m
+[32m+[m[32m/**[m
+[32m+[m[32m * @brief Definitions for operator interface constants (may change based on preference of drivers)[m
+[32m+[m[32m *[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr int16_t USER_MOUSE_YAW_MAX = 1000;[m
+[32m+[m[32mstatic constexpr int16_t USER_MOUSE_PITCH_MAX = 1000;[m
+[32m+[m[32mstatic constexpr float USER_MOUSE_YAW_SCALAR = (1.0f / USER_MOUSE_YAW_MAX);[m
+[32m+[m[32mstatic constexpr float USER_MOUSE_PITCH_SCALAR = (1.0f / USER_MOUSE_PITCH_MAX);[m
+[32m+[m
+[32m+[m[32mstatic constexpr float CTRL_SCALAR = (1.0f / 4);[m
+[32m+[m[32mstatic constexpr float SHIFT_SCALAR = (1.0f / 2);[m
+[32m+[m
+[32m+[m[32mstatic constexpr float FEEDER_MOTOR_DIRECTION = 1;[m
+[32m+[m[32mstatic constexpr float YAW_MOTOR_DIRECTION = 1;[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * @brief Chassis Velocity PID constants[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr float VELOCITY_PID_KP = 20.0f;[m
+[32m+[m[32mstatic constexpr float VELOCITY_PID_KI = 0.2f;[m
+[32m+[m[32mstatic constexpr float VELOCITY_PID_KD = 0.0f;[m
+[32m+[m[32mstatic constexpr float VELOCITY_PID_MAX_ERROR_SUM = 5000.0f;[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * @brief Gimbal Position PID constants[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr float YAW_POSITION_PID_KP = 600.0f;[m
+[32m+[m[32mstatic constexpr float YAW_POSITION_PID_KI = 0.0f;[m
+[32m+[m[32mstatic constexpr float YAW_POSITION_PID_KD = 0.0f;[m
+[32m+[m[32mstatic constexpr float YAW_POSITION_PID_MAX_ERROR_SUM = 5000.0f;[m
+[32m+[m[32mstatic constexpr float YAW_POSITION_PID_Q_DERIVATIVE_KALMAN = 0.0f;[m
+[32m+[m[32mstatic constexpr float YAW_POSITION_PID_R_DERIVATIVE_KALMAN = 0.0f;[m
+[32m+[m[32mstatic constexpr float YAW_POSITION_PID_Q_PROPORTIONAL_KALMAN = 0.0f;[m
+[32m+[m[32mstatic constexpr float YAW_POSITION_PID_R_PROPORTIONAL_KALMAN = 0.0f;[m
+[32m+[m
+[32m+[m[32mstatic constexpr float PITCH_POSITION_PID_KP = 600.0f;[m
+[32m+[m[32mstatic constexpr float PITCH_POSITION_PID_KI = 0.0f;[m
+[32m+[m[32mstatic constexpr float PITCH_POSITION_PID_KD = 0.0f;[m
+[32m+[m[32mstatic constexpr float PITCH_POSITION_PID_MAX_ERROR_SUM = 5000.0f;[m
+[32m+[m[32mstatic constexpr float PITCH_POSITION_PID_Q_DERIVATIVE_KALMAN = 0.0f;[m
+[32m+[m[32mstatic constexpr float PITCH_POSITION_PID_R_DERIVATIVE_KALMAN = 0.0f;[m
+[32m+[m[32mstatic constexpr float PITCH_POSITION_PID_Q_PROPORTIONAL_KALMAN = 0.0f;[m
+[32m+[m[32mstatic constexpr float PITCH_POSITION_PID_R_PROPORTIONAL_KALMAN = 0.0f;[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * @brief PID constants for shooter[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr float SHOOTER_PID_KP = 50.0f;[m
+[32m+[m[32mstatic constexpr float SHOOTER_PID_KI = 0.0f;[m
+[32m+[m[32mstatic constexpr float SHOOTER_PID_KD = 0.0f;[m
+[32m+[m[32mstatic constexpr float SHOOTER_MAX_I_CUMULATIVE = 10.0f;[m
+[32m+[m[32mstatic constexpr float SHOOTER_MAX_OUTPUT = 30000.0f;[m
+[32m+[m[32mstatic constexpr float SHOOTER_TQ_DERIVATIVE_KALMAN = 1.0f;[m
+[32m+[m[32mstatic constexpr float SHOOTER_TR_DERIVATIVE_KALMAN = 1.0f;[m
+[32m+[m[32mstatic constexpr float SHOOTER_TQ_PROPORTIONAL_KALMAN = 1.0f;[m
+[32m+[m[32mstatic constexpr float SHOOTER_TR_PROPORTIONAL_KALMAN = 1.0f;[m
+[32m+[m
+[32m+[m[32mstatic constexpr bool SHOOTER_1_DIRECTION = true;[m
+[32m+[m[32mstatic constexpr bool SHOOTER_3_DIRECTION = true;[m
+[32m+[m[32mstatic constexpr bool SHOOTER_5_DIRECTION = true;[m
+[32m+[m[32mstatic constexpr bool SHOOTER_2_DIRECTION=false;[m
+[32m+[m[32mstatic constexpr bool SHOOTER_4_DIRECTION=false;[m
+[32m+[m[32mstatic constexpr bool SHOOTER_6_DIRECTION = false;[m
+[32m+[m
+[32m+[m[32m// static constexpr MotorID LEFT_BACK_WHEEL_ID = MotorID::MOTOR1;[m
+[32m+[m[32m// static constexpr MotorID LEFT_FRONT_WHEEL_ID = MotorID::MOTOR2;[m
+[32m+[m[32m// static constexpr MotorID RIGHT_FRONT_WHEEL_ID = MotorID::MOTOR3;[m
+[32m+[m[32m// static constexpr MotorID RIGHT_BACK_WHEEL_ID = MotorID::MOTOR4;[m
+[32m+[m[32mstatic constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR5;[m
+[32m+[m[32mstatic constexpr MotorID PITCH_MOTOR_ID = MotorID::MOTOR6;[m
+[32m+[m[32m//[m
+[32m+[m[32m// static constexpr MotorID FEEDER_ID = MotorID::MOTOR7;[m
+[32m+[m[32m//[m
+[32m+[m[32mstatic constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR1;[m
+[32m+[m[32mstatic constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR2;[m
+[32m+[m[32mstatic constexpr MotorID SHOOTER_3_ID = MotorID::MOTOR3;[m
+[32m+[m[32mstatic constexpr MotorID SHOOTER_4_ID = MotorID::MOTOR4;[m
+[32m+[m[32mstatic constexpr MotorID SHOOTER_5_ID = MotorID::MOTOR5;[m
+[32m+[m[32mstatic constexpr MotorID SHOOTER_6_ID = MotorID::MOTOR6;[m
+[32m+[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * @brief Position PID constants[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr SmoothPIDConfig YAW_POSITION_PID_CONFIG = {[m
+[32m+[m[32m    .kp = 600.0f,[m
+[32m+[m[32m    .ki = 0.0f,[m
+[32m+[m[32m    .kd = 500.0f,[m
+[32m+[m[32m    .maxICumulative = 10.0f,[m
+[32m+[m[32m    .maxOutput = GM6020_MAX_OUTPUT,[m
+[32m+[m[32m    .tQDerivativeKalman = 1.0f,[m
+[32m+[m[32m    .tRDerivativeKalman = 1.0f,[m
+[32m+[m[32m    .tQProportionalKalman = 1.0f,[m
+[32m+[m[32m    .tRProportionalKalman = 1.0f,[m
+[32m+[m[32m    .errDeadzone = 0.0f,[m
+[32m+[m[32m    .errorDerivativeFloor = 0.0f,[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mstatic constexpr SmoothPIDConfig PITCH_POSITION_PID_CONFIG = {[m
+[32m+[m[32m    .kp = 1000.0f,[m
+[32m+[m[32m    .ki = 0.0f,[m
+[32m+[m[32m    .kd = 150.0f,[m
+[32m+[m[32m    .maxICumulative = 10.0f,[m
+[32m+[m[32m    .maxOutput = GM6020_MAX_OUTPUT,[m
+[32m+[m[32m    .tQDerivativeKalman = 1.0f,[m
+[32m+[m[32m    .tRDerivativeKalman = 1.0f,[m
+[32m+[m[32m    .tQProportionalKalman = 1.0f,[m
+[32m+[m[32m    .tRProportionalKalman = 1.0f,[m
+[32m+[m[32m    .errDeadzone = 0.0f,[m
+[32m+[m[32m    .errorDerivativeFloor = 0.0f,[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mstatic constexpr SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG = {[m
+[32m+[m[32m    .kp = 50.0f,[m
+[32m+[m[32m    .ki = 0.0f,[m
+[32m+[m[32m    .kd = 0.0f,[m
+[32m+[m[32m    .maxICumulative = 10.0f,[m
+[32m+[m[32m    .maxOutput = 30000.0f,[m
+[32m+[m[32m    .tQDerivativeKalman = 1.0f,[m
+[32m+[m[32m    .tRDerivativeKalman = 1.0f,[m
+[32m+[m[32m    .tQProportionalKalman = 1.0f,[m
+[32m+[m[32m    .tRProportionalKalman = 1.0f,[m
+[32m+[m[32m    .errDeadzone = 0.0f,[m
+[32m+[m[32m    .errorDerivativeFloor = 0.0f,[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32m// static constexpr CANBus CHASSIS_BUS = CANBus::CAN_BUS2;[m
+[32m+[m[32mstatic constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS1;[m
+[32m+[m[32mstatic constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS2;[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * This max output is measured in the c620 robomaster translated current.[m
+[32m+[m[32m * Per the datasheet, the controllable current range is -16384 ~ 0 ~ 16384.[m
+[32m+[m[32m * The corresponding speed controller output torque current range is[m
+[32m+[m[32m * -20 ~ 0 ~ 20 A.[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr float VELOCITY_PID_MAX_OUTPUT = 16000.0f;[m
+[32m+[m[32mstatic constexpr float POSITION_PID_MAX_OUTPUT = 16000.0f;[m
+[32m+[m
+[32m+[m[32m// Mechanical chassis constants, all in m[m
+[32m+[m[32m/**[m
+[32m+[m[32m * Radius of the wheels (m).[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr float WHEEL_RADIUS = 0.076;[m
+[32m+[m
+[32m+[m[32mstatic constexpr float WHEELBASE_WIDTH = 0.366f;[m
+[32m+[m
+[32m+[m[32mstatic constexpr float WHEELBASE_LENGTH = 0.366f;[m
+[32m+[m
+[32m+[m[32mstatic constexpr float GIMBAL_X_OFFSET = 0.0f;[m
+[32m+[m[32mstatic constexpr float GIMBAL_Y_OFFSET = 0.0f;[m
+[32m+[m
+[32m+[m[32mstatic constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f);[m
+[32m+[m
+[32m+[m[32m// FIXME: These work for thee testbed standard, so they need to[m
+[32m+[m[32m//        adjusted once we have real standard robots[m
+[32m+[m[32mstatic constexpr float YAW_START_ANGLE = 0.0f;[m
+[32m+[m[32mstatic constexpr float PITCH_START_ANGLE = 66.66f;[m
+[32m+[m[32mstatic constexpr float PITCH_HARDSTOP_LOW = 90.0f;[m
+[32m+[m[32mstatic constexpr float PITCH_HARDSTOP_HIGH = 20.0f;[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * Max wheel speed, measured in RPM of the 3508 motor shaft.[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr int MAX_3508_ENC_RPM = 7000;[m
+[32m+[m
+[32m+[m[32m// Power limiting constants, will explain later[m
+[32m+[m[32mstatic constexpr float MAX_ENERGY_BUFFER = 60.0f;[m
+[32m+[m[32mstatic constexpr float ENERGY_BUFFER_LIMIT_THRESHOLD = 40.0f;[m
+[32m+[m[32mstatic constexpr float ENERGY_BUFFER_CRIT_THRESHOLD = 5;[m
+[32m+[m[32mstatic constexpr uint16_t POWER_CONSUMPTION_THRESHOLD = 20;[m
+[32m+[m[32mstatic constexpr float CURRENT_ALLOCATED_FOR_ENERGY_BUFFER_LIMITING = 30000;[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * @brief Power constants for chassis[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr int MIN_WHEEL_SPEED_SINGLE_MOTOR = 4000;[m
+[32m+[m[32mstatic constexpr int MAX_WHEEL_SPEED_SINGLE_MOTOR = 8000;[m
+[32m+[m[32mstatic constexpr int MIN_CHASSIS_POWER = 40;[m
+[32m+[m[32mstatic constexpr int MAX_CHASSIS_POWER = 120;[m
+[32m+[m[32mstatic constexpr int WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE =[m
+[32m+[m[32m    (MAX_WHEEL_SPEED_SINGLE_MOTOR - MIN_WHEEL_SPEED_SINGLE_MOTOR) /[m
+[32m+[m[32m    (MAX_CHASSIS_POWER - MIN_CHASSIS_POWER);[m
+[32m+[m[32mstatic_assert(WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE >= 0);[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * @brief Behavior constants for chassis[m
+[32m+[m[32m */[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * The minimum desired wheel speed for chassis rotation, measured in RPM before[m
+[32m+[m[32m * we start slowing down translational speed.[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr float MIN_ROTATION_THRESHOLD = 800.0f;[m
+[1mdiff --git a/aimbots-src/src/robots/dart/dart_control.cpp b/aimbots-src/src/robots/dart/dart_control.cpp[m
+[1mnew file mode 100644[m
+[1mindex 00000000..09cc3163[m
+[1m--- /dev/null[m
+[1m+++ b/aimbots-src/src/robots/dart/dart_control.cpp[m
+[36m@@ -0,0 +1,120 @@[m
+[32m+[m[32m#ifdef TARGET_DART[m
+[32m+[m
+[32m+[m[32m#include "drivers.hpp"[m
+[32m+[m[32m#include "drivers_singleton.hpp"[m
+[32m+[m[32m#include "utils/common_types.hpp"[m
+[32m+[m[32m//[m
+[32m+[m[32m#include "tap/control/command_mapper.hpp"[m
+[32m+[m[32m#include "tap/control/hold_command_mapping.hpp"[m
+[32m+[m[32m#include "tap/control/hold_repeat_command_mapping.hpp"[m
+[32m+[m[32m#include "tap/control/press_command_mapping.hpp"[m
+[32m+[m[32m#include "tap/control/setpoint/commands/calibrate_command.hpp"[m
+[32m+[m[32m#include "tap/control/toggle_command_mapping.hpp"[m
+[32m+[m[32m//[m
+[32m+[m[32m// #include "subsystems/chassis/chassis.hpp"[m
+[32m+[m[32m// #include "subsystems/chassis/chassis_drive_command.hpp"[m
+[32m+[m[32m//[m
+[32m+[m[32m// #include "subsystems/feeder/feeder.hpp"[m
+[32m+[m[32m// #include "subsystems/feeder/run_feeder_command.hpp"[m
+[32m+[m[32m// #include "subsystems/feeder/stop_feeder_command.hpp"[m
+[32m+[m[32m//[m
+[32m+[m[32m#include "subsystems/gimbal/controllers/gimbal_chassis_relative_controller.hpp"[m
+[32m+[m[32m#include "subsystems/gimbal/gimbal.hpp"[m
+[32m+[m[32m#include "subsystems/gimbal/gimbal_control_command.hpp"[m
+[32m+[m[32m//[m
+[32m+[m[32m#include "subsystems/shooter/run_shooter_command.hpp"[m
+[32m+[m[32m#include "subsystems/shooter/shooter.hpp"[m
+[32m+[m[32m#include "subsystems/shooter/stop_shooter_command.hpp"[m
+[32m+[m[32m#include "subsystems/shooter/brake_shooter_command.hpp"[m
+[32m+[m
+[32m+[m[32m// using namespace src::Chassis;[m
+[32m+[m[32m// using namespace src::Feeder;[m
+[32m+[m[32musing namespace src::Gimbal;[m
+[32m+[m[32musing namespace src::Shooter;[m
+[32m+[m
+[32m+[m[32m/*[m
+[32m+[m[32m * NOTE: We are using the DoNotUse_getDrivers() function here[m
+[32m+[m[32m *      because this file defines all subsystems and command[m
+[32m+[m[32m *      and thus we must pass in the single statically allocated[m
+[32m+[m[32m *      Drivers class to all of these objects.[m
+[32m+[m[32m */[m
+[32m+[m[32msrc::driversFunc drivers = src::DoNotUse_getDrivers;[m
+[32m+[m
+[32m+[m[32musing namespace tap;[m
+[32m+[m[32musing namespace tap::control;[m
+[32m+[m[32musing namespace tap::communication::serial;[m
+[32m+[m
+[32m+[m[32mnamespace StandardControl {[m
+[32m+[m
+[32m+[m[32m// Define subsystems here ------------------------------------------------[m
+[32m+[m[32m// ChassisSubsystem chassis(drivers());[m
+[32m+[m[32m// FeederSubsystem feeder(drivers());[m
+[32m+[m[32mGimbalSubsystem gimbal(drivers());[m
+[32m+[m[32mShooterSubsystem shooter(drivers());[m
+[32m+[m
+[32m+[m[32m// Define commands here ---------------------------------------------------[m
+[32m+[m[32m// ChassisDriveCommand chassisDriveCommand(drivers(), &chassis);[m
+[32m+[m[32m// RunFeederCommand runFeederCommand(drivers(), &feeder);[m
+[32m+[m[32m// StopFeederCommand stopFeederCommand(drivers(), &feeder);[m
+[32m+[m[32mGimbalChassisRelativeController gimbalController(&gimbal);[m
+[32m+[m[32m// GimbalControlCommand gimbalControlCommand(drivers(), &gimbal, &gimbalController, 0.3f, 0.3f);[m
+[32m+[m[32mRunShooterCommand runShooterCommand(drivers(), &shooter);[m
+[32m+[m[32mStopShooterCommand shooterDefaultCommand(drivers(), &shooter);[m
+[32m+[m
+[32m+[m[32m// Define command mappings here -------------------------------------------[m
+[32m+[m[32mHoldCommandMapping leftSwitchUp([m
+[32m+[m[32m    drivers(),[m
+[32m+[m[32m    {&gimbalControlCommand},[m
+[32m+[m[32m    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));[m
+[32m+[m
+[32m+[m[32mHoldCommandMapping rightSwitchUp([m
+[32m+[m[32m    drivers(),[m
+[32m+[m[32m    {&runShooterCommand},[m
+[32m+[m[32m    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP));[m
+[32m+[m
+[32m+[m[32m// Register subsystems here -----------------------------------------------[m
+[32m+[m[32mvoid registerSubsystems(src::Drivers *drivers) {[m
+[32m+[m[32m    // drivers->commandScheduler.registerSubsystem(&chassis);[m
+[32m+[m[32m    // drivers->commandScheduler.registerSubsystem(&feeder);[m
+[32m+[m[32m    drivers->commandScheduler.registerSubsystem(&gimbal);[m
+[32m+[m[32m    drivers->commandScheduler.registerSubsystem(&shooter);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m// Initialize subsystems here ---------------------------------------------[m
+[32m+[m[32mvoid initializeSubsystems() {[m
+[32m+[m[32m    // chassis.initialize();[m
+[32m+[m[32m    // feeder.initialize();[m
+[32m+[m[32m    gimbal.initialize();[m
+[32m+[m[32m    shooter.initialize();[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m// Set default command here -----------------------------------------------[m
+[32m+[m[32mvoid setDefaultCommands(src::Drivers *) {[m
+[32m+[m[32m    // gimbal.setDefaultCommand(&stopFeederCommand);[m
+[32m+[m[32m    shooter.setDefaultCommand(&shooterDefaultCommand);[m
+[32m+[m[32m    // no default commands should be set[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m// Set commands scheduled on startup[m
+[32m+[m[32mvoid startupCommands(src::Drivers *) {}[m
+[32m+[m
+[32m+[m[32m// Register IO mappings here -----------------------------------------------[m
+[32m+[m[32mvoid registerIOMappings(src::Drivers *drivers) {[m
+[32m+[m[32m    drivers->commandMapper.addMap(&leftSwitchUp);[m
+[32m+[m[32m    drivers->commandMapper.addMap(&rightSwitchUp);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m}  // namespace StandardControl[m
+[32m+[m
+[32m+[m[32mnamespace src::Control {[m
+[32m+[m[32m// Initialize subsystems ---------------------------------------------------[m
+[32m+[m[32mvoid initializeSubsystemCommands(src::Drivers *drivers) {[m
+[32m+[m[32m    StandardControl::initializeSubsystems();[m
+[32m+[m[32m    StandardControl::registerSubsystems(drivers);[m
+[32m+[m[32m    StandardControl::setDefaultCommands(drivers);[m
+[32m+[m[32m    StandardControl::startupCommands(drivers);[m
+[32m+[m[32m    StandardControl::registerIOMappings(drivers);[m
+[32m+[m[32m}[m
+[32m+[m[32m}  // namespace src::Control[m
+[32m+[m
+[32m+[m[32m#endif  // TARGET_STANDARD[m
+[1mdiff --git a/aimbots-src/src/robots/engineer-swerve/swerve_engineer_control_interface.cpp b/aimbots-src/src/robots/dart/dart_control_interface.cpp[m
+[1msimilarity index 91%[m
+[1mrename from aimbots-src/src/robots/engineer-swerve/swerve_engineer_control_interface.cpp[m
+[1mrename to aimbots-src/src/robots/dart/dart_control_interface.cpp[m
+[1mindex 931ddfe3..4e60ddb4 100644[m
+[1m--- a/aimbots-src/src/robots/engineer-swerve/swerve_engineer_control_interface.cpp[m
+[1m+++ b/aimbots-src/src/robots/dart/dart_control_interface.cpp[m
+[36m@@ -1,5 +1,5 @@[m
+[31m-#ifdef TARGET_SWERVE_ENGINEER[m
+[31m-#include "swerve_engineer_control_interface.hpp"[m
+[32m+[m[32m#ifdef TARGET_DART[m
+[32m+[m[32m#include "dart_control_interface.hpp"[m
+ [m
+ #include "tap/architecture/clock.hpp"[m
+ #include "tap/communication/serial/remote.hpp"[m
+[36m@@ -92,13 +92,13 @@[m [mfloat OperatorInterface::getChassisRotationInput() {[m
+     return finalRotation;[m
+ }[m
+ [m
+[31m-// float OperatorInterface::getGimbalYawInput() {[m
+[31m-//     return drivers->remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL);[m
+[31m-// }[m
+[32m+[m[32mfloat OperatorInterface::getGimbalYawInput() {[m
+[32m+[m[32m    return drivers->remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL);[m
+[32m+[m[32m}[m
+ [m
+[31m-// float OperatorInterface::getGimbalPitchInput() {[m
+[31m-//     return drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL);[m
+[31m-// }[m
+[32m+[m[32mfloat OperatorInterface::getGimbalPitchInput() {[m
+[32m+[m[32m    return drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL);[m
+[32m+[m[32m}[m
+ [m
+ }  // namespace src::Control[m
+ [m
+[1mdiff --git a/aimbots-src/src/robots/engineer-swerve/swerve_engineer_control_interface.hpp b/aimbots-src/src/robots/dart/dart_control_interface.hpp[m
+[1msimilarity index 85%[m
+[1mrename from aimbots-src/src/robots/engineer-swerve/swerve_engineer_control_interface.hpp[m
+[1mrename to aimbots-src/src/robots/dart/dart_control_interface.hpp[m
+[1mindex 4d2b96a3..dee53eb5 100644[m
+[1m--- a/aimbots-src/src/robots/engineer-swerve/swerve_engineer_control_interface.hpp[m
+[1m+++ b/aimbots-src/src/robots/dart/dart_control_interface.hpp[m
+[36m@@ -3,6 +3,8 @@[m
+ #include "tap/algorithms/linear_interpolation_predictor.hpp"[m
+ #include "tap/util_macros.hpp"[m
+ #include "utils/robot_specific_inc.hpp"[m
+[32m+[m[32m#include "utils/common_types.hpp"[m
+[32m+[m
+ [m
+ using namespace tap::algorithms;[m
+ [m
+[36m@@ -29,8 +31,8 @@[m [mclass OperatorInterface {[m
+     mockable float getChassisYInput();[m
+     mockable float getChassisRotationInput();[m
+ [m
+[31m-    // mockable float getGimbalYawInput();[m
+[31m-    // mockable float getGimbalPitchInput();[m
+[32m+[m[32m    mockable float getGimbalYawInput();[m
+[32m+[m[32m    mockable float getGimbalPitchInput();[m
+ };[m
+ [m
+ }  // namespace src::Control[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/robots/engineer-swerve/swerve_engineer_constants.hpp b/aimbots-src/src/robots/engineer-swerve/swerve_engineer_constants.hpp[m
+[1mdeleted file mode 100644[m
+[1mindex a392eead..00000000[m
+[1m--- a/aimbots-src/src/robots/engineer-swerve/swerve_engineer_constants.hpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,225 +0,0 @@[m
+[31m-#pragma once[m
+[31m-#include "utils/common_types.hpp"[m
+[31m-#include "utils/math/matrix_helpers.hpp"[m
+[31m-[m
+[31m-#define SWERVE[m
+[31m-#define ENGINEER[m
+[31m-[m
+[31m-static constexpr uint8_t DRIVEN_WHEEL_COUNT = 4;[m
+[31m-static constexpr uint8_t MOTORS_PER_WHEEL = 2;[m
+[31m-[m
+[31m-static constexpr uint8_t SHOOTER_MOTOR_COUNT = 0;[m
+[31m-[m
+[31m-/**[m
+[31m- * @brief Definitions for operator interface constants (may change based on preference of drivers)[m
+[31m- *[m
+[31m- */[m
+[31m-static constexpr int16_t USER_MOUSE_YAW_MAX = 1000;[m
+[31m-static constexpr int16_t USER_MOUSE_PITCH_MAX = 1000;[m
+[31m-static constexpr float USER_MOUSE_YAW_SCALAR = (1.0f / USER_MOUSE_YAW_MAX);[m
+[31m-static constexpr float USER_MOUSE_PITCH_SCALAR = (1.0f / USER_MOUSE_PITCH_MAX);[m
+[31m-[m
+[31m-static constexpr float USER_JOYSTICK_YAW_SCALAR = 0.3f;[m
+[31m-static constexpr float USER_JOYSTICK_PITCH_SCALAR = 0.15f;[m
+[31m-[m
+[31m-static constexpr float CTRL_SCALAR = (1.0f / 4);[m
+[31m-static constexpr float SHIFT_SCALAR = (1.0f / 2);[m
+[31m-[m
+[31m-static constexpr SmoothPIDConfig CHASSIS_VELOCITY_PID_CONFIG = {[m
+[31m-    .kp = 18.0f,[m
+[31m-    .ki = 0.0f,[m
+[31m-    .kd = 1.0f,[m
+[31m-    .maxICumulative = 10.0f,[m
+[31m-    .maxOutput = M3508_MAX_OUTPUT,[m
+[31m-    .tQDerivativeKalman = 1.0f,[m
+[31m-    .tRDerivativeKalman = 1.0f,[m
+[31m-    .tQProportionalKalman = 1.0f,[m
+[31m-    .tRProportionalKalman = 1.0f,[m
+[31m-    .errDeadzone = 0.0f,[m
+[31m-    .errorDerivativeFloor = 0.0f,[m
+[31m-};[m
+[31m-[m
+[31m-static constexpr SmoothPIDConfig CHASSIS_YAW_PID_CONFIG = {[m
+[31m-    .kp = 10.0f,[m
+[31m-    .ki = 0.0f,[m
+[31m-    .kd = 0.0f,[m
+[31m-    .maxICumulative = 10.0f,[m
+[31m-    .maxOutput = M3508_MAX_OUTPUT,[m
+[31m-    .tQDerivativeKalman = 1.0f,[m
+[31m-    .tRDerivativeKalman = 1.0f,[m
+[31m-    .tQProportionalKalman = 1.0f,[m
+[31m-    .tRProportionalKalman = 1.0f,[m
+[31m-    .errDeadzone = 0.0f,[m
+[31m-    .errorDerivativeFloor = 0.0f,[m
+[31m-};[m
+[31m-[m
+[31m-static constexpr SmoothPIDConfig FEEDER_VELOCITY_PID_CONFIG = {[m
+[31m-    .kp = 0.0f,[m
+[31m-    .ki = 0.0f,[m
+[31m-    .kd = 0.8f,[m
+[31m-    .maxICumulative = 10.0f,[m
+[31m-    .maxOutput = M2006_MAX_OUTPUT,[m
+[31m-    .tQDerivativeKalman = 1.0f,[m
+[31m-    .tRDerivativeKalman = 1.0f,[m
+[31m-    .tQProportionalKalman = 1.0f,[m
+[31m-    .tRProportionalKalman = 1.0f,[m
+[31m-    .errDeadzone = 0.0f,[m
+[31m-    .errorDerivativeFloor = 0.0f,[m
+[31m-};[m
+[31m-[m
+[31m-static constexpr float POSITION_PID_MAX_OUTPUT = 16000.0f;[m
+[31m-[m
+[31m-static constexpr SmoothPIDConfig YAW_POSITION_PID_CONFIG = {[m
+[31m-    .kp = 0.0f,[m
+[31m-    .ki = 0.0f,[m
+[31m-    .kd = 500.0f,[m
+[31m-    .maxICumulative = 10.0f,[m
+[31m-    .maxOutput = GM6020_MAX_OUTPUT,[m
+[31m-    .tQDerivativeKalman = 1.0f,[m
+[31m-    .tRDerivativeKalman = 1.0f,[m
+[31m-    .tQProportionalKalman = 1.0f,[m
+[31m-    .tRProportionalKalman = 1.0f,[m
+[31m-    .errDeadzone = 0.0f,[m
+[31m-    .errorDerivativeFloor = 0.0f,[m
+[31m-};[m
+[31m-[m
+[31m-static constexpr SmoothPIDConfig PITCH_POSITION_PID_CONFIG = {[m
+[31m-    .kp = 0.0f,[m
+[31m-    .ki = 0.0f,[m
+[31m-    .kd = 150.0f,[m
+[31m-    .maxICumulative = 10.0f,[m
+[31m-    .maxOutput = GM6020_MAX_OUTPUT,[m
+[31m-    .tQDerivativeKalman = 1.0f,[m
+[31m-    .tRDerivativeKalman = 1.0f,[m
+[31m-    .tQProportionalKalman = 1.0f,[m
+[31m-    .tRProportionalKalman = 1.0f,[m
+[31m-    .errDeadzone = 0.0f,[m
+[31m-    .errorDerivativeFloor = 0.0f,[m
+[31m-};[m
+[31m-[m
+[31m-static constexpr float FLYWHEEL_DEFAULT_RPM = 0.0f;[m
+[31m-[m
+[31m-static constexpr float FEEDER_DEFAULT_RPM = 0.0f;[m
+[31m-[m
+[31m-static constexpr float YAW_INPUT_DIRECTION = -1;[m
+[31m-[m
+[31m-static constexpr int DEFAULT_BURST_LENGTH = 0;  // balls[m
+[31m-[m
+[31m-/**[m
+[31m- * This max output is measured in the c620 robomaster translated current.[m
+[31m- * Per the datasheet, the controllable current range is -16384 ~ 0 ~ 16384.[m
+[31m- * The corresponding speed controller output torque current range is[m
+[31m- * -20 ~ 0 ~ 20 A.[m
+[31m- */[m
+[31m-static constexpr float VELOCITY_PID_MAX_OUTPUT = 16000.0f;[m
+[31m-[m
+[31m-// Mechanical chassis constants, all in m[m
+[31m-/**[m
+[31m- * Radius of the wheels (m).[m
+[31m- */[m
+[31m-static constexpr float WHEEL_RADIUS = 0.076;[m
+[31m-[m
+[31m-static constexpr float WHEELBASE_WIDTH = 0.366f;[m
+[31m-[m
+[31m-static constexpr float WHEELBASE_LENGTH = 0.366f;[m
+[31m-[m
+[31m-static constexpr float GIMBAL_X_OFFSET = 0.0f;[m
+[31m-static constexpr float GIMBAL_Y_OFFSET = 0.0f;[m
+[31m-[m
+[31m-static const Matrix<float, 1, 3> ROBOT_STARTING_POSITION = Matrix<float, 1, 3>::zeroMatrix();[m
+[31m-[m
+[31m-static constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f);[m
+[31m-[m
+[31m-// static constexpr float YAW_START_ANGLE = M_PI_2;[m
+[31m-// static constexpr float PITCH_START_ANGLE = M_PI_2;[m
+[31m-// #error "DM Richard on Discord if you see this (or just calculate the pitch stop limits yourself idc)"[m
+[31m-// static constexpr float PITCH_SOFTSTOP_LOW = 0.0f;[m
+[31m-// static constexpr float PITCH_SOFTSTOP_HIGH = 0.0f;[m
+[31m-[m
+[31m-static constexpr CANBus CHASSIS_BUS = CANBus::CAN_BUS2;[m
+[31m-[m
+[31m-static constexpr MotorID LEFT_BACK_WHEEL_ID = MotorID::MOTOR1;[m
+[31m-static constexpr MotorID LEFT_FRONT_WHEEL_ID = MotorID::MOTOR2;[m
+[31m-static constexpr MotorID RIGHT_FRONT_WHEEL_ID = MotorID::MOTOR3;[m
+[31m-static constexpr MotorID RIGHT_BACK_WHEEL_ID = MotorID::MOTOR4;[m
+[31m-[m
+[31m-static constexpr MotorID LEFT_BACK_YAW_ID = MotorID::MOTOR5;[m
+[31m-static constexpr MotorID LEFT_FRONT_YAW_ID = MotorID::MOTOR6;[m
+[31m-static constexpr MotorID RIGHT_FRONT_YAW_ID = MotorID::MOTOR7;[m
+[31m-static constexpr MotorID RIGHT_BACK_YAW_ID = MotorID::MOTOR8;[m
+[31m-[m
+[31m-// CAN Bus 1[m
+[31m-static constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS1;[m
+[31m-static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS1;[m
+[31m-static constexpr CANBus FEED_BUS = CANBus::CAN_BUS1;[m
+[31m-[m
+[31m-static constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR5;[m
+[31m-static constexpr MotorID PITCH_MOTOR_ID = MotorID::MOTOR6;[m
+[31m-//[m
+[31m-static constexpr MotorID FEEDER_ID = MotorID::MOTOR7;[m
+[31m-//[m
+[31m-static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR3;[m
+[31m-static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR4;[m
+[31m-[m
+[31m-static constexpr bool SHOOTER_1_DIRECTION = false;[m
+[31m-static constexpr bool SHOOTER_2_DIRECTION = true;[m
+[31m-[m
+[31m-static constexpr bool FEEDER_DIRECTION = true;[m
+[31m-[m
+[31m-enum WheelRPMIndex {  // index used to easily navigate wheel matrices[m
+[31m-    LB = 0,[m
+[31m-    LF = 1,[m
+[31m-    RF = 2,[m
+[31m-    RB = 3,[m
+[31m-};[m
+[31m-[m
+[31m-static constexpr float YAW_START_ANGLE = 163.0f;[m
+[31m-static constexpr float PITCH_START_ANGLE = 117.0f;[m
+[31m-static constexpr float PITCH_SOFTSTOP_LOW = 134.0f;[m
+[31m-static constexpr float PITCH_SOFTSTOP_HIGH = 74.0f;[m
+[31m-[m
+[31m-/**[m
+[31m- * Max wheel speed, measured in RPM of the 3508 motor shaft.[m
+[31m- */[m
+[31m-static constexpr int MAX_3508_ENC_RPM = 7000;[m
+[31m-[m
+[31m-// Power limiting constants, will explain later[m
+[31m-static constexpr float MAX_ENERGY_BUFFER = 60.0f;[m
+[31m-static constexpr float ENERGY_BUFFER_LIMIT_THRESHOLD = 40.0f;[m
+[31m-static constexpr float ENERGY_BUFFER_CRIT_THRESHOLD = 5;[m
+[31m-static constexpr uint16_t POWER_CONSUMPTION_THRESHOLD = 20;[m
+[31m-static constexpr float CURRENT_ALLOCATED_FOR_ENERGY_BUFFER_LIMITING = 30000;[m
+[31m-[m
+[31m-static constexpr int MIN_WHEEL_SPEED_SINGLE_MOTOR = 4000;[m
+[31m-static constexpr int MAX_WHEEL_SPEED_SINGLE_MOTOR = 8000;[m
+[31m-static constexpr int MIN_CHASSIS_POWER = 40;[m
+[31m-static constexpr int MAX_CHASSIS_POWER = 120;[m
+[31m-static constexpr int WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE =[m
+[31m-    (MAX_WHEEL_SPEED_SINGLE_MOTOR - MIN_WHEEL_SPEED_SINGLE_MOTOR) / (MAX_CHASSIS_POWER - MIN_CHASSIS_POWER);[m
+[31m-static_assert(WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE >= 0);[m
+[31m-[m
+[31m-/**[m
+[31m- * @brief Behavior constants for chassis[m
+[31m- */[m
+[31m-[m
+[31m-/**[m
+[31m- * The minimum desired wheel speed for chassis rotation, measured in RPM before[m
+[31m- * we start slowing down translational speed.[m
+[31m- *[m
+[31m- */[m
+[31m-static constexpr float MIN_ROTATION_THRESHOLD = 800.0f;[m
+[31m-[m
+[31m-// // Power limiting constants, will explain later[m
+[31m-static constexpr float POWER_LIMIT_SAFETY_FACTOR = 0.85f;[m
+[31m-static constexpr float STARTING_ENERGY_BUFFER = 60.0f;[m
+[31m-// static constexpr float ENERGY_BUFFER_LIMIT_THRESHOLD = 60.0f;[m
+[31m-// static constexpr float ENERGY_BUFFER_CRIT_THRESHOLD = 10.0f;[m
+[31m-static constexpr bool PITCH_DIRECTION = false;[m
+[31m-[m
+[31m-static constexpr float DEV_BOARD_YAW_OFFSET = M_PI;  // in radians[m
+[31m-[m
+[31m-static constexpr float LEFT_FRONT_YAW_OFFSET = 6000.0f;[m
+[31m-[m
+[31m-static constexpr float LEFT_BACK_YAW_OFFSET = 8191.0f - 6840.0f;[m
+[31m-static constexpr float RIGHT_FRONT_YAW_OFFSET = 4000.0f;[m
+[31m-static constexpr float RIGHT_BACK_YAW_OFFSET = 8191.0f - 5449.0f;[m
+[1mdiff --git a/aimbots-src/src/robots/engineer-swerve/swerve_engineer_control.cpp b/aimbots-src/src/robots/engineer-swerve/swerve_engineer_control.cpp[m
+[1mdeleted file mode 100644[m
+[1mindex 3439ba7c..00000000[m
+[1m--- a/aimbots-src/src/robots/engineer-swerve/swerve_engineer_control.cpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,86 +0,0 @@[m
+[31m-#ifdef TARGET_SWERVE_ENGINEER[m
+[31m-[m
+[31m-#include "drivers.hpp"[m
+[31m-#include "drivers_singleton.hpp"[m
+[31m-#include "utils/common_types.hpp"[m
+[31m-//[m
+[31m-#include "tap/control/command_mapper.hpp"[m
+[31m-#include "tap/control/hold_command_mapping.hpp"[m
+[31m-#include "tap/control/hold_repeat_command_mapping.hpp"[m
+[31m-#include "tap/control/press_command_mapping.hpp"[m
+[31m-#include "tap/control/setpoint/commands/calibrate_command.hpp"[m
+[31m-#include "tap/control/toggle_command_mapping.hpp"[m
+[31m-//[m
+[31m-#include "subsystems/chassis/chassis.hpp"[m
+[31m-#include "subsystems/chassis/chassis_manual_drive_command.hpp"[m
+[31m-[m
+[31m-using namespace src::Chassis;[m
+[31m-[m
+[31m-/*[m
+[31m- * NOTE: We are using the DoNotUse_getDrivers() function here[m
+[31m- *      because this file defines all subsystems and command[m
+[31m- *      and thus we must pass in the single statically allocated[m
+[31m- *      Drivers class to all of these objects.[m
+[31m- */[m
+[31m-src::driversFunc drivers = src::DoNotUse_getDrivers;[m
+[31m-[m
+[31m-using namespace tap;[m
+[31m-using namespace tap::control;[m
+[31m-[m
+[31m-namespace EngineerControl {[m
+[31m-[m
+[31m-// Define subsystems here ------------------------------------------------[m
+[31m-ChassisSubsystem chassis(drivers());[m
+[31m-[m
+[31m-// Define commands here ---------------------------------------------------[m
+[31m-ChassisManualDriveCommand chassisManualDriveCommand(drivers(), &chassis);[m
+[31m-[m
+[31m-// Define command mappings here -------------------------------------------[m
+[31m-HoldCommandMapping leftSwitchUp([m
+[31m-    drivers(),[m
+[31m-    {&chassisManualDriveCommand},[m
+[31m-    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));[m
+[31m-[m
+[31m-// Register subsystems here -----------------------------------------------[m
+[31m-void registerSubsystems(src::Drivers *drivers) {[m
+[31m-    drivers->commandScheduler.registerSubsystem(&chassis);[m
+[31m-}[m
+[31m-[m
+[31m-// Initialize subsystems here ---------------------------------------------[m
+[31m-void initializeSubsystems() {[m
+[31m-    chassis.initialize();[m
+[31m-}[m
+[31m-[m
+[31m-// Set default command here -----------------------------------------------[m
+[31m-void setDefaultCommands(src::Drivers *) {[m
+[31m-    // no default commands should be set[m
+[31m-}[m
+[31m-[m
+[31m-// Set commands scheduled on startup[m
+[31m-void startupCommands(src::Drivers *drivers) {[m
+[31m-    // no startup commands should be set[m
+[31m-    // yet...[m
+[31m-    // TODO: Possibly add some sort of hardware test command[m
+[31m-    //       that will move all the parts so we[m
+[31m-    //       can make sure they're fully operational.[m
+[31m-}[m
+[31m-[m
+[31m-// Register IO mappings here -----------------------------------------------[m
+[31m-void registerIOMappings(src::Drivers *drivers) {[m
+[31m-    drivers->commandMapper.addMap(&leftSwitchUp);[m
+[31m-}[m
+[31m-[m
+[31m-}  // namespace StandardControl[m
+[31m-[m
+[31m-namespace src::Control {[m
+[31m-    // Initialize subsystems ---------------------------------------------------[m
+[31m-    void initializeSubsystemCommands(src::Drivers * drivers) {[m
+[31m-        EngineerControl::initializeSubsystems();[m
+[31m-        EngineerControl::registerSubsystems(drivers);[m
+[31m-        EngineerControl::setDefaultCommands(drivers);[m
+[31m-        EngineerControl::startupCommands(drivers);[m
+[31m-        EngineerControl::registerIOMappings(drivers);[m
+[31m-    }[m
+[31m-}  // namespace src::Control[m
+[31m-[m
+[31m-#endif  //TARGET_ENGINEER[m
+[1mdiff --git a/aimbots-src/src/robots/engineer/swerve_engineer_constants.hpp b/aimbots-src/src/robots/engineer/swerve_engineer_constants.hpp[m
+[1mnew file mode 100644[m
+[1mindex 00000000..0a6a2d4f[m
+[1m--- /dev/null[m
+[1m+++ b/aimbots-src/src/robots/engineer/swerve_engineer_constants.hpp[m
+[36m@@ -0,0 +1,71 @@[m
+[32m+[m[32m#pragma once[m
+[32m+[m[32m#include "utils/common_types.hpp"[m
+[32m+[m
+[32m+[m[32mstatic constexpr uint8_t DRIVEN_WHEEL_COUNT = 4;[m
+[32m+[m[32mstatic constexpr uint8_t MOTORS_PER_WHEEL = 2;[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * @brief Velocity PID constants[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr float VELOCITY_PID_KP = 20.0f;[m
+[32m+[m[32mstatic constexpr float VELOCITY_PID_KI = 0.2f;[m
+[32m+[m[32mstatic constexpr float VELOCITY_PID_KD = 0.0f;[m
+[32m+[m[32mstatic constexpr float VELOCITY_PID_MAX_ERROR_SUM = 5000.0f;[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * This max output is measured in the c620 robomaster translated current.[m
+[32m+[m[32m * Per the datasheet, the controllable current range is -16384 ~ 0 ~ 16384.[m
+[32m+[m[32m * The corresponding speed controller output torque current range is[m
+[32m+[m[32m * -20 ~ 0 ~ 20 A.[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr float VELOCITY_PID_MAX_OUTPUT = 16000.0f;[m
+[32m+[m
+[32m+[m[32m// Mechanical chassis constants, all in m[m
+[32m+[m[32m/**[m
+[32m+[m[32m * Radius of the wheels (m).[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr float WHEEL_RADIUS = 0.076;[m
+[32m+[m
+[32m+[m[32mstatic constexpr float WHEELBASE_WIDTH = 0.366f;[m
+[32m+[m
+[32m+[m[32mstatic constexpr float WHEELBASE_LENGTH = 0.366f;[m
+[32m+[m
+[32m+[m[32mstatic constexpr float GIMBAL_X_OFFSET = 0.0f;[m
+[32m+[m[32mstatic constexpr float GIMBAL_Y_OFFSET = 0.0f;[m
+[32m+[m
+[32m+[m[32mstatic constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f);[m
+[32m+[m
+[32m+[m[32mstatic constexpr float YAW_START_ANGLE = M_PI_2;[m
+[32m+[m[32mstatic constexpr float PITCH_START_ANGLE = M_PI_2;[m
+[32m+[m[32m#error "DM Richard on Discord if you see this (or just calculate the pitch stop limits yourself idc)"[m
+[32m+[m[32mstatic constexpr float PITCH_SOFTSTOP_LOW = 0.0f;[m
+[32m+[m[32mstatic constexpr float PITCH_SOFTSTOP_HIGH = 0.0f;[m
+[32m+[m
+[32m+[m[32mstatic constexpr MotorID LEFT_BACK_WHEEL_ID = MotorID::MOTOR1;[m
+[32m+[m[32mstatic constexpr MotorID LEFT_FRONT_WHEEL_ID = MotorID::MOTOR2;[m
+[32m+[m[32mstatic constexpr MotorID RIGHT_FRONT_WHEEL_ID = MotorID::MOTOR3;[m
+[32m+[m[32mstatic constexpr MotorID RIGHT_BACK_WHEEL_ID = MotorID::MOTOR4;[m
+[32m+[m
+[32m+[m[32mstatic constexpr MotorID LEFT_BACK_YAW_ID = MotorID::MOTOR5;[m
+[32m+[m[32mstatic constexpr MotorID LEFT_FRONT_YAW_ID = MotorID::MOTOR6;[m
+[32m+[m[32mstatic constexpr MotorID RIGHT_FRONT_YAW_ID = MotorID::MOTOR7;[m
+[32m+[m[32mstatic constexpr MotorID RIGHT_BACK_YAW_ID = MotorID::MOTOR8;[m
+[32m+[m
+[32m+[m[32menum WheelRPMIndex {  // index used to easily navigate wheel matrices[m
+[32m+[m[32m    LB = 0,[m
+[32m+[m[32m    LF = 1,[m
+[32m+[m[32m    RF = 2,[m
+[32m+[m[32m    RB = 3,[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32m/**[m
+[32m+[m[32m * Max wheel speed, measured in RPM of the 3508 motor shaft.[m
+[32m+[m[32m */[m
+[32m+[m[32mstatic constexpr int MAX_3508_ENC_RPM = 7000;[m
+[32m+[m
+[32m+[m[32m// Power limiting constants, will explain later[m
+[32m+[m[32mstatic constexpr float MAX_ENERGY_BUFFER = 60.0f;[m
+[32m+[m[32mstatic constexpr float ENERGY_BUFFER_LIMIT_THRESHOLD = 40.0f;[m
+[32m+[m[32mstatic constexpr float ENERGY_BUFFER_CRIT_THRESHOLD = 5;[m
+[32m+[m[32mstatic constexpr uint16_t POWER_CONSUMPTION_THRESHOLD = 20;[m
+[32m+[m[32mstatic constexpr float CURRENT_ALLOCATED_FOR_ENERGY_BUFFER_LIMITING = 30000;[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/robots/robot-states/robot_state.cpp b/aimbots-src/src/robots/robot-states/robot_state.cpp[m
+[1mdeleted file mode 100644[m
+[1mindex c0b9c798..00000000[m
+[1m--- a/aimbots-src/src/robots/robot-states/robot_state.cpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,44 +0,0 @@[m
+[31m-#include "robot_state.hpp"[m
+[31m-[m
+[31m-robot::robot(int x, int y, int z, int number, int health, Color color) {[m
+[31m-    this->x = x;[m
+[31m-    this->y = y;[m
+[31m-    this->z = z;[m
+[31m-    this->number = number;[m
+[31m-    this->health = health;[m
+[31m-[m
+[31m-    this->color = color;[m
+[31m-}[m
+[31m-[m
+[31m-robot::robot() {[m
+[31m-    x = 0;[m
+[31m-    y = 0;[m
+[31m-    z = 0;[m
+[31m-    number = -1;[m
+[31m-}[m
+[31m-[m
+[31m-robot::~robot() {}[m
+[31m-[m
+[31m-void robot::setX(int x) { this->x = x; }[m
+[31m-[m
+[31m-void robot::setY(int y) { this->y = y; }[m
+[31m-[m
+[31m-void robot::setZ(int z) { this->z = z; }[m
+[31m-[m
+[31m-void robot::setHealth(int health) { this->health = health; }[m
+[31m-[m
+[31m-int robot::getX() { return this->x; }[m
+[31m-[m
+[31m-int robot::getY() { return this->y; }[m
+[31m-[m
+[31m-int robot::getZ() { return this->z; }[m
+[31m-[m
+[31m-int robot::getHealth() { return this->health; }[m
+[31m-[m
+[31m-int robot::getNumber() { return this->number; }[m
+[31m-[m
+[31m-void robot::setColor(Color color) { this->color = color; }[m
+[31m-[m
+[31m-Color robot::getColor() { return this->color; }[m
+[31m-[m
+[31m-[m
+[1mdiff --git a/aimbots-src/src/robots/robot-states/robot_state.hpp b/aimbots-src/src/robots/robot-states/robot_state.hpp[m
+[1mdeleted file mode 100644[m
+[1mindex bd1dbe69..00000000[m
+[1m--- a/aimbots-src/src/robots/robot-states/robot_state.hpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,34 +0,0 @@[m
+[31m-#pragma once[m
+[31m-[m
+[31m-enum Color {[m
+[31m-    RED = 0,[m
+[31m-    BLUE =1,[m
+[31m-    UNKNOWN = 2[m
+[31m-};[m
+[31m-[m
+[31m-class robot {[m
+[31m-private:[m
+[31m-    int number;[m
+[31m-    int x, y, z;[m
+[31m-    int health;[m
+[31m-[m
+[31m-    Color color;[m
+[31m-[m
+[31m-public:[m
+[31m-    robot(int x, int y, int z, int number, int health, Color color);[m
+[31m-    robot();[m
+[31m-    ~robot();[m
+[31m-[m
+[31m-    void setX(int x);[m
+[31m-    void setY(int y);[m
+[31m-    void setZ(int z);[m
+[31m-    void setHealth(int health);[m
+[31m-    void setColor(Color color);[m
+[31m-[m
+[31m-    int getX();[m
+[31m-    int getY();[m
+[31m-    int getZ();[m
+[31m-    int getHealth();[m
+[31m-    int getNumber();[m
+[31m-    Color getColor();[m
+[31m-};[m
+[1mdiff --git a/aimbots-src/src/robots/sentry/sentry_constants.hpp b/aimbots-src/src/robots/sentry/sentry_constants.hpp[m
+[1mindex dca28dc2..a433bd06 100644[m
+[1m--- a/aimbots-src/src/robots/sentry/sentry_constants.hpp[m
+[1m+++ b/aimbots-src/src/robots/sentry/sentry_constants.hpp[m
+[36m@@ -105,7 +105,8 @@[m [mstatic constexpr float kGRAVITY = 6000.0f;[m
+ static constexpr float HORIZON_OFFSET = -30.0f;[m
+ [m
+ // sentry only has one speed: death[m
+[31m-static constexpr uint16_t shooter_speed_array[2] = {30, 8000};  // {m/s, rpm}[m
+[32m+[m[32mstatic constexpr uint16_t shooter_speed_array[2] =[m
+[32m+[m[32m    {30, 8000};  // {m/s, rpm}[m
+ [m
+ static const Matrix<uint16_t, 1, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);[m
+ [m
+[36m@@ -172,8 +173,7 @@[m [mstatic constexpr float FULL_RAIL_LENGTH = 2.130f;[m
+ static constexpr float FULL_RAIL_LENGTH_CM = 213.0f;                                                    // cm[m
+ static constexpr float USABLE_RAIL_LENGTH = FULL_RAIL_LENGTH - (WHEELBASE_WIDTH + RAIL_POLE_DIAMETER);  // in meters[m
+ [m
+[31m-static const Matrix<float, 1, 3> ROBOT_STARTING_POSITION =[m
+[31m-    left_sentry_rail_pole_location_matrix + robot_starting_rail_location * src::utils::MatrixHelper::rotation_matrix(AngleUnit::Degrees, 45.0f, 2);[m
+[32m+[m[32mstatic const Matrix<float, 1, 3> ROBOT_STARTING_POSITION = left_sentry_rail_pole_location_matrix + robot_starting_rail_location * src::utils::MatrixHelper::xy_rotation_matrix(AngleUnit::Degrees, 45.0f);[m
+ [m
+ static constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f) * (44.0f / 18.0f);[m
+ [m
+[36m@@ -209,7 +209,8 @@[m [mstatic constexpr int MAX_WHEEL_SPEED_SINGLE_MOTOR = 8000;[m
+ static constexpr int MIN_CHASSIS_POWER = 40;[m
+ static constexpr int MAX_CHASSIS_POWER = 120;[m
+ static constexpr int WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE =[m
+[31m-    (MAX_WHEEL_SPEED_SINGLE_MOTOR - MIN_WHEEL_SPEED_SINGLE_MOTOR) / (MAX_CHASSIS_POWER - MIN_CHASSIS_POWER);[m
+[32m+[m[32m    (MAX_WHEEL_SPEED_SINGLE_MOTOR - MIN_WHEEL_SPEED_SINGLE_MOTOR) /[m
+[32m+[m[32m    (MAX_CHASSIS_POWER - MIN_CHASSIS_POWER);[m
+ static_assert(WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE >= 0);[m
+ [m
+ /**[m
+[1mdiff --git a/aimbots-src/src/robots/standard/standard_constants.hpp b/aimbots-src/src/robots/standard/standard_constants.hpp[m
+[1mindex 92629028..38415e53 100644[m
+[1m--- a/aimbots-src/src/robots/standard/standard_constants.hpp[m
+[1m+++ b/aimbots-src/src/robots/standard/standard_constants.hpp[m
+[36m@@ -129,7 +129,7 @@[m [mstatic constexpr uint16_t shooter_speed_array[6] = {[m
+ [m
+ static const Matrix<uint16_t, 3, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);[m
+ [m
+[31m-static constexpr float FEEDER_DEFAULT_RPM = 3000.0f;            //FEEDER RPM: 3000.0f[m
+[32m+[m[32mstatic constexpr float FEEDER_DEFAULT_RPM = 3000.0f;[m
+ static constexpr int DEFAULT_BURST_LENGTH = 5;  // balls[m
+ [m
+ // CAN Bus 2[m
+[36m@@ -271,4 +271,4 @@[m [mstatic constexpr float TOKYO_ROTATIONAL_SPEED_FRACTION_OF_MAX = 0.75f;[m
+ // Fraction to cut rotation speed by when the robot is "drifting"[m
+ static constexpr float TOKYO_ROTATIONAL_SPEED_MULTIPLIER_WHEN_TRANSLATING = 0.7f;[m
+ // Rotational speed increment per iteration to apply until rotation setpoint is reached[m
+[31m-static constexpr float TOKYO_ROTATIONAL_SPEED_INCREMENT = 50.0f;  // rpm[m
+\ No newline at end of file[m
+[32m+[m[32mstatic constexpr float TOKYO_ROTATIONAL_SPEED_INCREMENT = 50.0f;  // rpm[m
+[1mdiff --git a/aimbots-src/src/robots/standard/standard_control.cpp b/aimbots-src/src/robots/standard/standard_control.cpp[m
+[1mindex 1f0992ee..03d6a131 100644[m
+[1m--- a/aimbots-src/src/robots/standard/standard_control.cpp[m
+[1m+++ b/aimbots-src/src/robots/standard/standard_control.cpp[m
+[36m@@ -37,16 +37,12 @@[m
+ #include "subsystems/hopper/hopper.hpp"[m
+ #include "subsystems/hopper/open_hopper_command.hpp"[m
+ #include "subsystems/hopper/toggle_hopper_command.hpp"[m
+[31m-//[m
+[31m-#include "subsystems/gui/gui_display.hpp"[m
+[31m-#include "subsystems/gui/gui_display_command.hpp"[m
+ [m
+ using namespace src::Chassis;[m
+ using namespace src::Feeder;[m
+ using namespace src::Gimbal;[m
+ using namespace src::Shooter;[m
+ using namespace src::Hopper;[m
+[31m-using namespace src::GUI;[m
+ [m
+ /*[m
+  * NOTE: We are using the DoNotUse_getDrivers() function here[m
+[36m@@ -68,8 +64,6 @@[m [mFeederSubsystem feeder(drivers());[m
+ GimbalSubsystem gimbal(drivers());[m
+ ShooterSubsystem shooter(drivers());[m
+ HopperSubsystem hopper(drivers());[m
+[31m-GUI_DisplaySubsystem gui(drivers());[m
+[31m-[m
+ [m
+ // Robot Specific Controllers ------------------------------------------------[m
+ GimbalChassisRelativeController gimbalChassisRelativeController(&gimbal);[m
+[36m@@ -100,8 +94,6 @@[m [mCloseHopperCommand closeHopperCommand(drivers(), &hopper);[m
+ CloseHopperCommand closeHopperCommand2(drivers(), &hopper);[m
+ ToggleHopperCommand toggleHopperCommand(drivers(), &hopper);[m
+ [m
+[31m-GUI_DisplayCommand guiDisplayCommand(drivers(),&gui);[m
+[31m-[m
+ // Define command mappings here -------------------------------------------[m
+ HoldCommandMapping leftSwitchMid([m
+     drivers(),[m
+[36m@@ -138,13 +130,6 @@[m [mHoldCommandMapping leftClickMouse([m
+     {&runFeederCommandFromMouse},[m
+     RemoteMapState(RemoteMapState::MouseButton::LEFT));[m
+ [m
+[31m-[m
+[31m-//This is the command for starting up the GUI.  Uncomment once subsystem does something more useful.[m
+[31m-/*PressCommandMapping ctrlC([m
+[31m-    drivers(), [m
+[31m-    {&guiDisplayCommand},[m
+[31m-    RemoteMapState({Remote::Key::CTRL, Remote::Key::C}));*/[m
+[31m-[m
+ // HoldCommandMapping rightClickMouse([m
+ //     drivers(),[m
+ //     {&},[m
+[36m@@ -157,7 +142,6 @@[m [mvoid registerSubsystems(src::Drivers *drivers) {[m
+     drivers->commandScheduler.registerSubsystem(&gimbal);[m
+     drivers->commandScheduler.registerSubsystem(&shooter);[m
+     drivers->commandScheduler.registerSubsystem(&hopper);[m
+[31m-    drivers->commandScheduler.registerSubsystem(&gui);[m
+ }[m
+ [m
+ // Initialize subsystems here ---------------------------------------------[m
+[36m@@ -167,7 +151,6 @@[m [mvoid initializeSubsystems() {[m
+     gimbal.initialize();[m
+     shooter.initialize();[m
+     hopper.initialize();[m
+[31m-    gui.initialize();[m
+ }[m
+ [m
+ // Set default command here -----------------------------------------------[m
+[36m@@ -193,7 +176,6 @@[m [mvoid registerIOMappings(src::Drivers *drivers) {[m
+     drivers->commandMapper.addMap(&rightSwitchMid);[m
+     drivers->commandMapper.addMap(&rightSwitchDown);[m
+     drivers->commandMapper.addMap(&leftClickMouse);[m
+[31m-    //drivers->commandMapper.addMap(&ctrlC);[m
+ }[m
+ [m
+ }  // namespace StandardControl[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis.cpp b/aimbots-src/src/subsystems/chassis/chassis.cpp[m
+[1mindex 122517df..f752978b 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis.cpp[m
+[36m@@ -1,3 +1,4 @@[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #include "subsystems/chassis/chassis.hpp"[m
+ [m
+ #include "tap/communication/gpio/leds.hpp"[m
+[36m@@ -32,11 +33,6 @@[m [mChassisSubsystem::ChassisSubsystem(src::Drivers* drivers)[m
+       leftFrontYaw(drivers, LEFT_FRONT_YAW_ID, CHASSIS_BUS, false, "Left Front Yaw Motor"),[m
+       rightFrontYaw(drivers, RIGHT_FRONT_YAW_ID, CHASSIS_BUS, false, "Right Front Yaw Motor"),[m
+       rightBackYaw(drivers, RIGHT_BACK_YAW_ID, CHASSIS_BUS, false, "Right Back Yaw Motor"),[m
+[31m-      leftBackYawPosPID(CHASSIS_YAW_PID_CONFIG),[m
+[31m-      leftFrontYawPosPID(CHASSIS_YAW_PID_CONFIG),[m
+[31m-      rightBackYawPosPID(CHASSIS_YAW_PID_CONFIG),[m
+[31m-      rightFrontYawPosPID(CHASSIS_YAW_PID_CONFIG),[m
+[31m-[m
+ #endif[m
+ #endif[m
+       targetRPMs(Matrix<float, DRIVEN_WHEEL_COUNT, MOTORS_PER_WHEEL>::zeroMatrix()),[m
+[36m@@ -134,17 +130,9 @@[m [mvoid ChassisSubsystem::limitChassisPower() {[m
+ }[m
+ [m
+ void ChassisSubsystem::updateMotorVelocityPID(WheelIndex WheelIdx, MotorOnWheelIndex MotorPerWheelIdx) {[m
+[31m-    float err = 0;[m
+[31m-    if (MotorPerWheelIdx == DRIVER) {[m
+[31m-        err = targetRPMs[WheelIdx][MotorPerWheelIdx] - motors[WheelIdx][MotorPerWheelIdx]->getShaftRPM();[m
+[31m-    } else if (MotorPerWheelIdx == YAW) {[m
+[31m-        err = targetRPMs[WheelIdx][MotorPerWheelIdx] - motors[WheelIdx][MotorPerWheelIdx]->getEncoderWrapped();[m
+[31m-        if (abs(err) > 4096) {[m
+[31m-            int err_int = (((-1 * static_cast<int>(err)) / (abs(static_cast<int>(err)))) * (8192 - static_cast<int>(err))) % 8192;[m
+[31m-            err = err_int * 1.0f;[m
+[31m-        }[m
+[31m-    }[m
+[32m+[m[32m    float err = targetRPMs[WheelIdx][MotorPerWheelIdx] - motors[WheelIdx][MotorPerWheelIdx]->getShaftRPM();[m
+     velocityPIDs[WheelIdx][MotorPerWheelIdx]->runControllerDerivateError(err);[m
+[32m+[m
+     desiredOutputs[WheelIdx][MotorPerWheelIdx] = velocityPIDs[WheelIdx][MotorPerWheelIdx]->getOutput();[m
+ }[m
+ [m
+[36m@@ -180,7 +168,6 @@[m [mvoid ChassisSubsystem::setDesiredOutput(WheelIndex WheelIdx, MotorOnWheelIndex M[m
+     motors[WheelIdx][MotorPerWheelIdx]->setDesiredOutput(static_cast<int32_t>(desiredOutputs[WheelIdx][MotorPerWheelIdx]));[m
+ }[m
+ [m
+[31m-#ifndef SWERVE[m
+ void ChassisSubsystem::calculateMecanum(float x, float y, float r, float maxWheelSpeed) {[m
+     // get distance from wheel to center of wheelbase[m
+     float wheelbaseCenterDist = sqrtf(powf(WHEELBASE_WIDTH / 2.0f, 2.0f) + powf(WHEELBASE_LENGTH / 2.0f, 2.0f));[m
+[36m@@ -201,64 +188,7 @@[m [mvoid ChassisSubsystem::calculateMecanum(float x, float y, float r, float maxWhee[m
+     desiredRotation = r;[m
+ }[m
+ [m
+[31m-#endif[m
+[31m-[m
+[31m-#ifdef SWERVE[m
+[31m-float left_front_yaw_actual = 0.0f;[m
+[31m-float right_front_yaw_actual = 0.0f;[m
+[31m-float left_back_yaw_actual = 0.0f;[m
+[31m-float right_back_yaw_actual = 0.0f;[m
+[31m-[m
+[31m-int left_front_yaw_db;[m
+[31m-int right_front_yaw_db;[m
+[31m-int left_back_yaw_db;[m
+[31m-int right_back_yaw_db;[m
+[31m-[m
+[31m-int left_front_yaw;[m
+[31m-int right_front_yaw;[m
+[31m-int left_back_yaw;[m
+[31m-int right_back_yaw;[m
+[31m-[m
+[31m-void ChassisSubsystem::calculateSwerve(float x, float y, float r, float maxWheelSpeed) {[m
+[31m-    // float theta = fieldRelativeInformant->getYaw();[m
+[31m-    // float temp = y*cos(theta)+x*sin(theta);[m
+[31m-    // x = -y*sin(theta)+x*cos(theta);[m
+[31m-    // y = temp;[m
+[31m-[m
+[31m-    float wheelbaseCenterDist = sqrtf(powf(WHEELBASE_WIDTH / 2.0f, 2.0f) + powf(WHEELBASE_LENGTH / 2.0f, 2.0f));[m
+[31m-[m
+[31m-    float a = x - r * (WHEELBASE_LENGTH / wheelbaseCenterDist);[m
+[31m-    float b = x + r * (WHEELBASE_LENGTH / wheelbaseCenterDist);[m
+[31m-    float c = y + r * (WHEELBASE_WIDTH / wheelbaseCenterDist);[m
+[31m-    float d = y - r * (WHEELBASE_WIDTH / wheelbaseCenterDist);[m
+[31m-[m
+[31m-    targetRPMs[LF][0] = limitVal<float>(sqrtf(powf(b, 2.0f) + powf(d, 2.0f)), -maxWheelSpeed, maxWheelSpeed);[m
+[31m-    left_front_yaw = (atan2f(d, b) + 3 * M_PI / 2) * (180 / M_PI) / 360 * 8191 + LEFT_FRONT_YAW_OFFSET;[m
+[31m-    targetRPMs[LF][1] = left_front_yaw % 8191;[m
+[31m-    // targetRPMs[LF][1] = 35/360 * 8191;[m
+[31m-    left_front_yaw_db = targetRPMs[LF][1];[m
+[31m-    left_front_yaw_actual = motors[LF][1]->getEncoderWrapped();[m
+[31m-[m
+[31m-    targetRPMs[RF][0] = limitVal<float>(sqrtf(powf(b, 2.0f) + powf(c, 2.0f)), -maxWheelSpeed, maxWheelSpeed);[m
+[31m-    right_front_yaw = (atan2f(c, b) + 3 * M_PI / 2) * (180 / M_PI) / 360 * 8191 + RIGHT_FRONT_YAW_OFFSET;[m
+[31m-    targetRPMs[RF][1] = right_front_yaw % 8191;[m
+[31m-    right_front_yaw_actual = motors[RF][1]->getEncoderWrapped();[m
+[31m-    right_front_yaw_db = targetRPMs[RF][1];[m
+[31m-[m
+[31m-    targetRPMs[LB][0] = limitVal<float>(sqrtf(powf(a, 2.0f) + powf(d, 2.0f)), -maxWheelSpeed, maxWheelSpeed);[m
+[31m-    left_back_yaw = (atan2f(d, a) + 3 * M_PI / 2) * (180 / M_PI) / 360 * 8191 + LEFT_BACK_YAW_OFFSET;[m
+[31m-    targetRPMs[LB][1] = left_back_yaw % 8191;[m
+[31m-    left_back_yaw_actual = motors[LB][1]->getEncoderWrapped();[m
+[31m-    left_back_yaw_db = targetRPMs[LB][1];[m
+[31m-[m
+[31m-    targetRPMs[RB][0] = limitVal<float>(sqrtf(powf(a, 2.0f) + powf(c, 2.0f)), -maxWheelSpeed, maxWheelSpeed);[m
+[31m-    int right_back_yaw = (atan2f(c, a) + 3 * M_PI / 2) * (180 / M_PI) / 360 * 8191 + RIGHT_BACK_YAW_OFFSET;[m
+[31m-    targetRPMs[RB][1] = right_back_yaw % 8191;[m
+[31m-    right_back_yaw_actual = motors[RB][1]->getEncoderWrapped();[m
+[31m-    right_back_yaw_db = targetRPMs[RB][1];[m
+[31m-    // wooo! just for commants[m
+[31m-}[m
+[31m-#endif[m
+[32m+[m[32mvoid ChassisSubsystem::calculateSwerve(float, float, float, float) {}[m
+ [m
+ void ChassisSubsystem::calculateRail(float x, float maxWheelSpeed) { targetRPMs[RAIL][0] = limitVal<float>(x, -maxWheelSpeed, maxWheelSpeed); }[m
+ [m
+[36m@@ -276,3 +206,4 @@[m [mfloat ChassisSubsystem::calculateRotationLimitedTranslationalWheelspeed(float ch[m
+     return rTranslationalGain * maxWheelSpeed;[m
+ }[m
+ };  // namespace src::Chassis[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis.hpp b/aimbots-src/src/subsystems/chassis/chassis.hpp[m
+[1mindex 42deb229..64afe7af 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis.hpp[m
+[36m@@ -1,5 +1,5 @@[m
+ #pragma once[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #include "tap/control/chassis/chassis_subsystem_interface.hpp"[m
+ #include "tap/motor/m3508_constants.hpp"[m
+ [m
+[36m@@ -85,13 +85,9 @@[m [mpublic:[m
+     // Uses the desiredOutputs matrix to set the desired power of the motors[m
+     void setDesiredOutput(WheelIndex WheelIdx, MotorOnWheelIndex MotorOnWheelIdx);[m
+ [m
+[31m-#ifndef SWERVE[m
+     void calculateMecanum(float x, float y, float r, float maxWheelSpeed);  // normal 4wd mecanum robots[m
+[31m-#endif[m
+[31m-#ifdef SWERVE[m
+[31m-    void calculateSwerve(float x, float y, float r, float maxWheelSpeed);  // swerve drive robots[m
+[31m-#endif[m
+[31m-    void calculateRail(float x, float maxWheelSpeed);  // sentry rail robots[m
+[32m+[m[32m    void calculateSwerve(float x, float y, float r, float maxWheelSpeed);   // swerve drive robots[m
+[32m+[m[32m    void calculateRail(float x, float maxWheelSpeed);                       // sentry rail robots[m
+ [m
+     inline int getNumChassisMotors() const override { return DRIVEN_WHEEL_COUNT * MOTORS_PER_WHEEL; }[m
+ [m
+[36m@@ -185,4 +181,5 @@[m [mpublic:[m
+ #endif[m
+ };[m
+ [m
+[31m-};  // namespace src::Chassis[m
+\ No newline at end of file[m
+[32m+[m[32m};  // namespace src::Chassis[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_drive_command.cpp b/aimbots-src/src/subsystems/chassis/chassis_drive_command.cpp[m
+[1mnew file mode 100644[m
+[1mindex 00000000..74f875bb[m
+[1m--- /dev/null[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_drive_command.cpp[m
+[36m@@ -0,0 +1,30 @@[m
+[32m+[m[32m#ifndef TARGET_DART[m
+[32m+[m[32m#include "chassis_drive_command.hpp"[m
+[32m+[m[32m#include <subsystems/chassis/chassis_rel_drive.hpp>[m
+[32m+[m
+[32m+[m[32mnamespace src::Chassis {[m
+[32m+[m
+[32m+[m[32mChassisDriveCommand::ChassisDriveCommand(src::Drivers* drivers, ChassisSubsystem* chassis)[m
+[32m+[m[32m    : drivers(drivers),[m
+[32m+[m[32m      chassis(chassis) {[m
+[32m+[m[32m    addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(chassis));[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mvoid ChassisDriveCommand::initialize() {}[m
+[32m+[m
+[32m+[m[32mvoid ChassisDriveCommand::execute() {[m
+[32m+[m[32m    Movement::Relative::onExecute(drivers, chassis);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mvoid ChassisDriveCommand::end(bool) {}[m
+[32m+[m
+[32m+[m[32mbool ChassisDriveCommand::isReady() {[m
+[32m+[m[32m    return true;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mbool ChassisDriveCommand::isFinished() const {[m
+[32m+[m[32m    return false;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32m}  // namespace src::Chassis[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_follow_gimbal_command.cpp b/aimbots-src/src/subsystems/chassis/chassis_follow_gimbal_command.cpp[m
+[1mindex 189107e7..d090a591 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis_follow_gimbal_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_follow_gimbal_command.cpp[m
+[36m@@ -1,5 +1,5 @@[m
+ #include "utils/robot_specific_inc.hpp"[m
+[31m-#ifndef ENGINEER[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #ifdef TOKYO_COMPATIBLE[m
+ [m
+ #include <subsystems/chassis/chassis_helper.hpp>[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_follow_gimbal_command.hpp b/aimbots-src/src/subsystems/chassis/chassis_follow_gimbal_command.hpp[m
+[1mindex bd5049b3..42d15a3b 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis_follow_gimbal_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_follow_gimbal_command.hpp[m
+[36m@@ -1,7 +1,5 @@[m
+ #pragma once[m
+[31m-[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #include "drivers.hpp"[m
+ #include "subsystems/chassis/chassis.hpp"[m
+ #include "subsystems/gimbal/gimbal.hpp"[m
+[36m@@ -33,5 +31,4 @@[m [mclass ChassisFollowGimbalCommand : public TapCommand {[m
+ };[m
+ [m
+ }  // namespace src::Chassis[m
+[31m-[m
+ #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_helper.cpp b/aimbots-src/src/subsystems/chassis/chassis_helper.cpp[m
+[1mindex 10727385..ef22d0f8 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis_helper.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_helper.cpp[m
+[36m@@ -1,5 +1,5 @@[m
+ #include "chassis_helper.hpp"[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #include "utils/robot_specific_inc.hpp"[m
+ [m
+ int8_t chassisYDesiredWheelspeedWatch = 0;[m
+[36m@@ -41,4 +41,5 @@[m [mvoid rescaleDesiredInputToPowerLimitedSpeeds([m
+     *desiredY = limitVal<float>(*desiredY * maxWheelSpeed, -rTranslationalGain, rTranslationalGain);[m
+ }[m
+ [m
+[31m-}  // namespace src::Chassis::Helper[m
+\ No newline at end of file[m
+[32m+[m[32m}  // namespace src::Chassis::Helper[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_helper.hpp b/aimbots-src/src/subsystems/chassis/chassis_helper.hpp[m
+[1mindex 66250ef1..63d26e5b 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis_helper.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_helper.hpp[m
+[36m@@ -1,5 +1,5 @@[m
+ #pragma once[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #include <drivers.hpp>[m
+ #include <subsystems/chassis/chassis.hpp>[m
+ [m
+[36m@@ -22,4 +22,5 @@[m [mvoid rescaleDesiredInputToPowerLimitedSpeeds([m
+     float* desiredY,[m
+     float* desiredRotation);[m
+ [m
+[31m-}  // namespace src::Chassis::Helper[m
+\ No newline at end of file[m
+[32m+[m[32m}  // namespace src::Chassis::Helper[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_manual_drive_command.cpp b/aimbots-src/src/subsystems/chassis/chassis_manual_drive_command.cpp[m
+[1mindex db28936f..ce5cb3d5 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis_manual_drive_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_manual_drive_command.cpp[m
+[36m@@ -1,5 +1,5 @@[m
+ #include "chassis_manual_drive_command.hpp"[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #include "subsystems/chassis/chassis_helper.hpp"[m
+ [m
+ namespace src::Chassis {[m
+[36m@@ -33,4 +33,5 @@[m [mbool ChassisManualDriveCommand::isReady() { return true; }[m
+ [m
+ bool ChassisManualDriveCommand::isFinished() const { return false; }[m
+ [m
+[31m-}  // namespace src::Chassis[m
+\ No newline at end of file[m
+[32m+[m[32m}  // namespace src::Chassis[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_manual_drive_command.hpp b/aimbots-src/src/subsystems/chassis/chassis_manual_drive_command.hpp[m
+[1mindex 78dbf256..350448a7 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis_manual_drive_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_manual_drive_command.hpp[m
+[36m@@ -1,4 +1,5 @@[m
+ #pragma once[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ [m
+ #include "drivers.hpp"[m
+ #include "subsystems/chassis/chassis.hpp"[m
+[36m@@ -26,4 +27,5 @@[m [mclass ChassisManualDriveCommand : public TapCommand {[m
+     ChassisSubsystem* chassis;[m
+ };[m
+ [m
+[31m-}  // namespace src::Chassis[m
+\ No newline at end of file[m
+[32m+[m[32m}  // namespace src::Chassis[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_rel_drive.cpp b/aimbots-src/src/subsystems/chassis/chassis_rel_drive.cpp[m
+[1mnew file mode 100644[m
+[1mindex 00000000..83543438[m
+[1m--- /dev/null[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_rel_drive.cpp[m
+[36m@@ -0,0 +1,72 @@[m
+[32m+[m[32m#include "chassis_rel_drive.hpp"[m
+[32m+[m[32m#ifndef TARGET_DART[m
+[32m+[m
+[32m+[m[32m#include "utils/robot_specific_inc.hpp"[m
+[32m+[m
+[32m+[m[32mfloat xFromRemote = 0.0f;[m
+[32m+[m
+[32m+[m[32mint8_t chassisXDesiredWheelspeedWatch = 0;[m
+[32m+[m[32mint8_t chassisYDesiredWheelspeedWatch = 0;[m
+[32m+[m
+[32m+[m[32mnamespace src::Chassis::Movement::Relative {[m
+[32m+[m
+[32m+[m[32mvoid calculateUserDesiredMovement(src::Drivers* drivers,[m
+[32m+[m[32m                                  ChassisSubsystem* chassis,[m
+[32m+[m[32m                                  float* desiredXSpeed,[m
+[32m+[m[32m                                  float* desiredYSpeed,[m
+[32m+[m[32m                                  float desiredChassisRotation) {[m
+[32m+[m[32m    if (drivers == nullptr || chassis == nullptr || desiredXSpeed == nullptr || desiredYSpeed == nullptr) {[m
+[32m+[m[32m        return;[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    const float MAX_WHEEL_SPEED = ChassisSubsystem::getMaxUserWheelSpeed([m
+[32m+[m[32m        drivers->refSerial.getRefSerialReceivingData(),[m
+[32m+[m[32m        drivers->refSerial.getRobotData().chassis.powerConsumptionLimit);[m
+[32m+[m
+[32m+[m[32m    // what we will multiply x and y speed by to take into account rotation[m
+[32m+[m[32m    float rTranslationalGain =[m
+[32m+[m[32m        chassis->calculateRotationTranslationalGain(desiredChassisRotation) * MAX_WHEEL_SPEED;[m
+[32m+[m
+[32m+[m[32m    *desiredXSpeed = limitVal<float>([m
+[32m+[m[32m                         drivers->controlOperatorInterface.getChassisXInput(),[m
+[32m+[m[32m                         -rTranslationalGain,[m
+[32m+[m[32m                         rTranslationalGain) *[m
+[32m+[m[32m                     MAX_WHEEL_SPEED;[m
+[32m+[m
+[32m+[m[32m    *desiredYSpeed = limitVal<float>([m
+[32m+[m[32m                         drivers->controlOperatorInterface.getChassisYInput(),[m
+[32m+[m[32m                         -rTranslationalGain,[m
+[32m+[m[32m                         rTranslationalGain) *[m
+[32m+[m[32m                     MAX_WHEEL_SPEED;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mvoid onExecute(src::Drivers* drivers, ChassisSubsystem* chassis) {[m
+[32m+[m[32m    const float MAX_WHEEL_SPEED = ChassisSubsystem::getMaxUserWheelSpeed([m
+[32m+[m[32m        drivers->refSerial.getRefSerialReceivingData(),[m
+[32m+[m[32m        drivers->refSerial.getRobotData().chassis.powerConsumptionLimit);[m
+[32m+[m
+[32m+[m[32m    float chassisRotationDesiredWheelspeed =[m
+[32m+[m[32m        drivers->controlOperatorInterface.getChassisRotationInput() * MAX_WHEEL_SPEED;[m
+[32m+[m
+[32m+[m[32m    float chassisXDesiredWheelspeed = 0.0f;[m
+[32m+[m[32m    float chassisYDesiredWheelspeed = 0.0f;[m
+[32m+[m
+[32m+[m[32m    calculateUserDesiredMovement([m
+[32m+[m[32m        drivers,[m
+[32m+[m[32m        chassis,[m
+[32m+[m[32m        &chassisXDesiredWheelspeed,[m
+[32m+[m[32m        &chassisYDesiredWheelspeed,[m
+[32m+[m[32m        chassisRotationDesiredWheelspeed);[m
+[32m+[m
+[32m+[m[32m    // set chassis targets using setDesiredOutputs[m
+[32m+[m[32m    chassis->setTargetRPMs([m
+[32m+[m[32m        chassisXDesiredWheelspeed,[m
+[32m+[m[32m        chassisYDesiredWheelspeed,[m
+[32m+[m[32m        chassisRotationDesiredWheelspeed);[m
+[32m+[m
+[32m+[m[32m    chassisXDesiredWheelspeedWatch = (int8_t)(chassisXDesiredWheelspeed * 127);[m
+[32m+[m[32m    chassisYDesiredWheelspeedWatch = (int8_t)(chassisYDesiredWheelspeed * 127);[m
+[32m+[m[32m    // chassis->setDesiredOutputs(0, 0, 0);[m
+[32m+[m[32m}[m
+[32m+[m[32m}  // namespace src::Chassis::Movement::Relative[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_rel_drive.hpp b/aimbots-src/src/subsystems/chassis/chassis_rel_drive.hpp[m
+[1mnew file mode 100644[m
+[1mindex 00000000..2f2653a7[m
+[1m--- /dev/null[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_rel_drive.hpp[m
+[36m@@ -0,0 +1,18 @@[m
+[32m+[m[32m#pragma once[m
+[32m+[m[32m#ifndef TARGET_DART[m
+[32m+[m
+[32m+[m[32m#include <drivers.hpp>[m
+[32m+[m[32m#include <subsystems/chassis/chassis.hpp>[m
+[32m+[m
+[32m+[m[32mnamespace src::Chassis::Movement::Relative {[m
+[32m+[m
+[32m+[m[32mvoid calculateUserDesiredMovement([m
+[32m+[m[32m    src::Drivers* drivers,[m
+[32m+[m[32m    ChassisSubsystem* chassis,[m
+[32m+[m[32m    float* desiredXSpeed,[m
+[32m+[m[32m    float* desiredYSpeed,[m
+[32m+[m[32m    float desiredChassisRotation);[m
+[32m+[m
+[32m+[m[32mvoid onExecute(src::Drivers* drivers, ChassisSubsystem* chassis);[m
+[32m+[m[32m}  // namespace src::Chassis::Movement::Relative[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_toggle_drive_command.cpp b/aimbots-src/src/subsystems/chassis/chassis_toggle_drive_command.cpp[m
+[1mindex 09586813..f1ed4757 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis_toggle_drive_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_toggle_drive_command.cpp[m
+[36m@@ -1,5 +1,6 @@[m
+ #include "chassis_toggle_drive_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+[32m+[m[32m#ifndef TARGET_DART[m
+[32m+[m
+ namespace src::Chassis {[m
+ [m
+ ChassisToggleDriveCommand::ChassisToggleDriveCommand(src::Drivers* drivers, ChassisSubsystem* chassis, Gimbal::GimbalSubsystem* gimbal)[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_toggle_drive_command.hpp b/aimbots-src/src/subsystems/chassis/chassis_toggle_drive_command.hpp[m
+[1mindex 0bd29967..39c4ccf6 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis_toggle_drive_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_toggle_drive_command.hpp[m
+[36m@@ -1,18 +1,16 @@[m
+ #pragma once[m
+[31m-[m
+[31m-#ifndef ENGINEER[m
+[32m+[m[32m#ifndef TARGET_DART[m
+[32m+[m[32m#include "drivers.hpp"[m
+ #include "subsystems/chassis/chassis.hpp"[m
+ #include "subsystems/chassis/chassis_follow_gimbal_command.hpp"[m
+ #include "subsystems/chassis/chassis_tokyo_command.hpp"[m
+ #include "subsystems/gimbal/gimbal.hpp"[m
+ #include "utils/common_types.hpp"[m
+ [m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+ namespace src::Chassis {[m
+ [m
+ class ChassisToggleDriveCommand : public TapComprisedCommand {[m
+[31m-public:[m
+[32m+[m[32m   public:[m
+     ChassisToggleDriveCommand(src::Drivers*, ChassisSubsystem*, Gimbal::GimbalSubsystem*);[m
+ [m
+     void initialize() override;[m
+[36m@@ -24,17 +22,15 @@[m [mpublic:[m
+ [m
+     char const* getName() const override { return "Chassis Toggle Drive Command"; }[m
+ [m
+[31m-private:[m
+[32m+[m[32m   private:[m
+     src::Drivers* drivers;[m
+     ChassisSubsystem* chassis;[m
+ [m
+[31m-#ifndef ENGINEER[m
+     ChassisFollowGimbalCommand followGimbalCommand;[m
+     ChassisTokyoCommand tokyoCommand;[m
+[31m-#endif[m
+[32m+[m
+     bool wasFPressed = false;[m
+ };[m
+ [m
+ }  // namespace src::Chassis[m
+[31m-[m
+ #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_tokyo_command.cpp b/aimbots-src/src/subsystems/chassis/chassis_tokyo_command.cpp[m
+[1mindex 9bed900f..bfaf9736 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis_tokyo_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_tokyo_command.cpp[m
+[36m@@ -1,5 +1,5 @@[m
+ #include "utils/robot_specific_inc.hpp"[m
+[31m-#ifndef ENGINEER[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #ifdef TOKYO_COMPATIBLE[m
+ [m
+ #include <subsystems/chassis/chassis_helper.hpp>[m
+[1mdiff --git a/aimbots-src/src/subsystems/chassis/chassis_tokyo_command.hpp b/aimbots-src/src/subsystems/chassis/chassis_tokyo_command.hpp[m
+[1mindex 7cc4bbb6..e95ff30a 100644[m
+[1m--- a/aimbots-src/src/subsystems/chassis/chassis_tokyo_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/chassis/chassis_tokyo_command.hpp[m
+[36m@@ -1,6 +1,7 @@[m
+ #pragma once[m
+[31m-#ifndef ENGINEER[m
+[32m+[m
+ #include "drivers.hpp"[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #include "subsystems/chassis/chassis.hpp"[m
+ #include "subsystems/gimbal/gimbal.hpp"[m
+ //[m
+[1mdiff --git a/aimbots-src/src/subsystems/feeder/burst_feeder_command.cpp b/aimbots-src/src/subsystems/feeder/burst_feeder_command.cpp[m
+[1mindex 2c7d8111..7c47b4a7 100644[m
+[1m--- a/aimbots-src/src/subsystems/feeder/burst_feeder_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/feeder/burst_feeder_command.cpp[m
+[36m@@ -1,6 +1,5 @@[m
+ #include "burst_feeder_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ namespace src::Feeder {[m
+ BurstFeederCommand::BurstFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder, float speed, float acceptableHeatThreshold, int burstLength)[m
+     : drivers(drivers),[m
+[1mdiff --git a/aimbots-src/src/subsystems/feeder/burst_feeder_command.hpp b/aimbots-src/src/subsystems/feeder/burst_feeder_command.hpp[m
+[1mindex b8258133..b4865609 100644[m
+[1m--- a/aimbots-src/src/subsystems/feeder/burst_feeder_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/feeder/burst_feeder_command.hpp[m
+[36m@@ -1,24 +1,17 @@[m
+ #pragma once[m
+[31m-#ifndef ENGINEER[m
+[32m+[m[32m#ifndef TARGET_DART[m
+[32m+[m[32m#include "drivers.hpp"[m
+[32m+[m[32m#include "subsystems/feeder/feeder.hpp"[m
+ #include "tap/communication/gpio/leds.hpp"[m
+ #include "tap/control/command.hpp"[m
+[31m-[m
+[31m-#include "subsystems/feeder/feeder.hpp"[m
+ #include "utils/common_types.hpp"[m
+ #include "utils/robot_specific_inc.hpp"[m
+ [m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+ namespace src::Feeder {[m
+ [m
+ class BurstFeederCommand : public TapCommand {[m
+[31m-public:[m
+[31m-    BurstFeederCommand([m
+[31m-        src::Drivers*,[m
+[31m-        FeederSubsystem*,[m
+[31m-        float speed = FEEDER_DEFAULT_RPM,[m
+[31m-        float acceptableHeatThreshold = 0.90f,[m
+[31m-        int burstLength = DEFAULT_BURST_LENGTH);[m
+[32m+[m[32m   public:[m
+[32m+[m[32m    BurstFeederCommand(src::Drivers*, FeederSubsystem*, float speed = FEEDER_DEFAULT_RPM, float acceptableHeatThreshold = 0.90f, int burstLength = DEFAULT_BURST_LENGTH);[m
+     void initialize() override;[m
+ [m
+     void execute() override;[m
+[36m@@ -34,7 +27,7 @@[m [mpublic:[m
+         burstLength = newBurstLength;[m
+     }[m
+ [m
+[31m-private:[m
+[32m+[m[32m   private:[m
+     src::Drivers* drivers;[m
+     FeederSubsystem* feeder;[m
+ [m
+[36m@@ -47,5 +40,4 @@[m [mprivate:[m
+ };[m
+ [m
+ }  // namespace src::Feeder[m
+[31m-[m
+ #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/feeder/feeder.cpp b/aimbots-src/src/subsystems/feeder/feeder.cpp[m
+[1mindex 72d2dfd8..1d8c4196 100644[m
+[1m--- a/aimbots-src/src/subsystems/feeder/feeder.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/feeder/feeder.cpp[m
+[36m@@ -1,5 +1,6 @@[m
+ #include "subsystems/feeder/feeder.hpp"[m
+[31m-#ifndef ENGINEER[m
+[32m+[m[32m#ifndef TARGET_DART[m
+[32m+[m[32m// static float pidOut;[m
+ namespace src::Feeder {[m
+ [m
+ FeederSubsystem::FeederSubsystem(src::Drivers* drivers)[m
+[1mdiff --git a/aimbots-src/src/subsystems/feeder/feeder.hpp b/aimbots-src/src/subsystems/feeder/feeder.hpp[m
+[1mindex 68b672fe..bb82d222 100644[m
+[1m--- a/aimbots-src/src/subsystems/feeder/feeder.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/feeder/feeder.hpp[m
+[36m@@ -1,17 +1,17 @@[m
+ #pragma once[m
+[31m-#ifndef ENGINEER[m
+[31m-#include "drivers.hpp"[m
+[31m-#include "informants/limit_switch.hpp"[m
+[31m-#include "tap/control/subsystem.hpp"[m
+[32m+[m[32m#ifndef TARGET_DART#include "tap/control/subsystem.hpp"[m
+ #include "tap/motor/m3508_constants.hpp"[m
+[32m+[m
+[32m+[m[32m#include "informants/limit_switch.hpp"[m
+ #include "utils/common_types.hpp"[m
+ #include "utils/robot_specific_inc.hpp"[m
+ [m
+[32m+[m[32m#include "drivers.hpp"[m
+[32m+[m
+ namespace src::Feeder {[m
+ class FeederSubsystem : public tap::control::Subsystem {[m
+[31m-   public:[m
+[31m-    FeederSubsystem([m
+[31m-        src::Drivers* drivers);[m
+[32m+[m[32mpublic:[m
+[32m+[m[32m    FeederSubsystem(src::Drivers* drivers);[m
+ [m
+     mockable void initialize() override;[m
+     mockable void refresh() override;[m
+[36m@@ -22,22 +22,18 @@[m [mclass FeederSubsystem : public tap::control::Subsystem {[m
+ [m
+     mockable float setTargetRPM(float rpm);[m
+ [m
+[31m-    float getTargetRPM() const {[m
+[31m-        return targetRPM;[m
+[31m-    }[m
+[32m+[m[32m    float getTargetRPM() const { return targetRPM; }[m
+ [m
+[31m-    float getCurrentRPM() const {[m
+[31m-        return feederMotor.getShaftRPM();[m
+[31m-    }[m
+[32m+[m[32m    float getCurrentRPM() const { return feederMotor.getShaftRPM(); }[m
+ [m
+     int getTotalLimitCount() const;[m
+ [m
+     bool isBarrelHeatAcceptable(float maxPercentage);[m
+ [m
+ #ifndef ENV_UNIT_TESTS[m
+[31m-   private:[m
+[32m+[m[32mprivate:[m
+ #else[m
+[31m-   public:[m
+[32m+[m[32mpublic:[m
+ #endif[m
+ [m
+     float targetRPM;[m
+[1mdiff --git a/aimbots-src/src/subsystems/feeder/full_auto_feeder_command.cpp b/aimbots-src/src/subsystems/feeder/full_auto_feeder_command.cpp[m
+[1mindex 4510609b..377a0eed 100644[m
+[1m--- a/aimbots-src/src/subsystems/feeder/full_auto_feeder_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/feeder/full_auto_feeder_command.cpp[m
+[36m@@ -1,6 +1,5 @@[m
+ #include "full_auto_feeder_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ namespace src::Feeder {[m
+ [m
+ FullAutoFeederCommand::FullAutoFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder, float speed, float acceptableHeatThreshold)[m
+[36m@@ -8,21 +7,21 @@[m [mFullAutoFeederCommand::FullAutoFeederCommand(src::Drivers* drivers, FeederSubsys[m
+       feeder(feeder),[m
+       speed(speed),[m
+       acceptableHeatThreshold(acceptableHeatThreshold),[m
+[31m-      unjamSpeed(-3000.0f)  //[m
+[32m+[m[32m      unjamSpeed(-250.0f)  //[m
+ {[m
+     addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(feeder));[m
+ }[m
+ [m
+ void FullAutoFeederCommand::initialize() {[m
+     feeder->setTargetRPM(0.0f);[m
+[31m-    startupThreshold.restart(500);  // delay to wait before attempting unjam[m
+[32m+[m[32m    startupThreshold.restart(1000);  // delay to wait before attempting unjam[m
+     unjamTimer.restart(0);[m
+ }[m
+ [m
+ void FullAutoFeederCommand::execute() {[m
+     if (fabs(feeder->getCurrentRPM()) <= 10.0f && startupThreshold.execute()) {[m
+         feeder->setTargetRPM(unjamSpeed);[m
+[31m-        unjamTimer.restart(175);[m
+[32m+[m[32m        unjamTimer.restart(500);[m
+     }[m
+ [m
+     if (unjamTimer.execute()) {[m
+[1mdiff --git a/aimbots-src/src/subsystems/feeder/full_auto_feeder_command.hpp b/aimbots-src/src/subsystems/feeder/full_auto_feeder_command.hpp[m
+[1mindex e3388e1a..0730ac72 100644[m
+[1m--- a/aimbots-src/src/subsystems/feeder/full_auto_feeder_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/feeder/full_auto_feeder_command.hpp[m
+[36m@@ -1,19 +1,16 @@[m
+ #pragma once[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+[32m+[m[32m#include "drivers.hpp"[m
+[32m+[m[32m#include "subsystems/feeder/feeder.hpp"[m
+ #include "tap/communication/gpio/leds.hpp"[m
+ #include "tap/control/command.hpp"[m
+[31m-[m
+[31m-#include "subsystems/feeder/feeder.hpp"[m
+ #include "utils/common_types.hpp"[m
+ #include "utils/robot_specific_inc.hpp"[m
+ [m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+ namespace src::Feeder {[m
+ [m
+ class FullAutoFeederCommand : public TapCommand {[m
+[31m-public:[m
+[32m+[m[32m   public:[m
+     FullAutoFeederCommand(src::Drivers*, FeederSubsystem*, float speed = FEEDER_DEFAULT_RPM, float acceptableHeatThreshold = 0.90f);[m
+     void initialize() override;[m
+ [m
+[36m@@ -27,7 +24,7 @@[m [mpublic:[m
+ [m
+     const char* getName() const override { return "run feeder"; }[m
+ [m
+[31m-private:[m
+[32m+[m[32m   private:[m
+     src::Drivers* drivers;[m
+     FeederSubsystem* feeder;[m
+ [m
+[36m@@ -40,5 +37,4 @@[m [mprivate:[m
+ };[m
+ [m
+ }  // namespace src::Feeder[m
+[31m-[m
+ #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/feeder/run_feeder_command.cpp b/aimbots-src/src/subsystems/feeder/run_feeder_command.cpp[m
+[1mnew file mode 100644[m
+[1mindex 00000000..d9d28ce0[m
+[1m--- /dev/null[m
+[1m+++ b/aimbots-src/src/subsystems/feeder/run_feeder_command.cpp[m
+[36m@@ -0,0 +1,37 @@[m
+[32m+[m[32m#include "run_feeder_command.hpp"[m
+[32m+[m[32m#ifndef TARGET_DART[m
+[32m+[m[32mnamespace src::Feeder {[m
+[32m+[m[32mRunFeederCommand::RunFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder)[m
+[32m+[m[32m    : drivers(drivers), feeder(feeder), speed(0) {[m
+[32m+[m[32m    addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(feeder));[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mvoid RunFeederCommand::initialize() {[m
+[32m+[m[32m    speed = 0.0f;[m
+[32m+[m[32m    feeder->setTargetRPM(speed);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mvoid RunFeederCommand::execute() {[m
+[32m+[m[32m    // drivers->leds.set(tap::gpio::Leds::A, true);[m
+[32m+[m[32m    // drivers->leds.set(tap::gpio::Leds::B, false);[m
+[32m+[m[32m    // drivers->leds.set(tap::gpio::Leds::C, true);[m
+[32m+[m[32m    // drivers->leds.set(tap::gpio::Leds::D, false);[m
+[32m+[m[32m    // drivers->leds.set(tap::gpio::Leds::E, true);[m
+[32m+[m[32m    // drivers->leds.set(tap::gpio::Leds::F, false);[m
+[32m+[m[32m    // drivers->leds.set(tap::gpio::Leds::G, true);[m
+[32m+[m[32m    // drivers->leds.set(tap::gpio::Leds::H, false);[m
+[32m+[m[32m    speed = 3000.0f * FEEDER_MOTOR_DIRECTION;[m
+[32m+[m[32m    feeder->setTargetRPM(speed);[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mvoid RunFeederCommand::end(bool) {}[m
+[32m+[m
+[32m+[m[32mbool RunFeederCommand::isReady() {[m
+[32m+[m[32m    return true;[m
+[32m+[m[32m}[m
+[32m+[m
+[32m+[m[32mbool RunFeederCommand::isFinished() const {[m
+[32m+[m[32m    return false;  // finished condition (button released) or their api is nice and we don't have to[m
+[32m+[m[32m}[m
+[32m+[m[32m}  // namespace src::Feeder[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/feeder/stop_feeder_command.cpp b/aimbots-src/src/subsystems/feeder/stop_feeder_command.cpp[m
+[1mindex 441f18d9..34346517 100644[m
+[1m--- a/aimbots-src/src/subsystems/feeder/stop_feeder_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/feeder/stop_feeder_command.cpp[m
+[36m@@ -1,6 +1,5 @@[m
+ #include "stop_feeder_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ namespace src::Feeder {[m
+ [m
+ StopFeederCommand::StopFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder) : drivers(drivers), feeder(feeder) {[m
+[36m@@ -16,6 +15,5 @@[m [mvoid StopFeederCommand::end(bool interrupted) { UNUSED(interrupted); }[m
+ bool StopFeederCommand::isReady() { return true; }[m
+ [m
+ bool StopFeederCommand::isFinished() const { return false; }[m
+[31m-[m
+ }  // namespace src::Feeder[m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m#endif[m
+[1mdiff --git a/aimbots-src/src/subsystems/feeder/stop_feeder_command.hpp b/aimbots-src/src/subsystems/feeder/stop_feeder_command.hpp[m
+[1mindex c2a6409c..f07cef53 100644[m
+[1m--- a/aimbots-src/src/subsystems/feeder/stop_feeder_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/feeder/stop_feeder_command.hpp[m
+[36m@@ -1,18 +1,15 @@[m
+ #pragma once[m
+[31m-[m
+[31m-#ifndef ENGINEER[m
+[31m-#include "tap/control/command.hpp"[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+[32m+[m[32m#include "drivers.hpp"[m
+ #include "subsystems/feeder/feeder.hpp"[m
+[32m+[m[32m#include "tap/control/command.hpp"[m
+ #include "utils/common_types.hpp"[m
+ #include "utils/robot_specific_inc.hpp"[m
+ [m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+ namespace src::Feeder {[m
+ [m
+ class StopFeederCommand : public TapCommand {[m
+[31m-public:[m
+[32m+[m[32m   public:[m
+     StopFeederCommand(src::Drivers*, FeederSubsystem*);[m
+     void initialize() override;[m
+ [m
+[36m@@ -24,11 +21,10 @@[m [mpublic:[m
+ [m
+     const char* getName() const override { return "stop feeder"; }[m
+ [m
+[31m-private:[m
+[32m+[m[32m   private:[m
+     src::Drivers* drivers;[m
+     FeederSubsystem* feeder;[m
+ };[m
+ [m
+ }  // namespace src::Feeder[m
+[31m-[m
+ #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/controllers/gimbal_chassis_relative_controller.cpp b/aimbots-src/src/subsystems/gimbal/controllers/gimbal_chassis_relative_controller.cpp[m
+[1mindex 5060d775..2609d9fc 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/controllers/gimbal_chassis_relative_controller.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/controllers/gimbal_chassis_relative_controller.cpp[m
+[36m@@ -1,5 +1,4 @@[m
+ #include "gimbal_chassis_relative_controller.hpp"[m
+[31m-#ifndef ENGINEER[m
+ [m
+ #include <utils/robot_specific_inc.hpp>[m
+ [m
+[36m@@ -57,5 +56,4 @@[m [mvoid GimbalChassisRelativeController::runPitchController(AngleUnit unit, float t[m
+ [m
+ bool GimbalChassisRelativeController::isOnline() const { return gimbal->isOnline(); }[m
+ [m
+[31m-}  // namespace src::Gimbal[m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m}  // namespace src::Gimbal[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/controllers/gimbal_field_relative_controller.cpp b/aimbots-src/src/subsystems/gimbal/controllers/gimbal_field_relative_controller.cpp[m
+[1mindex eb5947d7..df7136cc 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/controllers/gimbal_field_relative_controller.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/controllers/gimbal_field_relative_controller.cpp[m
+[36m@@ -1,6 +1,4 @@[m
+ #include "utils/robot_specific_inc.hpp"[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+ #ifdef TOKYO_COMPATIBLE[m
+ [m
+ #include "gimbal_field_relative_controller.hpp"[m
+[36m@@ -62,5 +60,4 @@[m [mbool GimbalFieldRelativeController::isOnline() const { return gimbal->isOnline()[m
+ [m
+ }  // namespace src::Gimbal[m
+ [m
+[31m-#endif  // TOKYO_COMPATIBLE[m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m#endif  // TOKYO_COMPATIBLE[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/gimbal.cpp b/aimbots-src/src/subsystems/gimbal/gimbal.cpp[m
+[1mindex 8da5b191..4cb7fb99 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/gimbal.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/gimbal.cpp[m
+[36m@@ -2,8 +2,6 @@[m
+ [m
+ #include <drivers.hpp>[m
+ [m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+ static inline float wrappedEncoderValueToRadians(int64_t encoderValue) {[m
+     return (M_TWOPI * static_cast<float>(encoderValue)) / DJIMotor::ENC_RESOLUTION;[m
+ }[m
+[36m@@ -151,4 +149,3 @@[m [mnamespace src::Gimbal {[m
+     }[m
+ [m
+ }  // namespace src::Gimbal[m
+[31m-#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/gimbal.hpp b/aimbots-src/src/subsystems/gimbal/gimbal.hpp[m
+[1mindex 5e6abb4d..b1ce144a 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/gimbal.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/gimbal.hpp[m
+[36m@@ -1,6 +1,6 @@[m
+ #pragma once[m
+[31m-[m
+[31m-#ifndef ENGINEER[m
+[32m+[m[32m#ifndef TARGET_ENGINEER[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ [m
+ #include <tap/algorithms/contiguous_float.hpp>[m
+ #include <tap/algorithms/math_user_utils.hpp>[m
+[36m@@ -81,4 +81,5 @@[m [mclass GimbalSubsystem : public tap::control::Subsystem {[m
+ };[m
+ [m
+ }  // namespace src::Gimbal[m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m#endif[m
+[32m+[m[32m// #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/gimbal_chase_command.cpp b/aimbots-src/src/subsystems/gimbal/gimbal_chase_command.cpp[m
+[1mindex ca826563..b0fd9a86 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/gimbal_chase_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/gimbal_chase_command.cpp[m
+[36m@@ -1,6 +1,6 @@[m
+ #include "gimbal_chase_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+ [m
+[32m+[m[32m#ifndef TARGET_DART[m
+ namespace src::Gimbal {[m
+ // feed chassis relative controller for sentry, field relative for ground robots[m
+ GimbalChaseCommand::GimbalChaseCommand(src::Drivers* drivers,[m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/gimbal_chase_command.hpp b/aimbots-src/src/subsystems/gimbal/gimbal_chase_command.hpp[m
+[1mindex d8b281dc..d95371d4 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/gimbal_chase_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/gimbal_chase_command.hpp[m
+[36m@@ -1,5 +1,5 @@[m
+ #pragma once[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #include <drivers.hpp>[m
+ #include <subsystems/gimbal/controllers/gimbal_chassis_relative_controller.hpp>[m
+ #include <subsystems/gimbal/gimbal.hpp>[m
+[36m@@ -8,10 +8,8 @@[m
+ namespace src::Gimbal {[m
+ [m
+ class GimbalChaseCommand : public tap::control::Command {[m
+[31m-   public:[m
+[31m-    GimbalChaseCommand(src::Drivers*,[m
+[31m-                       GimbalSubsystem*,[m
+[31m-                       GimbalControllerInterface*);[m
+[32m+[m[32mpublic:[m
+[32m+[m[32m    GimbalChaseCommand(src::Drivers*, GimbalSubsystem*, GimbalControllerInterface*);[m
+ [m
+     char const* getName() const override { return "Gimbal Chase Command"; }[m
+ [m
+[36m@@ -22,11 +20,12 @@[m [mclass GimbalChaseCommand : public tap::control::Command {[m
+     bool isFinished() const override;[m
+     void end(bool interrupted) override;[m
+ [m
+[31m-   private:[m
+[32m+[m[32mprivate:[m
+     src::Drivers* drivers;[m
+ [m
+     GimbalSubsystem* gimbal;[m
+     GimbalControllerInterface* controller;[m
+ };[m
+ [m
+[31m-}  // namespace src::Gimbal[m
+\ No newline at end of file[m
+[32m+[m[32m}  // namespace src::Gimbal[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/gimbal_control_command.cpp b/aimbots-src/src/subsystems/gimbal/gimbal_control_command.cpp[m
+[1mindex adb47c4e..acd36a90 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/gimbal_control_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/gimbal_control_command.cpp[m
+[36m@@ -1,6 +1,5 @@[m
+ #include "gimbal_control_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ #include <tap/architecture/clock.hpp>[m
+ #include <tap/communication/gpio/leds.hpp>[m
+ [m
+[36m@@ -47,4 +46,4 @@[m [mvoid GimbalControlCommand::end(bool) {[m
+ }[m
+ [m
+ }  // namespace src::Gimbal[m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m   // #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/gimbal_control_command.hpp b/aimbots-src/src/subsystems/gimbal/gimbal_control_command.hpp[m
+[1mindex b7856e38..04669ad0 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/gimbal_control_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/gimbal_control_command.hpp[m
+[36m@@ -1,5 +1,5 @@[m
+ #pragma once[m
+[31m-[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ #include <drivers.hpp>[m
+ #include <subsystems/gimbal/controllers/gimbal_controller_interface.hpp>[m
+ #include <subsystems/gimbal/gimbal.hpp>[m
+[36m@@ -27,4 +27,5 @@[m [mprivate:[m
+     GimbalControllerInterface* controller;[m
+ };[m
+ [m
+[31m-}  // namespace src::Gimbal[m
+\ No newline at end of file[m
+[32m+[m[32m}  // namespace src::Gimbal[m
+[32m+[m[32m// #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/gimbal_field_relative_control_command.cpp b/aimbots-src/src/subsystems/gimbal/gimbal_field_relative_control_command.cpp[m
+[1mindex 27c20a5b..54546306 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/gimbal_field_relative_control_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/gimbal_field_relative_control_command.cpp[m
+[36m@@ -1,6 +1,5 @@[m
+ #include "gimbal_field_relative_control_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #include <tap/architecture/clock.hpp>[m
+ #include <tap/communication/gpio/leds.hpp>[m
+ [m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/gimbal_field_relative_control_command.hpp b/aimbots-src/src/subsystems/gimbal/gimbal_field_relative_control_command.hpp[m
+[1mindex df042a19..f2e69a25 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/gimbal_field_relative_control_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/gimbal_field_relative_control_command.hpp[m
+[36m@@ -1,5 +1,5 @@[m
+ #pragma once[m
+[31m-[m
+[32m+[m[32m#ifndef TARGET_DART[m
+ #include <drivers.hpp>[m
+ #include <subsystems/gimbal/controllers/gimbal_controller_interface.hpp>[m
+ #include <subsystems/gimbal/gimbal.hpp>[m
+[36m@@ -30,4 +30,5 @@[m [mprivate:[m
+     bool wasEPressed = false;[m
+ };[m
+ [m
+[31m-}  // namespace src::Gimbal[m
+\ No newline at end of file[m
+[32m+[m[32m}  // namespace src::Gimbal[m
+[32m+[m[32m#endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gimbal/sentry_commands/gimbal_patrol_command.cpp b/aimbots-src/src/subsystems/gimbal/sentry_commands/gimbal_patrol_command.cpp[m
+[1mindex 9cc99f64..a6652298 100644[m
+[1m--- a/aimbots-src/src/subsystems/gimbal/sentry_commands/gimbal_patrol_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/gimbal/sentry_commands/gimbal_patrol_command.cpp[m
+[36m@@ -98,13 +98,13 @@[m [mfloat GimbalPatrolCommand::getFieldRelativeYawPatrolAngle(AngleUnit unit) {[m
+     currPatrolCoordinateYDisplay = patrolCoordinates[patrolCoordinateIndex][Y];[m
+     currPatrolCoordinateTimeDisplay = patrolCoordinates[patrolCoordinateIndex][TIME];[m
+ [m
+[31m-    Matrix<float, 1, 3> demoPosition1 = Matrix<float, 1, 3>::zeroMatrix();[m
+[31m-    demoPosition1[0][0] = drivers->fieldRelativeInformant.getFieldRelativeRobotPosition()[0][X];[m
+[31m-    demoPosition1[0][1] = drivers->fieldRelativeInformant.getFieldRelativeRobotPosition()[0][Y];[m
+[32m+[m[32m    // Matrix<float, 1, 3> demoPosition1 = Matrix<float, 1, 3>::zeroMatrix();[m
+[32m+[m[32m    // demoPosition1[0][0] = drivers->fieldRelativeInformant.getFieldRelativeRobotPosition()[0][X];[m
+[32m+[m[32m    // demoPosition1[0][1] = drivers->fieldRelativeInformant.getFieldRelativeRobotPosition()[0][Y];[m
+ [m
+[31m-    Matrix<float, 1, 3> demoPosition2 = Matrix<float, 1, 3>::zeroMatrix();[m
+[31m-    demoPosition2[0][0] = -3.6675f + 1.0f;[m
+[31m-    demoPosition2[0][1] = -1.6675f + 1.0f;[m
+[32m+[m[32m    // Matrix<float, 1, 3> demoPosition2 = Matrix<float, 1, 3>::zeroMatrix();[m
+[32m+[m[32m    // demoPosition2[0][0] = -3.6675f + 1.0f;[m
+[32m+[m[32m    // demoPosition2[0][1] = -1.6675f + 1.0f;[m
+ [m
+     float xy_angle = src::utils::MatrixHelper::xy_angle_between_locations(AngleUnit::Radians, drivers->fieldRelativeInformant.getFieldRelativeRobotPosition(), patrolCoordinates.getRow(patrolCoordinateIndex) /*demoPosition2*/);[m
+     xy_angleDisplay = modm::toDegree(xy_angle);[m
+[1mdiff --git a/aimbots-src/src/subsystems/gui/graphic_helper.cpp b/aimbots-src/src/subsystems/gui/graphic_helper.cpp[m
+[1mdeleted file mode 100644[m
+[1mindex 0f1c4908..00000000[m
+[1m--- a/aimbots-src/src/subsystems/gui/graphic_helper.cpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,32 +0,0 @@[m
+[31m-#include "graphic_helper.hpp"[m
+[31m-[m
+[31m-#include <cstdint>[m
+[31m-[m
+[31m-namespace src::GUI[m
+[31m-{[m
+[31m-uint32_t GraphicHelper::currGraphicName = 0;[m
+[31m-[m
+[31m-GraphicHelper::GraphicHelper(tap::communication::serial::RefSerialTransmitter &refSerialTransmitter)[m
+[31m-    : refSerialTransmitter(refSerialTransmitter)[m
+[31m-{[m
+[31m-}[m
+[31m-//d:\RoboMasters\Codebases\aimbots-dev\aimbots-src\taproot\src\tap\communication\serial\ref_serial_transmitter.cpp[m
+[31m-//Saving for reference later[m
+[31m-void GraphicHelper::resetGraphicNameGenerator() { currGraphicName = 0; }[m
+[31m-[m
+[31m-void GraphicHelper::getUnusedGraphicName(uint8_t graphicName[3])[m
+[31m-{[m
+[31m-    if (currGraphicName > 0xffffff)[m
+[31m-    {[m
+[31m-        return;[m
+[31m-    }[m
+[31m-    else[m
+[31m-    {[m
+[31m-        graphicName[0] = static_cast<uint8_t>((currGraphicName >> 16) & 0xff);[m
+[31m-        graphicName[1] = static_cast<uint8_t>((currGraphicName >> 8) & 0xff);[m
+[31m-        graphicName[2] = static_cast<uint8_t>(currGraphicName & 0xff);[m
+[31m-        currGraphicName++;[m
+[31m-    }[m
+[31m-}[m
+[31m-[m
+[31m-}[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gui/graphic_helper.hpp b/aimbots-src/src/subsystems/gui/graphic_helper.hpp[m
+[1mdeleted file mode 100644[m
+[1mindex d86cdeae..00000000[m
+[1m--- a/aimbots-src/src/subsystems/gui/graphic_helper.hpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,47 +0,0 @@[m
+[31m-#pragma once[m
+[31m-[m
+[31m-#include "tap/architecture/timeout.hpp"[m
+[31m-#include "tap/communication/serial/ref_serial_data.hpp"[m
+[31m-[m
+[31m-#include "modm/processing/resumable.hpp"[m
+[31m-[m
+[31m-namespace tap::communication::serial[m
+[31m-{[m
+[31m-class RefSerialTransmitter;[m
+[31m-}[m
+[31m-[m
+[31m-namespace src::GUI[m
+[31m-{[m
+[31m-[m
+[31m-//Helper subclass for several basic GUI graphics functions[m
+[31m-class GraphicHelper : protected tap::communication::serial::RefSerialData[m
+[31m-{[m
+[31m-public:[m
+[31m-[m
+[31m-    static constexpr uint16_t SCREEN_WIDTH = 1920; //Right is positive X[m
+[31m-    static constexpr uint16_t SCREEN_HEIGHT = 1080; //Top is positive Y[m
+[31m-[m
+[31m-    static constexpr uint8_t DEFAULT_GRAPHIC_LAYER = 0;[m
+[31m-[m
+[31m-    GraphicHelper(tap::communication::serial::RefSerialTransmitter &refSerialTransmitter);[m
+[31m-[m
+[31m-    virtual modm::ResumableResult<bool> sendInitialGraphics() = 0;[m
+[31m-[m
+[31m-    virtual modm::ResumableResult<bool> update() = 0;[m
+[31m-[m
+[31m-    virtual void initialize() = 0;[m
+[31m-[m
+[31m-    static void resetGraphicNameGenerator();[m
+[31m-[m
+[31m-protected:[m
+[31m-    //Graphics must have a unique 3 byte identifier.  Utility function gets an unused name to give to the graphic[m
+[31m-    static void getUnusedGraphicName(uint8_t graphicName[3]);[m
+[31m-[m
+[31m-    static uint32_t currGraphicName;[m
+[31m-[m
+[31m-    tap::communication::serial::RefSerialTransmitter &refSerialTransmitter;[m
+[31m-[m
+[31m-    //Delay between GUI update messages [m
+[31m-    tap::arch::MilliTimeout delayTimer;[m
+[31m-};[m
+[31m-}[m
+[1mdiff --git a/aimbots-src/src/subsystems/gui/gui_display.cpp b/aimbots-src/src/subsystems/gui/gui_display.cpp[m
+[1mdeleted file mode 100644[m
+[1mindex eb44654f..00000000[m
+[1m--- a/aimbots-src/src/subsystems/gui/gui_display.cpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,8 +0,0 @@[m
+[31m-#include "gui_display.hpp"[m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+[31m-namespace src::GUI {[m
+[31m-[m
+[31m-GUI_DisplaySubsystem::GUI_DisplaySubsystem(src::Drivers* drivers) : Subsystem(drivers) {}[m
+[31m-[m
+[31m-}[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gui/gui_display.hpp b/aimbots-src/src/subsystems/gui/gui_display.hpp[m
+[1mdeleted file mode 100644[m
+[1mindex d772c1bf..00000000[m
+[1m--- a/aimbots-src/src/subsystems/gui/gui_display.hpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,16 +0,0 @@[m
+[31m-#pragma once[m
+[31m-[m
+[31m-#include "tap/control/command.hpp"[m
+[31m-#include "tap/control/subsystem.hpp"[m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+[31m-namespace src::GUI {[m
+[31m-[m
+[31m-class GUI_DisplaySubsystem : public tap::control::Subsystem {[m
+[31m-[m
+[31m-    //Virtual sub-system, exists only to run commands on it.[m
+[31m-    public:[m
+[31m-    GUI_DisplaySubsystem(src::Drivers* drivers);[m
+[31m-};[m
+[31m-[m
+[31m-};[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gui/gui_display_command.cpp b/aimbots-src/src/subsystems/gui/gui_display_command.cpp[m
+[1mdeleted file mode 100644[m
+[1mindex 7b0e3c17..00000000[m
+[1m--- a/aimbots-src/src/subsystems/gui/gui_display_command.cpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,46 +0,0 @@[m
+[31m-#include "gui_display_command.hpp"[m
+[31m-#include "gui_display.hpp"[m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+[31m-namespace src::GUI {[m
+[31m-[m
+[31m-GUI_DisplayCommand::GUI_DisplayCommand(src::Drivers* drivers,GUI_DisplaySubsystem* GUI_Display) :[m
+[31m-Command(), drivers(*drivers), refSerialTransmitter(drivers), subsystemStatGraphics(drivers, refSerialTransmitter) {[m
+[31m-[m
+[31m-    addSubsystemRequirement(GUI_Display);[m
+[31m-}[m
+[31m-[m
+[31m-//GUI command just runs a protothread (lightweight multithread) to allow for all graphic writing code to be run.[m
+[31m-void GUI_DisplayCommand::initialize() {[m
+[31m-    [m
+[31m-    GraphicHelper::resetGraphicNameGenerator();[m
+[31m-    restart();[m
+[31m-    [m
+[31m-    subsystemStatGraphics.initialize();[m
+[31m-    //Initialize other drawing commands here[m
+[31m-}[m
+[31m-[m
+[31m-void GUI_DisplayCommand::execute() {[m
+[31m-    run();[m
+[31m-}[m
+[31m-[m
+[31m-bool GUI_DisplayCommand::run() {[m
+[31m-    //Intentional error, ignore[m
+[31m-    PT_BEGIN();[m
+[31m-[m
+[31m-    //Try commentting out this line next time[m
+[31m-    PT_WAIT_UNTIL(drivers.refSerial.getRefSerialReceivingData());[m
+[31m-[m
+[31m-    PT_CALL(subsystemStatGraphics.sendInitialGraphics());[m
+[31m-[m
+[31m-    while (true)[m
+[31m-    {[m
+[31m-        PT_CALL(subsystemStatGraphics.update());[m
+[31m-        PT_YIELD();[m
+[31m-    }[m
+[31m-    PT_END();[m
+[31m-[m
+[31m-}[m
+[31m-[m
+[31m-[m
+[31m-}[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gui/gui_display_command.hpp b/aimbots-src/src/subsystems/gui/gui_display_command.hpp[m
+[1mdeleted file mode 100644[m
+[1mindex 4eef3212..00000000[m
+[1m--- a/aimbots-src/src/subsystems/gui/gui_display_command.hpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,42 +0,0 @@[m
+[31m-#pragma once[m
+[31m-[m
+[31m-#include "tap/architecture/periodic_timer.hpp"[m
+[31m-#include "tap/communication/referee/state_hud_indicator.hpp"[m
+[31m-#include "tap/communication/serial/ref_serial.hpp"[m
+[31m-#include "tap/communication/serial/ref_serial_transmitter.hpp"[m
+[31m-#include "tap/control/command.hpp"[m
+[31m-[m
+[31m-#include "modm/processing/protothread.hpp"[m
+[31m-[m
+[31m-#include <drivers.hpp>[m
+[31m-#include <subsystems/gui/gui_display.hpp>[m
+[31m-[m
+[31m-#include "subsystemStatusGraphic.hpp"[m
+[31m-[m
+[31m-namespace src::GUI {[m
+[31m-[m
+[31m-//According to ARUW, only one Display Command should be instantiated, else unspeakable horrors occur[m
+[31m-[m
+[31m-class GUI_DisplayCommand : public tap::control::Command, ::modm::pt::Protothread {[m
+[31m-    public:[m
+[31m-        GUI_DisplayCommand(src::Drivers* drivers, GUI_DisplaySubsystem* GUIDisplay);[m
+[31m-[m
+[31m-    void initialize() override;[m
+[31m-[m
+[31m-    void execute() override;[m
+[31m-[m
+[31m-    void end(bool) override {}[m
+[31m-[m
+[31m-    bool isFinished() const override { return false; }[m
+[31m-[m
+[31m-    const char *getName() const override { return "client display"; }[m
+[31m-    [m
+[31m-    private:[m
+[31m-        src::Drivers &drivers;[m
+[31m-        tap::communication::serial::RefSerialTransmitter refSerialTransmitter;[m
+[31m-[m
+[31m-        SubsystemStatusGraphic subsystemStatGraphics;[m
+[31m-[m
+[31m-        bool run();[m
+[31m-};[m
+[31m-}[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gui/subsystemStatusGraphic.cpp b/aimbots-src/src/subsystems/gui/subsystemStatusGraphic.cpp[m
+[1mdeleted file mode 100644[m
+[1mindex e3fd2182..00000000[m
+[1m--- a/aimbots-src/src/subsystems/gui/subsystemStatusGraphic.cpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,90 +0,0 @@[m
+[31m-#include "subsystemStatusGraphic.hpp"[m
+[31m-[m
+[31m-#include "tap/communication/serial/ref_serial.hpp"[m
+[31m-#include "tap/communication/serial/ref_serial_transmitter.hpp"[m
+[31m-[m
+[31m-#include "drivers.hpp"[m
+[31m-// #ifdef __INTELLISENSE__[m
+[31m-//     #pragma diag_suppress 1227[m
+[31m-// #endif[m
+[31m-[m
+[31m-using namespace tap::communication::serial;[m
+[31m-using namespace tap::communication::referee;[m
+[31m-[m
+[31m-namespace src::GUI {[m
+[31m-[m
+[31m-SubsystemStatusGraphic::SubsystemStatusGraphic(src::Drivers* drivers, tap::communication::serial::RefSerialTransmitter &refSerialTransmitter) :[m
+[31m-GraphicHelper(refSerialTransmitter),[m
+[31m-      drivers(drivers) {[m
+[31m-[m
+[31m-      }[m
+[31m-[m
+[31m-modm::ResumableResult<bool> SubsystemStatusGraphic::sendInitialGraphics() {[m
+[31m-    // not actually an error[m
+[31m-    RF_BEGIN(0);[m
+[31m-[m
+[31m-    RF_CALL(refSerialTransmitter.sendGraphic(&statusStaticGraphics[0]));[m
+[31m-    //RF_CALL(refSerialTransmitter.sendGraphic(&statusStaticGraphics[1]));[m
+[31m-[m
+[31m-    RF_CALL(refSerialTransmitter.sendGraphic(&statusStaticLabelGraphics[0]));[m
+[31m-    //RF_CALL(refSerialTransmitter.sendGraphic(&statusStaticLabelGraphics[1]));[m
+[31m-[m
+[31m-    RF_END();[m
+[31m-}[m
+[31m-[m
+[31m-modm::ResumableResult<bool> SubsystemStatusGraphic::update() {[m
+[31m-    // not actually an error[m
+[31m-    RF_BEGIN(1);[m
+[31m-[m
+[31m-    //RF_CALL(statusStaticGraphics[0].draw());[m
+[31m-[m
+[31m-    RF_END();[m
+[31m-}[m
+[31m-[m
+[31m-void SubsystemStatusGraphic::initialize() {[m
+[31m-    uint8_t graphicName[3] = {};[m
+[31m-    [m
+[31m-    for (int i = 0; i < 2; i++) {[m
+[31m-        //Gets a name and assigns it to graphicName[m
+[31m-        getUnusedGraphicName(graphicName);[m
+[31m-[m
+[31m-        //Sets up the basic information for a graphic, needs to be called on every single one[m
+[31m-        RefSerialTransmitter::configGraphicGenerics(&statusStaticGraphics[i].graphicData,[m
+[31m-        graphicName,[m
+[31m-        Tx::GRAPHIC_ADD,[m
+[31m-        DEFAULT_GRAPHIC_LAYER,[m
+[31m-        Tx::GraphicColor::GREEN);[m
+[31m-[m
+[31m-        //Specific graphic Configuration type[m
+[31m-        RefSerialTransmitter::configCircle(/*Width*/40,[m
+[31m-        /*X*/280,[m
+[31m-        /*Y*/760,[m
+[31m-        /*Radius*/125,[m
+[31m-        &statusStaticGraphics[i].graphicData);    [m
+[31m-        [m
+[31m-        //Gets a name and assigns it to graphicName[m
+[31m-        getUnusedGraphicName(graphicName);[m
+[31m-[m
+[31m-        //Sets up the basic information for a graphic, needs to be called on every single one[m
+[31m-        RefSerialTransmitter::configGraphicGenerics(&statusStaticLabelGraphics[i].graphicData,[m
+[31m-        graphicName,[m
+[31m-        Tx::GRAPHIC_ADD,[m
+[31m-        DEFAULT_GRAPHIC_LAYER,[m
+[31m-        Tx::GraphicColor::GREEN);[m
+[31m-[m
+[31m-        //Specific graphic Configuration type[m
+[31m-        //Char Size, Line Width, X, Y, Message (30 chars)[m
+[31m-        RefSerialTransmitter::configCharacterMsg(40,[m
+[31m-            50,[m
+[31m-            900,[m
+[31m-            760,[m
+[31m-            sampleMsg,[m
+[31m-            &statusStaticLabelGraphics[i]);[m
+[31m-[m
+[31m-[m
+[31m-        [m
+[31m-    }[m
+[31m-[m
+[31m-}[m
+[31m-[m
+[31m-}[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/gui/subsystemStatusGraphic.hpp b/aimbots-src/src/subsystems/gui/subsystemStatusGraphic.hpp[m
+[1mdeleted file mode 100644[m
+[1mindex b530ef37..00000000[m
+[1m--- a/aimbots-src/src/subsystems/gui/subsystemStatusGraphic.hpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,44 +0,0 @@[m
+[31m-#pragma once[m
+[31m-[m
+[31m-#include "tap/communication/referee/state_hud_indicator.hpp"[m
+[31m-#include "tap/communication/serial/ref_serial_data.hpp"[m
+[31m-[m
+[31m-#include "modm/processing/resumable.hpp"[m
+[31m-[m
+[31m-[m
+[31m-#include "graphic_helper.hpp"[m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+[31m-namespace src[m
+[31m-{[m
+[31m-class Drivers;[m
+[31m-}[m
+[31m-[m
+[31m-namespace src::GUI {[m
+[31m-[m
+[31m-class SubsystemStatusGraphic : public GraphicHelper, protected modm::Resumable<2> {[m
+[31m-[m
+[31m-public:[m
+[31m-[m
+[31m-SubsystemStatusGraphic(src::Drivers* drivers, tap::communication::serial::RefSerialTransmitter &refSerialTransmitter);[m
+[31m-[m
+[31m-modm::ResumableResult<bool> sendInitialGraphics() override final;[m
+[31m-modm::ResumableResult<bool> update() override final;[m
+[31m-void initialize() override final;[m
+[31m-[m
+[31m-private:[m
+[31m-[m
+[31m-src::Drivers *drivers;[m
+[31m-[m
+[31m-static constexpr uint16_t BOOLEAN_HUD_INDICATOR_LIST_CENTER_X = 280;[m
+[31m-static constexpr uint16_t BOOLEAN_HUD_INDICATOR_LIST_START_Y = 760;[m
+[31m-static constexpr uint16_t BOOLEAN_HUD_INDICATOR_WIDTH = 40;[m
+[31m-[m
+[31m-Tx::Graphic1Message statusStaticGraphics[2];[m
+[31m-Tx::GraphicCharacterMessage statusStaticLabelGraphics[2];[m
+[31m-[m
+[31m-const char * sampleMsg = "Howdy World";[m
+[31m-[m
+[31m-[m
+[31m-};[m
+[31m-}[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/shooter/brake_shooter_command.cpp b/aimbots-src/src/subsystems/shooter/brake_shooter_command.cpp[m
+[1mindex abdf956f..d0fc0cc1 100644[m
+[1m--- a/aimbots-src/src/subsystems/shooter/brake_shooter_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/shooter/brake_shooter_command.cpp[m
+[36m@@ -1,5 +1,5 @@[m
+ #include "subsystems/shooter/brake_shooter_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+[32m+[m
+ #include "tap/communication/gpio/leds.hpp"[m
+ #include "tap/control/subsystem.hpp"[m
+ [m
+[36m@@ -9,7 +9,7 @@[m
+ #include "drivers.hpp"[m
+ [m
+ //#ifndef TARGET_ENGINEER[m
+[31m-[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ namespace src::Shooter {[m
+ static int highestSpeedDebug = 0;[m
+ BrakeShooterCommand::BrakeShooterCommand(src::Drivers* drivers, ShooterSubsystem* shooter, float brakePower)[m
+[36m@@ -41,5 +41,4 @@[m [mbool BrakeShooterCommand::isFinished() const {[m
+ [m
+ }  // namespace src::Shooter[m
+ [m
+[31m-//#endif //#ifndef TARGET_ENGINEER[m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m// #endif  //#ifndef TARGET_ENGINEER[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/shooter/brake_shooter_command.hpp b/aimbots-src/src/subsystems/shooter/brake_shooter_command.hpp[m
+[1mindex 1d2df6cc..0947f9b0 100644[m
+[1m--- a/aimbots-src/src/subsystems/shooter/brake_shooter_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/shooter/brake_shooter_command.hpp[m
+[36m@@ -1,14 +1,13 @@[m
+ #pragma once[m
+[31m-[m
+[31m-#include "drivers.hpp"[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ #include "tap/control/subsystem.hpp"[m
+ [m
+ #include "subsystems/shooter/shooter.hpp"[m
+ #include "utils/common_types.hpp"[m
+ #include "utils/robot_constants.hpp"[m
+ [m
+[32m+[m[32m#include "drivers.hpp"[m
+[32m+[m
+ //#ifndef TARGET_ENGINEER[m
+ [m
+ namespace src::Shooter {[m
+[36m@@ -34,4 +33,4 @@[m [mprivate:[m
+ [m
+ }  // namespace src::Shooter[m
+ [m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m// #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/shooter/run_shooter_command.cpp b/aimbots-src/src/subsystems/shooter/run_shooter_command.cpp[m
+[1mindex 0c45209f..c23318a0 100644[m
+[1m--- a/aimbots-src/src/subsystems/shooter/run_shooter_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/shooter/run_shooter_command.cpp[m
+[36m@@ -1,16 +1,13 @@[m
+ #include "subsystems/shooter/run_shooter_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+ [m
+[32m+[m[32m#include "drivers.hpp"[m
+ #include "tap/communication/gpio/leds.hpp"[m
+ #include "tap/control/subsystem.hpp"[m
+[31m-[m
+ #include "utils/common_types.hpp"[m
+ #include "utils/robot_constants.hpp"[m
+ [m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+ //#ifndef TARGET_ENGINEER[m
+[31m-[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ namespace src::Shooter {[m
+ [m
+ RunShooterCommand::RunShooterCommand(src::Drivers* drivers, ShooterSubsystem* shooter) {[m
+[36m@@ -70,12 +67,12 @@[m [mvoid RunShooterCommand::end(bool) {[m
+     // No cleanup needed[m
+ }[m
+ [m
+[31m-bool RunShooterCommand::isReady() { return true; }[m
+[32m+[m[32mbool RunShooterCommand::isReady() {[m
+[32m+[m[32m    return true;[m
+[32m+[m[32m}[m
+ [m
+ bool RunShooterCommand::isFinished() const {[m
+     return false;[m
+ }[m
+ }  // namespace src::Shooter[m
+[31m-[m
+[31m-#endif[m
+[31m-[m
+[32m+[m[32m// #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/shooter/run_shooter_command.hpp b/aimbots-src/src/subsystems/shooter/run_shooter_command.hpp[m
+[1mindex 1ad6b216..117ab844 100644[m
+[1m--- a/aimbots-src/src/subsystems/shooter/run_shooter_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/shooter/run_shooter_command.hpp[m
+[36m@@ -1,5 +1,6 @@[m
+ #pragma once[m
+ [m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ #include "tap/control/subsystem.hpp"[m
+ [m
+ #include "subsystems/shooter/shooter.hpp"[m
+[36m@@ -8,7 +9,7 @@[m
+ [m
+ #include "drivers.hpp"[m
+ [m
+[31m-#ifndef ENGINEER[m
+[32m+[m[32m//#ifndef TARGET_ENGINEER[m
+ [m
+ namespace src::Shooter {[m
+ [m
+[36m@@ -32,4 +33,4 @@[m [mprivate:[m
+ [m
+ }  // namespace src::Shooter[m
+ [m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m// #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/shooter/shooter.cpp b/aimbots-src/src/subsystems/shooter/shooter.cpp[m
+[1mindex 905cae34..07ab4d2d 100644[m
+[1m--- a/aimbots-src/src/subsystems/shooter/shooter.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/shooter/shooter.cpp[m
+[36m@@ -1,7 +1,5 @@[m
+ #include "subsystems/shooter/shooter.hpp"[m
+[31m-[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ #include <tap/architecture/clock.hpp>[m
+ #include <tap/communication/gpio/leds.hpp>[m
+ [m
+[36m@@ -20,7 +18,16 @@[m [mShooterSubsystem::ShooterSubsystem(tap::Drivers* drivers)[m
+       flywheel4(drivers, SHOOTER_4_ID, SHOOTER_BUS, SHOOTER_4_DIRECTION, "Flywheel Four"),[m
+       flywheel3PID(SHOOTER_VELOCITY_PID_CONFIG),[m
+       flywheel4PID(SHOOTER_VELOCITY_PID_CONFIG),[m
+[31m-[m
+[32m+[m[32m#endif[m
+[32m+[m[32m#ifdef TARGET_DART[m
+[32m+[m[32m    flywheel3(drivers, SHOOTER_3_ID, SHOOTER_BUS, SHOOTER_3_DIRECTION, "Flywheel Three"),[m
+[32m+[m[32m    flywheel4(drivers, SHOOTER_4_ID, SHOOTER_BUS, SHOOTER_4_DIRECTION, "Flywheel Four"),[m
+[32m+[m[32m    flywheel3PID(SHOOTER_VELOCITY_PID_CONFIG),[m
+[32m+[m[32m    flywheel4PID(SHOOTER_VELOCITY_PID_CONFIG),[m
+[32m+[m[32m    flywheel5(drivers, SHOOTER_5_ID, SHOOTER_BUS, SHOOTER_5_DIRECTION, "Flywheel Three"),[m
+[32m+[m[32m    flywheel6(drivers, SHOOTER_6_ID, SHOOTER_BUS, SHOOTER_6_DIRECTION, "Flywheel Four"),[m
+[32m+[m[32m    flywheel5PID(SHOOTER_VELOCITY_PID_CONFIG),[m
+[32m+[m[32m    flywheel6PID(SHOOTER_VELOCITY_PID_CONFIG),[m
+ #endif[m
+       targetRPMs(Matrix<float, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),[m
+       desiredOutputs(Matrix<int32_t, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),[m
+[36m@@ -37,6 +44,14 @@[m [mShooterSubsystem::ShooterSubsystem(tap::Drivers* drivers)[m
+     motors[BOT_LEFT][0] = &flywheel4;[m
+     velocityPIDs[TOP_LEFT][0] = &flywheel3PID;[m
+     velocityPIDs[BOT_LEFT][0] = &flywheel4PID;[m
+[32m+[m[32m#endif[m
+[32m+[m[32m#ifdef TARGET_DART[m
+[32m+[m[32m    motors[TOP_LEFT][0] = &flywheel3;[m
+[32m+[m[32m    motors[BOT_LEFT][0] = &flywheel4;[m
+[32m+[m[32m    velocityPIDs[TOP_LEFT][0] = &flywheel3PID;[m
+[32m+[m[32m    velocityPIDs[BOT_LEFT][0] = &flywheel4PID;[m
+[32m+[m
+[32m+[m
+ #endif[m
+ }[m
+ [m
+[36m@@ -110,7 +125,9 @@[m [mvoid ShooterSubsystem::updateMotorVelocityPID(MotorIndex motorIdx) {[m
+     }[m
+ }[m
+ [m
+[31m-void ShooterSubsystem::setTargetRPM(MotorIndex motorIdx, float targetRPM) { targetRPMs[motorIdx][0] = targetRPM; }[m
+[32m+[m[32mvoid ShooterSubsystem::setTargetRPM(MotorIndex motorIdx, float targetRPM) {[m
+[32m+[m[32m    targetRPMs[motorIdx][0] = targetRPM;[m
+[32m+[m[32m}[m
+ [m
+ float powerDisplay = 0.0f;[m
+ [m
+[36m@@ -125,4 +142,4 @@[m [mvoid ShooterSubsystem::setDesiredOutputToMotor(MotorIndex motorIdx) {[m
+ }[m
+ };  // namespace src::Shooter[m
+ [m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m// #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/shooter/shooter.hpp b/aimbots-src/src/subsystems/shooter/shooter.hpp[m
+[1mindex e3123589..5a59cdf5 100644[m
+[1m--- a/aimbots-src/src/subsystems/shooter/shooter.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/shooter/shooter.hpp[m
+[36m@@ -1,10 +1,9 @@[m
+ #pragma once[m
+ #include <vector>[m
+[31m-[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ #include "tap/architecture/clock.hpp"[m
+ #include "tap/control/subsystem.hpp"[m
+[32m+[m
+ #include "utils/common_types.hpp"[m
+ #include "utils/robot_constants.hpp"[m
+ [m
+[36m@@ -18,11 +17,13 @@[m [menum MotorIndex {[m
+     BOT_RIGHT = 1,[m
+     TOP_LEFT = 2,[m
+     BOT_LEFT = 3,[m
+[32m+[m[32m    MID_LEFT = 4,[m
+[32m+[m[32m    MID_RIGHT = 5,[m
+ #endif[m
+ };[m
+ [m
+ class ShooterSubsystem : public tap::control::Subsystem {[m
+[31m-   public:[m
+[32m+[m[32mpublic:[m
+     ShooterSubsystem(tap::Drivers* drivers);[m
+ [m
+     /**[m
+[36m@@ -103,9 +104,9 @@[m [mclass ShooterSubsystem : public tap::control::Subsystem {[m
+     }[m
+ [m
+ #ifndef ENV_UNIT_TESTS[m
+[31m-   private:[m
+[32m+[m[32mprivate:[m
+ #else[m
+[31m-   public:[m
+[32m+[m[32mpublic:[m
+ #endif[m
+ [m
+     DJIMotor flywheel1, flywheel2;[m
+[36m@@ -114,6 +115,11 @@[m [mclass ShooterSubsystem : public tap::control::Subsystem {[m
+ #ifdef TARGET_SENTRY[m
+     DJIMotor flywheel3, flywheel4;[m
+     SmoothPID flywheel3PID, flywheel4PID;[m
+[32m+[m
+[32m+[m[32m#endif[m
+[32m+[m[32m#ifdef TARGET_DART[m
+[32m+[m[32m    DJIMotor flywheel3, flywheel4, flywheel5, flywheel6;[m
+[32m+[m[32m    SmoothPID flywheel3PID, flywheel4PID, flywheel5PID, flywheel6PID;[m
+ #endif[m
+ [m
+     Matrix<float, SHOOTER_MOTOR_COUNT, 1> targetRPMs;[m
+[36m@@ -123,5 +129,4 @@[m [mclass ShooterSubsystem : public tap::control::Subsystem {[m
+     Matrix<SmoothPID*, SHOOTER_MOTOR_COUNT, 1> velocityPIDs;[m
+ };[m
+ };  // namespace src::Shooter[m
+[31m-[m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m// #endif[m
+[1mdiff --git a/aimbots-src/src/subsystems/shooter/stop_shooter_command.cpp b/aimbots-src/src/subsystems/shooter/stop_shooter_command.cpp[m
+[1mindex d95e9d4d..bffb3176 100644[m
+[1m--- a/aimbots-src/src/subsystems/shooter/stop_shooter_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/shooter/stop_shooter_command.cpp[m
+[36m@@ -1,5 +1,4 @@[m
+ #include "subsystems/shooter/stop_shooter_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+ [m
+ #include "drivers.hpp"[m
+ #include "tap/communication/gpio/leds.hpp"[m
+[36m@@ -8,7 +7,7 @@[m
+ #include "utils/robot_constants.hpp"[m
+ [m
+ //#ifndef TARGET_ENGINEER[m
+[31m-[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ namespace src::Shooter {[m
+ [m
+ StopShooterCommand::StopShooterCommand(src::Drivers* drivers, ShooterSubsystem* shooter) {[m
+[36m@@ -38,4 +37,4 @@[m [mbool StopShooterCommand::isFinished() const {[m
+ [m
+ }  // namespace src::Shooter[m
+ [m
+[31m-#endif //#ifndef TARGET_ENGINEER[m
+\ No newline at end of file[m
+[32m+[m[32m// #endif //#ifndef TARGET_ENGINEER[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/shooter/stop_shooter_command.hpp b/aimbots-src/src/subsystems/shooter/stop_shooter_command.hpp[m
+[1mindex 6dfb0fe1..0a956c76 100644[m
+[1m--- a/aimbots-src/src/subsystems/shooter/stop_shooter_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/shooter/stop_shooter_command.hpp[m
+[36m@@ -1,16 +1,15 @@[m
+ #pragma once[m
+ [m
+[31m-#include "drivers.hpp"[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+ #include "tap/control/subsystem.hpp"[m
+ [m
+ #include "subsystems/shooter/shooter.hpp"[m
+ #include "utils/common_types.hpp"[m
+ #include "utils/robot_constants.hpp"[m
+ [m
+[31m-//#ifndef TARGET_ENGINEER[m
+[32m+[m[32m#include "drivers.hpp"[m
+ [m
+[32m+[m[32m//#ifndef TARGET_ENGINEER[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ namespace src::Shooter {[m
+ [m
+ class StopShooterCommand : public TapCommand {[m
+[36m@@ -33,4 +32,4 @@[m [mprivate:[m
+ [m
+ }  // namespace src::Shooter[m
+ [m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m// #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/subsystems/shooter/stop_shooter_comprised_command.cpp b/aimbots-src/src/subsystems/shooter/stop_shooter_comprised_command.cpp[m
+[1mindex 3daf510a..5c5b14cd 100644[m
+[1m--- a/aimbots-src/src/subsystems/shooter/stop_shooter_comprised_command.cpp[m
+[1m+++ b/aimbots-src/src/subsystems/shooter/stop_shooter_comprised_command.cpp[m
+[36m@@ -1,20 +1,16 @@[m
+ #include "stop_shooter_comprised_command.hpp"[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+[32m+[m[32m#include "drivers.hpp"[m
+ #include "tap/communication/gpio/leds.hpp"[m
+ #include "tap/control/subsystem.hpp"[m
+[31m-[m
+ #include "utils/common_types.hpp"[m
+ #include "utils/robot_constants.hpp"[m
+ [m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+ namespace src::Shooter {[m
+ [m
+[31m-StopShooterComprisedCommand::StopShooterComprisedCommand(src::Drivers* drivers, ShooterSubsystem* shooter)[m
+[31m-    : TapComprisedCommand(drivers),[m
+[31m-      brake_command(drivers, shooter, 500.0f),[m
+[31m-      stop_command(drivers, shooter) {[m
+[32m+[m[32mStopShooterComprisedCommand::StopShooterComprisedCommand(src::Drivers* drivers, ShooterSubsystem* shooter) : TapComprisedCommand(drivers),[m
+[32m+[m[32m                                                                                                             brake_command(drivers, shooter, 500.0f),[m
+[32m+[m[32m                                                                                                             stop_command(drivers, shooter) {[m
+     this->comprisedCommandScheduler.registerSubsystem(shooter);[m
+     this->addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(shooter));[m
+ }[m
+[36m@@ -51,12 +47,17 @@[m [mvoid ExtendAndGrabCommand::refresh()                            |[m
+ ----------------------------------------------------------------/[m
+ */[m
+ [m
+[31m-void StopShooterComprisedCommand::end(bool) {}[m
+[32m+[m[32mvoid StopShooterComprisedCommand::end(bool) {[m
+[32m+[m[32m}[m
+ [m
+[31m-bool StopShooterComprisedCommand::isReady() { return true; }[m
+[32m+[m[32mbool StopShooterComprisedCommand::isReady() {[m
+[32m+[m[32m    return true;[m
+[32m+[m[32m}[m
+ [m
+ // this command will auto-deschedule when we want to move[m
+[31m-bool StopShooterComprisedCommand::isFinished() const { return false; }[m
+[32m+[m[32mbool StopShooterComprisedCommand::isFinished() const {[m
+[32m+[m[32m    return false;[m
+[32m+[m[32m}[m
+ [m
+ }  // namespace src::Shooter[m
+[31m-#endif[m
+[32m+[m[32m// #endif[m
+[1mdiff --git a/aimbots-src/src/subsystems/shooter/stop_shooter_comprised_command.hpp b/aimbots-src/src/subsystems/shooter/stop_shooter_comprised_command.hpp[m
+[1mindex 4743857c..cd111978 100644[m
+[1m--- a/aimbots-src/src/subsystems/shooter/stop_shooter_comprised_command.hpp[m
+[1m+++ b/aimbots-src/src/subsystems/shooter/stop_shooter_comprised_command.hpp[m
+[36m@@ -1,30 +1,25 @@[m
+ #pragma once[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[31m-#include "tap/control/subsystem.hpp"[m
+ [m
+[32m+[m[32m#include "drivers.hpp"[m
+ #include "subsystems/shooter/brake_shooter_command.hpp"[m
+ #include "subsystems/shooter/shooter.hpp"[m
+ #include "subsystems/shooter/stop_shooter_command.hpp"[m
+[32m+[m[32m#include "tap/control/subsystem.hpp"[m
+ #include "utils/common_types.hpp"[m
+ #include "utils/robot_constants.hpp"[m
+ [m
+[31m-#include "drivers.hpp"[m
+[31m-[m
+[32m+[m[32m// #ifndef TARGET_DART[m
+ //#ifndef TARGET_ENGINEER[m
+ [m
+ namespace src::Shooter {[m
+ [m
+ class StopShooterComprisedCommand : public TapComprisedCommand {[m
+[31m-public:[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m   public:[m
+     StopShooterComprisedCommand(src::Drivers* drivers, ShooterSubsystem* shooter);[m
+[31m-#endif[m
+     void initialize() override;[m
+ [m
+     void execute() override;[m
+[31m-[m
+[32m+[m[41m    [m
+     void end(bool interrupted) override;[m
+     bool isReady() override;[m
+ [m
+[36m@@ -32,18 +27,15 @@[m [mpublic:[m
+ [m
+     const char* getName() const override { return "Slow To Stop Command"; }[m
+ [m
+[31m-private:[m
+[31m-#ifndef ENGINEER[m
+[31m-[m
+[32m+[m[32m   private:[m
+     src::Drivers* drivers;[m
+     ShooterSubsystem* shooter;[m
+ [m
+     BrakeShooterCommand brake_command;[m
+     StopShooterCommand stop_command;[m
+     bool brakeFinished;[m
+[31m-#endif[m
+ };[m
+ [m
+ }  // namespace src::Shooter[m
+ [m
+[31m-#endif[m
+\ No newline at end of file[m
+[32m+[m[32m// #endif /[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/utils/math/matrix_helpers.cpp b/aimbots-src/src/utils/math/matrix_helpers.cpp[m
+[1mindex 1fa7a012..f344edfc 100644[m
+[1m--- a/aimbots-src/src/utils/math/matrix_helpers.cpp[m
+[1m+++ b/aimbots-src/src/utils/math/matrix_helpers.cpp[m
+[36m@@ -3,21 +3,15 @@[m
+ namespace src::utils::MatrixHelper {[m
+ [m
+ float xy_angle_between_locations(AngleUnit unit, Matrix<float, 1, 3> v1, Matrix<float, 1, 3> v2) {[m
+[31m-    // Gets the absolute angle from the horizontal in the positive direction of the vector from one point to another[m
+[31m-    // Used to determine the absolute, field relative angle to aim at from our robot positon (v1) to another postion (v2)[m
+[31m-    // Define the vector from point 2 to point 1[m
+     Matrix<float, 1, 3> v3 = v2 - v1;[m
+ [m
+[31m-    // Calculate absolute angle from positive horizontal[m
+     float angle = atan2f(v3[0][1], v3[0][0]);[m
+[31m-[m
+     if (unit == AngleUnit::Degrees) {[m
+         angle = modm::toDegree(angle);[m
+     }[m
+     return angle;[m
+ }[m
+ [m
+[31m-// Outdated use rotation_matix(~, ~, 2) instead[m
+ Matrix<float, 3, 3> xy_rotation_matrix(AngleUnit unit, float angle) {[m
+     if (unit == AngleUnit::Degrees) {[m
+         angle = modm::toRadian(angle);[m
+[36m@@ -33,61 +27,4 @@[m [mMatrix<float, 3, 3> xy_rotation_matrix(AngleUnit unit, float angle) {[m
+     return Matrix<float, 3, 3>(xy_rotation_array);[m
+ }[m
+ [m
+[31m-Matrix<float, 3, 3> rotation_matrix(AngleUnit unit, float angle, int axis) {[m
+[31m-    // Constructs a rotation matrix about an elementary (Robot's X, Y, Z Axis)[m
+[31m-    // Rotation matricies are used to determine coordinates before / after a rotation[m
+[31m-    // Takes input of angle unit (Degrees / Rads), Float angle, and axis[m
+[31m-    //  0 = X - Axis[m
+[31m-    //  1 = Y - Axis[m
+[31m-    //  2 = Z - Axis[m
+[31m-    // Returns rotation matrix[m
+[31m-    // If axis is not recognized, returns Identity matrix = No Rotation[m
+[31m-    if (unit == AngleUnit::Degrees) {[m
+[31m-        angle = modm::toRadian(angle);[m
+[31m-    }[m
+[31m-    float c = cosf(angle);[m
+[31m-    float s = sinf(angle);[m
+[31m-    // clang-format off[m
+[31m-            float rotation_array[9] = {[m
+[31m-                1.0f, 0.0f, 0.0f, [m
+[31m-                0.0f, 1.0f, 0.0f, [m
+[31m-                0.0f, 0.0f, 1.0f};[m
+[31m-    // clang-format on[m
+[31m-    switch (axis) {[m
+[31m-        case 0: {[m
+[31m-            // Create X-axis rotation matrix[m
+[31m-            // In ground robots this is the "roll" and does not exist[m
+[31m-            // In Sentry this is the "pitch"[m
+[31m-            // clang-format off[m
+[31m-             rotation_array[0] = 1.0f; rotation_array[1] = 0.0f; rotation_array[2] = 0.0f;[m
+[31m-             rotation_array[3] = 0.0f; rotation_array[4] = c; rotation_array[5] = -s;[m
+[31m-             rotation_array[6] = 0.0f; rotation_array[7] = s; rotation_array[8] = c;[m
+[31m-            // clang-format on[m
+[31m-            break;[m
+[31m-        }[m
+[31m-        case 1: {[m
+[31m-            // Create Y-Axis Rotation Matirx[m
+[31m-            // In ground rotbots this is the "pitch"[m
+[31m-            // In sentry this is the "roll" and does not exist[m
+[31m-            // clang-format off[m
+[31m-            rotation_array[0] = c; rotation_array[1] = 0.0f; rotation_array[2] = s;[m
+[31m-            rotation_array[3] = 0.0f; rotation_array[4] = 1.0; rotation_array[5] = 0.0f;[m
+[31m-            rotation_array[6] = -s; rotation_array[7] = 0.0f; rotation_array[8] = c;[m
+[31m-            // clang-format on[m
+[31m-            break;[m
+[31m-        }[m
+[31m-        case 2: {[m
+[31m-            // Creates a Z-Axis rotation matrix[m
+[31m-            // In Ground robots and sentry this is "yaw"[m
+[31m-            // clang-format off[m
+[31m-            rotation_array[0] = c; rotation_array[1] = -s; rotation_array[2] = 0.0f;[m
+[31m-            rotation_array[3] = s; rotation_array[4] = c; rotation_array[5] = 0.0f;[m
+[31m-            rotation_array[6] = 0.0f; rotation_array[7] = 0.0f; rotation_array[8] = 1.0f;[m
+[31m-            // clang-format on[m
+[31m-            break;[m
+[31m-        }[m
+[31m-    }[m
+[31m-    return Matrix<float, 3, 3>(rotation_array);[m
+[31m-}[m
+[31m-[m
+ }  // namespace src::utils::MatrixHelper[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/utils/math/matrix_helpers.hpp b/aimbots-src/src/utils/math/matrix_helpers.hpp[m
+[1mindex 09b9a712..ccfccdf0 100644[m
+[1m--- a/aimbots-src/src/utils/math/matrix_helpers.hpp[m
+[1m+++ b/aimbots-src/src/utils/math/matrix_helpers.hpp[m
+[36m@@ -8,10 +8,6 @@[m [mnamespace src::utils::MatrixHelper {[m
+ float xy_angle_between_locations(AngleUnit unit, Matrix<float, 1, 3> v1, Matrix<float, 1, 3> v2);[m
+ [m
+ // takes radians, rotates clockwise[m
+[31m-// Outdated use rotation_matix(~, ~, 2) instead[m
+ Matrix<float, 3, 3> xy_rotation_matrix(AngleUnit unit, float angle);[m
+ [m
+[31m-// Takes radians / degrees, an angle angle, rotates about an elementary axis[m
+[31m-Matrix<float, 3, 3> rotation_matrix(AngleUnit unit, float angle, int axis);[m
+[31m-[m
+ }  // namespace src::utils::MatrixHelper[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/utils/motion/s_curve_acceleration.hpp b/aimbots-src/src/utils/motion/s_curve_acceleration.hpp[m
+[1mindex 63da57fb..25622e63 100644[m
+[1m--- a/aimbots-src/src/utils/motion/s_curve_acceleration.hpp[m
+[1m+++ b/aimbots-src/src/utils/motion/s_curve_acceleration.hpp[m
+[36m@@ -4,157 +4,144 @@[m
+ [m
+ namespace src::utils::motion {[m
+ [m
+[31m-class SCurveAcceleration {[m
+[31m-public:[m
+[31m-    struct Step {[m
+[31m-        // Derivatives of postion[m
+[31m-        //  Used to determine how smoothly we want our robot to move[m
+[31m-        //  Distance: 0[m
+[31m-        //  Velocity: 1[m
+[31m-        //  Acceleration: 2[m
+[31m-        //  Jerk: 3[m
+[31m-        float velocity;[m
+[31m-        float acceleration;[m
+[31m-        float jerk;[m
+[31m-        float dist;[m
+[31m-[m
+[31m-        Step(float dist = 0.0f, float velocity = 0.0f, float acceleration = 0.0f, float jerk = 0.0f)[m
+[31m-            : velocity(velocity),[m
+[31m-              acceleration(acceleration),[m
+[31m-              jerk(jerk),[m
+[31m-              dist(dist) {}[m
+[31m-    };[m
+[31m-[m
+[31m-    struct Constraints {[m
+[31m-        // Place limits on the derivatives (Higher limits are smoother)[m
+[31m-        float velocity;[m
+[31m-        float acceleration;[m
+[31m-        float jerk;[m
+[32m+[m[32m    class SCurveAcceleration {[m
+[32m+[m[32m       public:[m
+[32m+[m[32m        struct Step {[m
+[32m+[m[32m            float velocity;[m
+[32m+[m[32m            float acceleration;[m
+[32m+[m[32m            float jerk;[m
+[32m+[m[32m            float dist;[m
+[32m+[m
+[32m+[m[32m            Step(float dist = 0.0f, float velocity = 0.0f, float acceleration = 0.0f, float jerk = 0.0f)[m
+[32m+[m[32m                : velocity(velocity), acceleration(acceleration), jerk(jerk), dist(dist) {}[m
+[32m+[m[32m        };[m
+[32m+[m
+[32m+[m[32m        struct Constraints {[m
+[32m+[m[32m            float velocity;[m
+[32m+[m[32m            float acceleration;[m
+[32m+[m[32m            float jerk;[m
+[32m+[m
+[32m+[m[32m            Constraints(float velocity, float acceleration, float jerk)[m
+[32m+[m[32m                : velocity(velocity), acceleration(acceleration), jerk(jerk) {}[m
+[32m+[m[32m        };[m
+[32m+[m
+[32m+[m[32m        float t1, v1, d1, t2, v2, d2, t3, v3, d3;[m
+[32m+[m[32m        float distInterpA, distInterpB;[m
+[32m+[m
+[32m+[m[32m       private:[m
+[32m+[m[32m        Constraints constraints;[m
+[32m+[m
+[32m+[m[32m       public:[m
+[32m+[m[32m        SCurveAcceleration(Constraints constraints) : constraints(constraints) {[m
+[32m+[m[32m            // time to jerk up to max acceleration[m
+[32m+[m[32m            t1 = constraints.jerk <= 0.0f ? 0.0 : constraints.acceleration / constraints.jerk;[m
+[32m+[m[32m            // velocity at end of jerk up period[m
+[32m+[m[32m            v1 = constraints.jerk <= 0.0f ? 0.0 : constraints.jerk * (t1 * t1) / 2.0f;[m
+[32m+[m[32m            // displacement from jerk up period[m
+[32m+[m[32m            d1 = constraints.jerk <= 0.0f ? 0.0 : constraints.jerk * (t1 * t1 * t1) / 6.0f;[m
+[32m+[m
+[32m+[m[32m            // velocity at end of constant acceleration period[m
+[32m+[m[32m            v2 = constraints.velocity - v1;[m
+[32m+[m[32m            // time of constant acceleration period[m
+[32m+[m[32m            t2 = (v2 - v1) / constraints.acceleration;[m
+[32m+[m[32m            // displacement from constant acceleration period[m
+[32m+[m[32m            // d2 = v1 * t2 + constraints.acceleration * (t2 * t2) / 2.0f;[m
+[32m+[m[32m            // d2 = t2 * (v1 + constraints.acceleration * t2 / 2.0f);[m
+[32m+[m[32m            d2 = v1 * t2 + constraints.acceleration * (t2 * t2) / 2.0f;[m
+[32m+[m
+[32m+[m[32m            t3 = t1;[m
+[32m+[m[32m            v3 = constraints.velocity;[m
+[32m+[m[32m            d3 = v2 * t3 + constraints.acceleration * (t3 * t3) / 2.0f - constraints.jerk * (t3 * t3 * t3) / 6.0f;[m
+[32m+[m
+[32m+[m[32m            // no closed form solution for dispalcement paramaterization of the third segment, so quadratic interpolation works really nicely[m
+[32m+[m[32m            float t3_mid = t3 / 2.0f;[m
+[32m+[m[32m            float d3_mid = -constraints.jerk * (t3_mid * t3_mid * t3_mid) / 6.0f + constraints.acceleration * (t3_mid * t3_mid) / 2.0f + v2 * t3_mid;[m
+[32m+[m[32m            float denominator = d3_mid * d3 * (d3_mid - d3);[m
+[32m+[m
+[32m+[m[32m            distInterpA = (d3 * t3_mid - d3_mid * t3) / denominator;[m
+[32m+[m[32m            distInterpB = ((d3_mid * d3_mid) * t3 - (d3 * d3) * t3_mid) / denominator;[m
+[32m+[m[32m        }[m
+ [m
+[31m-        Constraints(float velocity, float acceleration, float jerk) : velocity(velocity), acceleration(acceleration), jerk(jerk) {}[m
+[31m-    };[m
+[32m+[m[32m        Step stepAtT(float t) {[m
+[32m+[m[32m            if (t <= 0.0f) {[m
+[32m+[m[32m                return Step(0.0f, 0.0f, 0.0f);[m
+[32m+[m[32m            }[m
+ [m
+[31m-    float t1, v1, d1, t2, v2, d2, t3, v3, d3;[m
+[31m-    float distInterpA, distInterpB;[m
+[31m-[m
+[31m-private:[m
+[31m-    Constraints constraints;[m
+[31m-[m
+[31m-public:[m
+[31m-    SCurveAcceleration(Constraints constraints) : constraints(constraints) {[m
+[31m-        // time to jerk up to max acceleration[m
+[31m-        t1 = constraints.jerk <= 0.0f ? 0.0 : constraints.acceleration / constraints.jerk;[m
+[31m-        // velocity at end of jerk up period[m
+[31m-        v1 = constraints.jerk <= 0.0f ? 0.0 : constraints.jerk * (t1 * t1) / 2.0f;[m
+[31m-        // displacement from jerk up period[m
+[31m-        d1 = constraints.jerk <= 0.0f ? 0.0 : constraints.jerk * (t1 * t1 * t1) / 6.0f;[m
+[31m-[m
+[31m-        // velocity at end of constant acceleration period[m
+[31m-        v2 = constraints.velocity - v1;[m
+[31m-        // time of constant acceleration period[m
+[31m-        t2 = (v2 - v1) / constraints.acceleration;[m
+[31m-        // displacement from constant acceleration period[m
+[31m-        // d2 = v1 * t2 + constraints.acceleration * (t2 * t2) / 2.0f;[m
+[31m-        // d2 = t2 * (v1 + constraints.acceleration * t2 / 2.0f);[m
+[31m-        d2 = v1 * t2 + constraints.acceleration * (t2 * t2) / 2.0f;[m
+[31m-[m
+[31m-        t3 = t1;[m
+[31m-        v3 = constraints.velocity;[m
+[31m-        d3 = v2 * t3 + constraints.acceleration * (t3 * t3) / 2.0f - constraints.jerk * (t3 * t3 * t3) / 6.0f;[m
+[31m-[m
+[31m-        // no closed form solution for dispalcement paramaterization of the third segment, so quadratic interpolation works really nicely[m
+[31m-        float t3_mid = t3 / 2.0f;[m
+[31m-        float d3_mid = -constraints.jerk * (t3_mid * t3_mid * t3_mid) / 6.0f + constraints.acceleration * (t3_mid * t3_mid) / 2.0f + v2 * t3_mid;[m
+[31m-        float denominator = d3_mid * d3 * (d3_mid - d3);[m
+[31m-[m
+[31m-        distInterpA = (d3 * t3_mid - d3_mid * t3) / denominator;[m
+[31m-        distInterpB = ((d3_mid * d3_mid) * t3 - (d3 * d3) * t3_mid) / denominator;[m
+[31m-    }[m
+[31m-[m
+[31m-    Step stepAtT(float t) {[m
+[31m-        if (t <= 0.0f) {[m
+[31m-            return Step(0.0f, 0.0f, 0.0f);[m
+[31m-        }[m
+[32m+[m[32m            if (t < t1) {[m
+[32m+[m[32m                return Step(constraints.jerk * (t * t * t) / 6.0f, constraints.jerk * (t * t) / 2.0, constraints.jerk * t, constraints.jerk);[m
+[32m+[m[32m            }[m
+ [m
+[31m-        if (t < t1) {[m
+[31m-            return Step(constraints.jerk * (t * t * t) / 6.0f, constraints.jerk * (t * t) / 2.0, constraints.jerk * t, constraints.jerk);[m
+[31m-        }[m
+[32m+[m[32m            t -= t1;[m
+ [m
+[31m-        t -= t1;[m
+[32m+[m[32m            if (t < t2) {[m
+[32m+[m[32m                return Step(d1 + v1 * t + constraints.acceleration * (t * t) / 2.0f, v1 + constraints.acceleration * t, constraints.acceleration, 0.0f);[m
+[32m+[m[32m            }[m
+ [m
+[31m-        if (t < t2) {[m
+[31m-            return Step(d1 + v1 * t + constraints.acceleration * (t * t) / 2.0f, v1 + constraints.acceleration * t, constraints.acceleration, 0.0f);[m
+[31m-        }[m
+[32m+[m[32m            t -= t2;[m
+ [m
+[31m-        t -= t2;[m
+[32m+[m[32m            if (t < t3) {[m
+[32m+[m[32m                return Step(d1 + d2 - constraints.jerk * (t * t * t) / 6.0f + constraints.acceleration * (t * t) / 2.0f + v2 * t, v2 + constraints.acceleration * t - (constraints.jerk * (t * t)) / 2.0f, constraints.acceleration - constraints.jerk * t, -constraints.jerk);[m
+[32m+[m[32m            }[m
+ [m
+[31m-        if (t < t3) {[m
+[31m-            return Step([m
+[31m-                d1 + d2 - constraints.jerk * (t * t * t) / 6.0f + constraints.acceleration * (t * t) / 2.0f + v2 * t,[m
+[31m-                v2 + constraints.acceleration * t - (constraints.jerk * (t * t)) / 2.0f,[m
+[31m-                constraints.acceleration - constraints.jerk * t,[m
+[31m-                -constraints.jerk);[m
+[32m+[m[32m            return Step(constraints.velocity, 0.0f, 0.0f);[m
+         }[m
+ [m
+[31m-        return Step(constraints.velocity, 0.0f, 0.0f);[m
+[31m-    }[m
+[32m+[m[32m        float timeAtDisplacement(float displacement) {[m
+[32m+[m[32m            if (displacement < d1) {[m
+[32m+[m[32m                float t = std::cbrt(displacement * 6.0f / constraints.jerk);[m
+[32m+[m[32m                return (t);[m
+[32m+[m[32m            }[m
+ [m
+[31m-    float timeAtDisplacement(float displacement) {[m
+[31m-        if (displacement < d1) {[m
+[31m-            float t = std::cbrt(displacement * 6.0f / constraints.jerk);[m
+[31m-            return (t);[m
+[31m-        }[m
+[32m+[m[32m            displacement -= d1;[m
+ [m
+[31m-        displacement -= d1;[m
+[32m+[m[32m            if (displacement < d2) {[m
+[32m+[m[32m                float t = (-v1 + std::sqrt(v1 * v1 - 4.0f * constraints.acceleration / 2.0f * -displacement)) / (constraints.acceleration);[m
+[32m+[m[32m                return (t + t1);[m
+[32m+[m[32m            }[m
+ [m
+[31m-        if (displacement < d2) {[m
+[31m-            float t = (-v1 + std::sqrt(v1 * v1 - 4.0f * constraints.acceleration / 2.0f * -displacement)) / (constraints.acceleration);[m
+[31m-            return (t + t1);[m
+[31m-        }[m
+[32m+[m[32m            displacement -= d2;[m
+ [m
+[31m-        displacement -= d2;[m
+[32m+[m[32m            if (displacement < d3) {[m
+[32m+[m[32m                float t = distInterpA * (displacement * displacement) + distInterpB * displacement;[m
+[32m+[m[32m                return (t + t1 + t2);[m
+[32m+[m[32m            }[m
+ [m
+[31m-        if (displacement < d3) {[m
+[31m-            float t = distInterpA * (displacement * displacement) + distInterpB * displacement;[m
+[31m-            return (t + t1 + t2);[m
+[32m+[m[32m            return t1 + t2 + t3;[m
+         }[m
+ [m
+[31m-        return t1 + t2 + t3;[m
+[31m-    }[m
+[32m+[m[32m        Step stepAtDisplacement(float displacement) {[m
+[32m+[m[32m            if (displacement <= 0.0f) {[m
+[32m+[m[32m                return Step();[m
+[32m+[m[32m            }[m
+ [m
+[31m-    Step stepAtDisplacement(float displacement) {[m
+[31m-        if (displacement <= 0.0f) {[m
+[31m-            return Step();[m
+[31m-        }[m
+[32m+[m[32m            if (displacement < d1) {[m
+[32m+[m[32m                float t = std::cbrt(displacement * 6.0f / constraints.jerk);[m
+[32m+[m[32m                return Step(constraints.jerk * (t * t * t) / 6.0f, constraints.jerk * (t * t) / 2.0, constraints.jerk * t, constraints.jerk);[m
+[32m+[m[32m            }[m
+ [m
+[31m-        if (displacement < d1) {[m
+[31m-            float t = std::cbrt(displacement * 6.0f / constraints.jerk);[m
+[31m-            return Step(constraints.jerk * (t * t * t) / 6.0f, constraints.jerk * (t * t) / 2.0, constraints.jerk * t, constraints.jerk);[m
+[31m-        }[m
+[32m+[m[32m            displacement -= d1;[m
+ [m
+[31m-        displacement -= d1;[m
+[32m+[m[32m            if (displacement < d2) {[m
+[32m+[m[32m                float t = (-v1 + std::sqrt(v1 * v1 - 4.0f * constraints.acceleration / 2.0f * -displacement)) / (constraints.acceleration);[m
+[32m+[m[32m                return Step(d1 + v1 * t + constraints.acceleration * (t * t) / 2.0f, v1 + constraints.acceleration * t, constraints.acceleration, 0.0f);[m
+[32m+[m[32m            }[m
+ [m
+[31m-        if (displacement < d2) {[m
+[31m-            float t = (-v1 + std::sqrt(v1 * v1 - 4.0f * constraints.acceleration / 2.0f * -displacement)) / (constraints.acceleration);[m
+[31m-            return Step(d1 + v1 * t + constraints.acceleration * (t * t) / 2.0f, v1 + constraints.acceleration * t, constraints.acceleration, 0.0f);[m
+[31m-        }[m
+[32m+[m[32m            displacement -= d2;[m
+ [m
+[31m-        displacement -= d2;[m
+[32m+[m[32m            if (displacement < d3) {[m
+[32m+[m[32m                float t = distInterpA * (displacement * displacement) + distInterpB * displacement;[m
+[32m+[m[32m                return Step(d1 + d2 - constraints.jerk * (t * t * t) / 6.0f + constraints.acceleration * (t * t) / 2.0f + v2 * t, v2 + constraints.acceleration * t - (constraints.jerk * (t * t)) / 2.0f, constraints.acceleration - constraints.jerk * t, -constraints.jerk);[m
+[32m+[m[32m            }[m
+ [m
+[31m-        if (displacement < d3) {[m
+[31m-            float t = distInterpA * (displacement * displacement) + distInterpB * displacement;[m
+[31m-            return Step([m
+[31m-                d1 + d2 - constraints.jerk * (t * t * t) / 6.0f + constraints.acceleration * (t * t) / 2.0f + v2 * t,[m
+[31m-                v2 + constraints.acceleration * t - (constraints.jerk * (t * t)) / 2.0f,[m
+[31m-                constraints.acceleration - constraints.jerk * t,[m
+[31m-                -constraints.jerk);[m
+[32m+[m[32m            return Step(constraints.velocity, 0.0f, 0.0f);[m
+         }[m
+ [m
+[31m-        return Step(constraints.velocity, 0.0f, 0.0f);[m
+[31m-    }[m
+[31m-[m
+[31m-    float totalTime() { return t1 + t2 + t3; }[m
+[32m+[m[32m        float totalTime() {[m
+[32m+[m[32m            return t1 + t2 + t3;[m
+[32m+[m[32m        }[m
+ [m
+[31m-    float totalDisplacement() { return d1 + d2 + d3; }[m
+[31m-};[m
+[32m+[m[32m        float totalDisplacement() {[m
+[32m+[m[32m            return d1 + d2 + d3;[m
+[32m+[m[32m        }[m
+[32m+[m[32m    };[m
+ }  // namespace src::utils::motion[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/utils/nxp_imu/matrix.c b/aimbots-src/src/utils/nxp_imu/matrix.c[m
+[1mindex efae1e3f..b6fac159 100644[m
+[1m--- a/aimbots-src/src/utils/nxp_imu/matrix.c[m
+[1m+++ b/aimbots-src/src/utils/nxp_imu/matrix.c[m
+[36m@@ -36,7 +36,7 @@[m
+ #include <math.h>[m
+ [m
+ // compile time constants that are private to this file[m
+[31m-#define CORRUPTMATRIX 0.001F  // column vector modulus limit for rotation matrix[m
+[32m+[m[32m#define CORRUPTMATRIX 0.001F			// column vector modulus limit for rotation matrix[m
+ [m
+ // vector components[m
+ #define X 0[m
+[36m@@ -44,116 +44,123 @@[m
+ #define Z 2[m
+ [m
+ // function sets the 3x3 matrix A to the identity matrix[m
+[31m-void f3x3matrixAeqI(float A[][3]) {[m
+[31m-    float *pAij;  // pointer to A[i][j][m
+[31m-    int8_t i, j;  // loop counters[m
+[31m-[m
+[31m-    for (i = 0; i < 3; i++) {[m
+[31m-        // set pAij to &A[i][j=0][m
+[31m-        pAij = A[i];[m
+[31m-        for (j = 0; j < 3; j++) {[m
+[31m-            *(pAij++) = 0.0F;[m
+[31m-        }[m
+[31m-        A[i][i] = 1.0F;[m
+[31m-    }[m
+[32m+[m[32mvoid f3x3matrixAeqI(float A[][3])[m
+[32m+[m[32m{[m
+[32m+[m	[32mfloat *pAij;	// pointer to A[i][j][m
+[32m+[m	[32mint8_t i, j;	// loop counters[m
+[32m+[m
+[32m+[m	[32mfor (i = 0; i < 3; i++) {[m
+[32m+[m		[32m// set pAij to &A[i][j=0][m
+[32m+[m		[32mpAij = A[i];[m
+[32m+[m		[32mfor (j = 0; j < 3; j++) {[m
+[32m+[m			[32m*(pAij++) = 0.0F;[m
+[32m+[m		[32m}[m
+[32m+[m		[32mA[i][i] = 1.0F;[m
+[32m+[m	[32m}[m
+ }[m
+ [m
+ // function sets the matrix A to the identity matrix[m
+[31m-void fmatrixAeqI(float *A[], int16_t rc) {[m
+[31m-    // rc = rows and columns in A[m
+[31m-[m
+[31m-    float *pAij;  // pointer to A[i][j][m
+[31m-    int8_t i, j;  // loop counters[m
+[31m-[m
+[31m-    for (i = 0; i < rc; i++) {[m
+[31m-        // set pAij to &A[i][j=0][m
+[31m-        pAij = A[i];[m
+[31m-        for (j = 0; j < rc; j++) {[m
+[31m-            *(pAij++) = 0.0F;[m
+[31m-        }[m
+[31m-        A[i][i] = 1.0F;[m
+[31m-    }[m
+[32m+[m[32mvoid fmatrixAeqI(float *A[], int16_t rc)[m
+[32m+[m[32m{[m
+[32m+[m	[32m// rc = rows and columns in A[m
+[32m+[m
+[32m+[m	[32mfloat *pAij;	// pointer to A[i][j][m
+[32m+[m	[32mint8_t i, j;	// loop counters[m
+[32m+[m
+[32m+[m	[32mfor (i = 0; i < rc; i++) {[m
+[32m+[m		[32m// set pAij to &A[i][j=0][m
+[32m+[m		[32mpAij = A[i];[m
+[32m+[m		[32mfor (j = 0; j < rc; j++) {[m
+[32m+[m			[32m*(pAij++) = 0.0F;[m
+[32m+[m		[32m}[m
+[32m+[m		[32mA[i][i] = 1.0F;[m
+[32m+[m	[32m}[m
+ }[m
+ [m
+ // function sets every entry in the 3x3 matrix A to a constant scalar[m
+[31m-void f3x3matrixAeqScalar(float A[][3], float Scalar) {[m
+[31m-    float *pAij;  // pointer to A[i][j][m
+[31m-    int8_t i, j;  // counters[m
+[31m-[m
+[31m-    for (i = 0; i < 3; i++) {[m
+[31m-        // set pAij to &A[i][j=0][m
+[31m-        pAij = A[i];[m
+[31m-        for (j = 0; j < 3; j++) {[m
+[31m-            *(pAij++) = Scalar;[m
+[31m-        }[m
+[31m-    }[m
+[32m+[m[32mvoid f3x3matrixAeqScalar(float A[][3], float Scalar)[m
+[32m+[m[32m{[m
+[32m+[m	[32mfloat *pAij;	// pointer to A[i][j][m
+[32m+[m	[32mint8_t i, j;	// counters[m
+[32m+[m
+[32m+[m	[32mfor (i = 0; i < 3; i++) {[m
+[32m+[m		[32m// set pAij to &A[i][j=0][m
+[32m+[m		[32mpAij = A[i];[m
+[32m+[m		[32mfor (j = 0; j < 3; j++) {[m
+[32m+[m			[32m*(pAij++) = Scalar;[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+ }[m
+ [m
+ // function multiplies all elements of 3x3 matrix A by the specified scalar[m
+[31m-void f3x3matrixAeqAxScalar(float A[][3], float Scalar) {[m
+[31m-    float *pAij;  // pointer to A[i][j][m
+[31m-    int8_t i, j;  // loop counters[m
+[31m-[m
+[31m-    for (i = 0; i < 3; i++) {[m
+[31m-        // set pAij to &A[i][j=0][m
+[31m-        pAij = A[i];[m
+[31m-        for (j = 0; j < 3; j++) {[m
+[31m-            *(pAij++) *= Scalar;[m
+[31m-        }[m
+[31m-    }[m
+[32m+[m[32mvoid f3x3matrixAeqAxScalar(float A[][3], float Scalar)[m
+[32m+[m[32m{[m
+[32m+[m	[32mfloat *pAij;	// pointer to A[i][j][m
+[32m+[m	[32mint8_t i, j;	// loop counters[m
+[32m+[m
+[32m+[m	[32mfor (i = 0; i < 3; i++) {[m
+[32m+[m		[32m// set pAij to &A[i][j=0][m
+[32m+[m		[32mpAij = A[i];[m
+[32m+[m		[32mfor (j = 0; j < 3; j++) {[m
+[32m+[m			[32m*(pAij++) *= Scalar;[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+ }[m
+ [m
+ // function negates all elements of 3x3 matrix A[m
+[31m-void f3x3matrixAeqMinusA(float A[][3]) {[m
+[31m-    float *pAij;  // pointer to A[i][j][m
+[31m-    int8_t i, j;  // loop counters[m
+[31m-[m
+[31m-    for (i = 0; i < 3; i++) {[m
+[31m-        // set pAij to &A[i][j=0][m
+[31m-        pAij = A[i];[m
+[31m-        for (j = 0; j < 3; j++) {[m
+[31m-            *pAij = -*pAij;[m
+[31m-            pAij++;[m
+[31m-        }[m
+[31m-    }[m
+[32m+[m[32mvoid f3x3matrixAeqMinusA(float A[][3])[m
+[32m+[m[32m{[m
+[32m+[m	[32mfloat *pAij;	// pointer to A[i][j][m
+[32m+[m	[32mint8_t i, j;	// loop counters[m
+[32m+[m
+[32m+[m	[32mfor (i = 0; i < 3; i++) {[m
+[32m+[m		[32m// set pAij to &A[i][j=0][m
+[32m+[m		[32mpAij = A[i];[m
+[32m+[m		[32mfor (j = 0; j < 3; j++) {[m
+[32m+[m			[32m*pAij = -*pAij;[m
+[32m+[m			[32mpAij++;[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+ }[m
+ [m
+ // function directly calculates the symmetric inverse of a symmetric 3x3 matrix[m
+ // only the on and above diagonal terms in B are used and need to be specified[m
+[31m-void f3x3matrixAeqInvSymB(float A[][3], float B[][3]) {[m
+[31m-    float fB11B22mB12B12;  // B[1][1] * B[2][2] - B[1][2] * B[1][2][m
+[31m-    float fB12B02mB01B22;  // B[1][2] * B[0][2] - B[0][1] * B[2][2][m
+[31m-    float fB01B12mB11B02;  // B[0][1] * B[1][2] - B[1][1] * B[0][2][m
+[31m-    float ftmp;            // determinant and then reciprocal[m
+[31m-[m
+[31m-    // calculate useful products[m
+[31m-    fB11B22mB12B12 = B[1][1] * B[2][2] - B[1][2] * B[1][2];[m
+[31m-    fB12B02mB01B22 = B[1][2] * B[0][2] - B[0][1] * B[2][2];[m
+[31m-    fB01B12mB11B02 = B[0][1] * B[1][2] - B[1][1] * B[0][2];[m
+[31m-[m
+[31m-    // set ftmp to the determinant of the input matrix B[m
+[31m-    ftmp = B[0][0] * fB11B22mB12B12 + B[0][1] * fB12B02mB01B22 + B[0][2] * fB01B12mB11B02;[m
+[31m-[m
+[31m-    // set A to the inverse of B for any determinant except zero[m
+[31m-    if (ftmp != 0.0F) {[m
+[31m-        ftmp = 1.0F / ftmp;[m
+[31m-        A[0][0] = fB11B22mB12B12 * ftmp;[m
+[31m-        A[1][0] = A[0][1] = fB12B02mB01B22 * ftmp;[m
+[31m-        A[2][0] = A[0][2] = fB01B12mB11B02 * ftmp;[m
+[31m-        A[1][1] = (B[0][0] * B[2][2] - B[0][2] * B[0][2]) * ftmp;[m
+[31m-        A[2][1] = A[1][2] = (B[0][2] * B[0][1] - B[0][0] * B[1][2]) * ftmp;[m
+[31m-        A[2][2] = (B[0][0] * B[1][1] - B[0][1] * B[0][1]) * ftmp;[m
+[31m-    } else {[m
+[31m-        // provide the identity matrix if the determinant is zero[m
+[31m-        f3x3matrixAeqI(A);[m
+[31m-    }[m
+[32m+[m[32mvoid f3x3matrixAeqInvSymB(float A[][3], float B[][3])[m
+[32m+[m[32m{[m
+[32m+[m	[32mfloat fB11B22mB12B12;	// B[1][1] * B[2][2] - B[1][2] * B[1][2][m
+[32m+[m	[32mfloat fB12B02mB01B22;	// B[1][2] * B[0][2] - B[0][1] * B[2][2][m
+[32m+[m	[32mfloat fB01B12mB11B02;	// B[0][1] * B[1][2] - B[1][1] * B[0][2][m
+[32m+[m	[32mfloat ftmp;				// determinant and then reciprocal[m
+[32m+[m
+[32m+[m	[32m// calculate useful products[m
+[32m+[m	[32mfB11B22mB12B12 = B[1][1] * B[2][2] - B[1][2] * B[1][2];[m
+[32m+[m	[32mfB12B02mB01B22 = B[1][2] * B[0][2] - B[0][1] * B[2][2];[m
+[32m+[m	[32mfB01B12mB11B02 = B[0][1] * B[1][2] - B[1][1] * B[0][2];[m
+[32m+[m
+[32m+[m	[32m// set ftmp to the determinant of the input matrix B[m
+[32m+[m	[32mftmp = B[0][0] * fB11B22mB12B12 + B[0][1] * fB12B02mB01B22 + B[0][2] * fB01B12mB11B02;[m
+[32m+[m
+[32m+[m	[32m// set A to the inverse of B for any determinant except zero[m
+[32m+[m	[32mif (ftmp != 0.0F) {[m
+[32m+[m		[32mftmp = 1.0F / ftmp;[m
+[32m+[m		[32mA[0][0] = fB11B22mB12B12 * ftmp;[m
+[32m+[m		[32mA[1][0] = A[0][1] = fB12B02mB01B22 * ftmp;[m
+[32m+[m		[32mA[2][0] = A[0][2] = fB01B12mB11B02 * ftmp;[m
+[32m+[m		[32mA[1][1] = (B[0][0] * B[2][2] - B[0][2] * B[0][2]) * ftmp;[m
+[32m+[m		[32mA[2][1] = A[1][2] = (B[0][2] * B[0][1] - B[0][0] * B[1][2]) * ftmp;[m
+[32m+[m		[32mA[2][2] = (B[0][0] * B[1][1] - B[0][1] * B[0][1]) * ftmp;[m
+[32m+[m	[32m} else {[m
+[32m+[m		[32m// provide the identity matrix if the determinant is zero[m
+[32m+[m		[32mf3x3matrixAeqI(A);[m
+[32m+[m	[32m}[m
+ }[m
+ [m
+ // function calculates the determinant of a 3x3 matrix[m
+[31m-float f3x3matrixDetA(float A[][3]) {[m
+[31m-    return ([m
+[31m-        A[X][X] * (A[Y][Y] * A[Z][Z] - A[Y][Z] * A[Z][Y]) + A[X][Y] * (A[Y][Z] * A[Z][X] - A[Y][X] * A[Z][Z]) +[m
+[31m-        A[X][Z] * (A[Y][X] * A[Z][Y] - A[Y][Y] * A[Z][X]));[m
+[32m+[m[32mfloat f3x3matrixDetA(float A[][3])[m
+[32m+[m[32m{[m
+[32m+[m	[32mreturn (A[X][X] * (A[Y][Y] * A[Z][Z] - A[Y][Z] * A[Z][Y]) +[m
+[32m+[m			[32mA[X][Y] * (A[Y][Z] * A[Z][X] - A[Y][X] * A[Z][Z]) +[m
+[32m+[m			[32mA[X][Z] * (A[Y][X] * A[Z][Y] - A[Y][Y] * A[Z][X]));[m
+ }[m
+ [m
+ // function computes all eigenvalues and eigenvectors of a real symmetric matrix A[0..n-1][0..n-1][m
+[36m@@ -162,282 +169,285 @@[m [mfloat f3x3matrixDetA(float A[][3]) {[m
+ // eigval[0..n-1] returns the eigenvalues of A[][].[m
+ // eigvec[0..n-1][0..n-1] returns the normalized eigenvectors of A[][][m
+ // the eigenvectors are not sorted by value[m
+[31m-void eigencompute(float A[][10], float eigval[], float eigvec[][10], int8_t n) {[m
+[31m-    // maximum number of iterations to achieve convergence: in practice 6 is typical[m
+[32m+[m[32mvoid eigencompute(float A[][10], float eigval[], float eigvec[][10], int8_t n)[m
+[32m+[m[32m{[m
+[32m+[m	[32m// maximum number of iterations to achieve convergence: in practice 6 is typical[m
+ #define NITERATIONS 15[m
+ [m
+[31m-    // various trig functions of the jacobi rotation angle phi[m
+[31m-    float cot2phi, tanhalfphi, tanphi, sinphi, cosphi;[m
+[31m-    // scratch variable to prevent over-writing during rotations[m
+[31m-    float ftmp;[m
+[31m-    // residue from remaining non-zero above diagonal terms[m
+[31m-    float residue;[m
+[31m-    // matrix row and column indices[m
+[31m-    int8_t ir, ic;[m
+[31m-    // general loop counter[m
+[31m-    int8_t j;[m
+[31m-    // timeout ctr for number of passes of the algorithm[m
+[31m-    int8_t ctr;[m
+[31m-[m
+[31m-    // initialize eigenvectors matrix and eigenvalues array[m
+[31m-    for (ir = 0; ir < n; ir++) {[m
+[31m-        // loop over all columns[m
+[31m-        for (ic = 0; ic < n; ic++) {[m
+[31m-            // set on diagonal and off-diagonal elements to zero[m
+[31m-            eigvec[ir][ic] = 0.0F;[m
+[31m-        }[m
+[31m-[m
+[31m-        // correct the diagonal elements to 1.0[m
+[31m-        eigvec[ir][ir] = 1.0F;[m
+[31m-[m
+[31m-        // initialize the array of eigenvalues to the diagonal elements of m[m
+[31m-        eigval[ir] = A[ir][ir];[m
+[31m-    }[m
+[31m-[m
+[31m-    // initialize the counter and loop until converged or NITERATIONS reached[m
+[31m-    ctr = 0;[m
+[31m-    do {[m
+[31m-        // compute the absolute value of the above diagonal elements as exit criterion[m
+[31m-        residue = 0.0F;[m
+[31m-        // loop over rows excluding last row[m
+[31m-        for (ir = 0; ir < n - 1; ir++) {[m
+[31m-            // loop over above diagonal columns[m
+[31m-            for (ic = ir + 1; ic < n; ic++) {[m
+[31m-                // accumulate the residual off diagonal terms which are being driven to zero[m
+[31m-                residue += fabsf(A[ir][ic]);[m
+[31m-            }[m
+[31m-        }[m
+[31m-[m
+[31m-        // check if we still have work to do[m
+[31m-        if (residue > 0.0F) {[m
+[31m-            // loop over all rows with the exception of the last row (since only rotating above diagonal elements)[m
+[31m-            for (ir = 0; ir < n - 1; ir++) {[m
+[31m-                // loop over columns ic (where ic is always greater than ir since above diagonal)[m
+[31m-                for (ic = ir + 1; ic < n; ic++) {[m
+[31m-                    // only continue with this element if the element is non-zero[m
+[31m-                    if (fabsf(A[ir][ic]) > 0.0F) {[m
+[31m-                        // calculate cot(2*phi) where phi is the Jacobi rotation angle[m
+[31m-                        cot2phi = 0.5F * (eigval[ic] - eigval[ir]) / (A[ir][ic]);[m
+[31m-[m
+[31m-                        // calculate tan(phi) correcting sign to ensure the smaller solution is used[m
+[31m-                        tanphi = 1.0F / (fabsf(cot2phi) + sqrtf(1.0F + cot2phi * cot2phi));[m
+[31m-                        if (cot2phi < 0.0F) {[m
+[31m-                            tanphi = -tanphi;[m
+[31m-                        }[m
+[31m-[m
+[31m-                        // calculate the sine and cosine of the Jacobi rotation angle phi[m
+[31m-                        cosphi = 1.0F / sqrtf(1.0F + tanphi * tanphi);[m
+[31m-                        sinphi = tanphi * cosphi;[m
+[31m-[m
+[31m-                        // calculate tan(phi/2)[m
+[31m-                        tanhalfphi = sinphi / (1.0F + cosphi);[m
+[31m-[m
+[31m-                        // set tmp = tan(phi) times current matrix element used in update of leading diagonal elements[m
+[31m-                        ftmp = tanphi * A[ir][ic];[m
+[31m-[m
+[31m-                        // apply the jacobi rotation to diagonal elements [ir][ir] and [ic][ic] stored in the eigenvalue array[m
+[31m-                        // eigval[ir] = eigval[ir] - tan(phi) *  A[ir][ic][m
+[31m-                        eigval[ir] -= ftmp;[m
+[31m-                        // eigval[ic] = eigval[ic] + tan(phi) * A[ir][ic][m
+[31m-                        eigval[ic] += ftmp;[m
+[31m-[m
+[31m-                        // by definition, applying the jacobi rotation on element ir, ic results in 0.0[m
+[31m-                        A[ir][ic] = 0.0F;[m
+[31m-[m
+[31m-                        // apply the jacobi rotation to all elements of the eigenvector matrix[m
+[31m-                        for (j = 0; j < n; j++) {[m
+[31m-                            // store eigvec[j][ir][m
+[31m-                            ftmp = eigvec[j][ir];[m
+[31m-                            // eigvec[j][ir] = eigvec[j][ir] - sin(phi) * (eigvec[j][ic] + tan(phi/2) * eigvec[j][ir])[m
+[31m-                            eigvec[j][ir] = ftmp - sinphi * (eigvec[j][ic] + tanhalfphi * ftmp);[m
+[31m-                            // eigvec[j][ic] = eigvec[j][ic] + sin(phi) * (eigvec[j][ir] - tan(phi/2) * eigvec[j][ic])[m
+[31m-                            eigvec[j][ic] = eigvec[j][ic] + sinphi * (ftmp - tanhalfphi * eigvec[j][ic]);[m
+[31m-                        }[m
+[31m-[m
+[31m-                        // apply the jacobi rotation only to those elements of matrix m that can change[m
+[31m-                        for (j = 0; j <= ir - 1; j++) {[m
+[31m-                            // store A[j][ir][m
+[31m-                            ftmp = A[j][ir];[m
+[31m-                            // A[j][ir] = A[j][ir] - sin(phi) * (A[j][ic] + tan(phi/2) * A[j][ir])[m
+[31m-                            A[j][ir] = ftmp - sinphi * (A[j][ic] + tanhalfphi * ftmp);[m
+[31m-                            // A[j][ic] = A[j][ic] + sin(phi) * (A[j][ir] - tan(phi/2) * A[j][ic])[m
+[31m-                            A[j][ic] = A[j][ic] + sinphi * (ftmp - tanhalfphi * A[j][ic]);[m
+[31m-                        }[m
+[31m-                        for (j = ir + 1; j <= ic - 1; j++) {[m
+[31m-                            // store A[ir][j][m
+[31m-                            ftmp = A[ir][j];[m
+[31m-                            // A[ir][j] = A[ir][j] - sin(phi) * (A[j][ic] + tan(phi/2) * A[ir][j])[m
+[31m-                            A[ir][j] = ftmp - sinphi * (A[j][ic] + tanhalfphi * ftmp);[m
+[31m-                            // A[j][ic] = A[j][ic] + sin(phi) * (A[ir][j] - tan(phi/2) * A[j][ic])[m
+[31m-                            A[j][ic] = A[j][ic] + sinphi * (ftmp - tanhalfphi * A[j][ic]);[m
+[31m-                        }[m
+[31m-                        for (j = ic + 1; j < n; j++) {[m
+[31m-                            // store A[ir][j][m
+[31m-                            ftmp = A[ir][j];[m
+[31m-                            // A[ir][j] = A[ir][j] - sin(phi) * (A[ic][j] + tan(phi/2) * A[ir][j])[m
+[31m-                            A[ir][j] = ftmp - sinphi * (A[ic][j] + tanhalfphi * ftmp);[m
+[31m-                            // A[ic][j] = A[ic][j] + sin(phi) * (A[ir][j] - tan(phi/2) * A[ic][j])[m
+[31m-                            A[ic][j] = A[ic][j] + sinphi * (ftmp - tanhalfphi * A[ic][j]);[m
+[31m-                        }[m
+[31m-                    }                                     // end of test for matrix element already zero[m
+[31m-                }                                         // end of loop over columns[m
+[31m-            }                                             // end of loop over rows[m
+[31m-        }                                                 // end of test for non-zero residue[m
+[31m-    } while ((residue > 0.0F) && (ctr++ < NITERATIONS));  // end of main loop[m
+[32m+[m	[32m// various trig functions of the jacobi rotation angle phi[m
+[32m+[m	[32mfloat cot2phi, tanhalfphi, tanphi, sinphi, cosphi;[m
+[32m+[m	[32m// scratch variable to prevent over-writing during rotations[m
+[32m+[m	[32mfloat ftmp;[m
+[32m+[m	[32m// residue from remaining non-zero above diagonal terms[m
+[32m+[m	[32mfloat residue;[m
+[32m+[m	[32m// matrix row and column indices[m
+[32m+[m	[32mint8_t ir, ic;[m
+[32m+[m	[32m// general loop counter[m
+[32m+[m	[32mint8_t j;[m
+[32m+[m	[32m// timeout ctr for number of passes of the algorithm[m
+[32m+[m	[32mint8_t ctr;[m
+[32m+[m
+[32m+[m	[32m// initialize eigenvectors matrix and eigenvalues array[m
+[32m+[m	[32mfor (ir = 0; ir < n; ir++) {[m
+[32m+[m		[32m// loop over all columns[m
+[32m+[m		[32mfor (ic = 0; ic < n; ic++) {[m
+[32m+[m			[32m// set on diagonal and off-diagonal elements to zero[m
+[32m+[m			[32meigvec[ir][ic] = 0.0F;[m
+[32m+[m		[32m}[m
+[32m+[m
+[32m+[m		[32m// correct the diagonal elements to 1.0[m
+[32m+[m		[32meigvec[ir][ir] = 1.0F;[m
+[32m+[m
+[32m+[m		[32m// initialize the array of eigenvalues to the diagonal elements of m[m
+[32m+[m		[32meigval[ir] = A[ir][ir];[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// initialize the counter and loop until converged or NITERATIONS reached[m
+[32m+[m	[32mctr = 0;[m
+[32m+[m	[32mdo {[m
+[32m+[m		[32m// compute the absolute value of the above diagonal elements as exit criterion[m
+[32m+[m		[32mresidue = 0.0F;[m
+[32m+[m		[32m// loop over rows excluding last row[m
+[32m+[m		[32mfor (ir = 0; ir < n - 1; ir++) {[m
+[32m+[m			[32m// loop over above diagonal columns[m
+[32m+[m			[32mfor (ic = ir + 1; ic < n; ic++) {[m
+[32m+[m				[32m// accumulate the residual off diagonal terms which are being driven to zero[m
+[32m+[m				[32mresidue += fabsf(A[ir][ic]);[m
+[32m+[m			[32m}[m
+[32m+[m		[32m}[m
+[32m+[m
+[32m+[m		[32m// check if we still have work to do[m
+[32m+[m		[32mif (residue > 0.0F) {[m
+[32m+[m			[32m// loop over all rows with the exception of the last row (since only rotating above diagonal elements)[m
+[32m+[m			[32mfor (ir = 0; ir < n - 1; ir++) {[m
+[32m+[m				[32m// loop over columns ic (where ic is always greater than ir since above diagonal)[m
+[32m+[m				[32mfor (ic = ir + 1; ic < n; ic++) {[m
+[32m+[m					[32m// only continue with this element if the element is non-zero[m
+[32m+[m					[32mif (fabsf(A[ir][ic]) > 0.0F) {[m
+[32m+[m						[32m// calculate cot(2*phi) where phi is the Jacobi rotation angle[m
+[32m+[m						[32mcot2phi = 0.5F * (eigval[ic] - eigval[ir]) / (A[ir][ic]);[m
+[32m+[m
+[32m+[m						[32m// calculate tan(phi) correcting sign to ensure the smaller solution is used[m
+[32m+[m						[32mtanphi = 1.0F / (fabsf(cot2phi) + sqrtf(1.0F + cot2phi * cot2phi));[m
+[32m+[m						[32mif (cot2phi < 0.0F) {[m
+[32m+[m							[32mtanphi = -tanphi;[m
+[32m+[m						[32m}[m
+[32m+[m
+[32m+[m						[32m// calculate the sine and cosine of the Jacobi rotation angle phi[m
+[32m+[m						[32mcosphi = 1.0F / sqrtf(1.0F + tanphi * tanphi);[m
+[32m+[m						[32msinphi = tanphi * cosphi;[m
+[32m+[m
+[32m+[m						[32m// calculate tan(phi/2)[m
+[32m+[m						[32mtanhalfphi = sinphi / (1.0F + cosphi);[m
+[32m+[m
+[32m+[m						[32m// set tmp = tan(phi) times current matrix element used in update of leading diagonal elements[m
+[32m+[m						[32mftmp = tanphi * A[ir][ic];[m
+[32m+[m
+[32m+[m						[32m// apply the jacobi rotation to diagonal elements [ir][ir] and [ic][ic] stored in the eigenvalue array[m
+[32m+[m						[32m// eigval[ir] = eigval[ir] - tan(phi) *  A[ir][ic][m
+[32m+[m						[32meigval[ir] -= ftmp;[m
+[32m+[m						[32m// eigval[ic] = eigval[ic] + tan(phi) * A[ir][ic][m
+[32m+[m						[32meigval[ic] += ftmp;[m
+[32m+[m
+[32m+[m						[32m// by definition, applying the jacobi rotation on element ir, ic results in 0.0[m
+[32m+[m						[32mA[ir][ic] = 0.0F;[m
+[32m+[m
+[32m+[m						[32m// apply the jacobi rotation to all elements of the eigenvector matrix[m
+[32m+[m						[32mfor (j = 0; j < n; j++) {[m
+[32m+[m							[32m// store eigvec[j][ir][m
+[32m+[m							[32mftmp = eigvec[j][ir];[m
+[32m+[m							[32m// eigvec[j][ir] = eigvec[j][ir] - sin(phi) * (eigvec[j][ic] + tan(phi/2) * eigvec[j][ir])[m
+[32m+[m							[32meigvec[j][ir] = ftmp - sinphi * (eigvec[j][ic] + tanhalfphi * ftmp);[m
+[32m+[m							[32m// eigvec[j][ic] = eigvec[j][ic] + sin(phi) * (eigvec[j][ir] - tan(phi/2) * eigvec[j][ic])[m
+[32m+[m							[32meigvec[j][ic] = eigvec[j][ic] + sinphi * (ftmp - tanhalfphi * eigvec[j][ic]);[m
+[32m+[m						[32m}[m
+[32m+[m
+[32m+[m						[32m// apply the jacobi rotation only to those elements of matrix m that can change[m
+[32m+[m						[32mfor (j = 0; j <= ir - 1; j++) {[m
+[32m+[m							[32m// store A[j][ir][m
+[32m+[m							[32mftmp = A[j][ir];[m
+[32m+[m							[32m// A[j][ir] = A[j][ir] - sin(phi) * (A[j][ic] + tan(phi/2) * A[j][ir])[m
+[32m+[m							[32mA[j][ir] = ftmp - sinphi * (A[j][ic] + tanhalfphi * ftmp);[m
+[32m+[m							[32m// A[j][ic] = A[j][ic] + sin(phi) * (A[j][ir] - tan(phi/2) * A[j][ic])[m
+[32m+[m							[32mA[j][ic] = A[j][ic] + sinphi * (ftmp - tanhalfphi * A[j][ic]);[m
+[32m+[m						[32m}[m
+[32m+[m						[32mfor (j = ir + 1; j <= ic - 1; j++) {[m
+[32m+[m							[32m// store A[ir][j][m
+[32m+[m							[32mftmp = A[ir][j];[m
+[32m+[m							[32m// A[ir][j] = A[ir][j] - sin(phi) * (A[j][ic] + tan(phi/2) * A[ir][j])[m
+[32m+[m							[32mA[ir][j] = ftmp - sinphi * (A[j][ic] + tanhalfphi * ftmp);[m
+[32m+[m							[32m// A[j][ic] = A[j][ic] + sin(phi) * (A[ir][j] - tan(phi/2) * A[j][ic])[m
+[32m+[m							[32mA[j][ic] = A[j][ic] + sinphi * (ftmp - tanhalfphi * A[j][ic]);[m
+[32m+[m						[32m}[m
+[32m+[m						[32mfor (j = ic + 1; j < n; j++) {[m
+[32m+[m							[32m// store A[ir][j][m
+[32m+[m							[32mftmp = A[ir][j];[m
+[32m+[m							[32m// A[ir][j] = A[ir][j] - sin(phi) * (A[ic][j] + tan(phi/2) * A[ir][j])[m
+[32m+[m							[32mA[ir][j] = ftmp - sinphi * (A[ic][j] + tanhalfphi * ftmp);[m
+[32m+[m							[32m// A[ic][j] = A[ic][j] + sin(phi) * (A[ir][j] - tan(phi/2) * A[ic][j])[m
+[32m+[m							[32mA[ic][j] = A[ic][j] + sinphi * (ftmp - tanhalfphi * A[ic][j]);[m
+[32m+[m						[32m}[m
+[32m+[m					[32m}   // end of test for matrix element already zero[m
+[32m+[m				[32m}   // end of loop over columns[m
+[32m+[m			[32m}   // end of loop over rows[m
+[32m+[m		[32m}  // end of test for non-zero residue[m
+[32m+[m	[32m} while ((residue > 0.0F) && (ctr++ < NITERATIONS)); // end of main loop[m
+ }[m
+ [m
+ // function uses Gauss-Jordan elimination to compute the inverse of matrix A in situ[m
+ // on exit, A is replaced with its inverse[m
+[31m-void fmatrixAeqInvA(float *A[], int8_t iColInd[], int8_t iRowInd[], int8_t iPivot[], int8_t isize) {[m
+[31m-    float largest;                // largest element used for pivoting[m
+[31m-    float scaling;                // scaling factor in pivoting[m
+[31m-    float recippiv;               // reciprocal of pivot element[m
+[31m-    float ftmp;                   // temporary variable used in swaps[m
+[31m-    int8_t i, j, k, l, m;         // index counters[m
+[31m-    int8_t iPivotRow, iPivotCol;  // row and column of pivot element[m
+[31m-[m
+[31m-    // to avoid compiler warnings[m
+[31m-    iPivotRow = iPivotCol = 0;[m
+[31m-[m
+[31m-    // initialize the pivot array to 0[m
+[31m-    for (j = 0; j < isize; j++) {[m
+[31m-        iPivot[j] = 0;[m
+[31m-    }[m
+[31m-[m
+[31m-    // main loop i over the dimensions of the square matrix A[m
+[31m-    for (i = 0; i < isize; i++) {[m
+[31m-        // zero the largest element found for pivoting[m
+[31m-        largest = 0.0F;[m
+[31m-        // loop over candidate rows j[m
+[31m-        for (j = 0; j < isize; j++) {[m
+[31m-            // check if row j has been previously pivoted[m
+[31m-            if (iPivot[j] != 1) {[m
+[31m-                // loop over candidate columns k[m
+[31m-                for (k = 0; k < isize; k++) {[m
+[31m-                    // check if column k has previously been pivoted[m
+[31m-                    if (iPivot[k] == 0) {[m
+[31m-                        // check if the pivot element is the largest found so far[m
+[31m-                        if (fabsf(A[j][k]) >= largest) {[m
+[31m-                            // and store this location as the current best candidate for pivoting[m
+[31m-                            iPivotRow = j;[m
+[31m-                            iPivotCol = k;[m
+[31m-                            largest = (float)fabsf(A[iPivotRow][iPivotCol]);[m
+[31m-                        }[m
+[31m-                    } else if (iPivot[k] > 1) {[m
+[31m-                        // zero determinant situation: exit with identity matrix[m
+[31m-                        fmatrixAeqI(A, isize);[m
+[31m-                        return;[m
+[31m-                    }[m
+[31m-                }[m
+[31m-            }[m
+[31m-        }[m
+[31m-        // increment the entry in iPivot to denote it has been selected for pivoting[m
+[31m-        iPivot[iPivotCol]++;[m
+[31m-[m
+[31m-        // check the pivot rows iPivotRow and iPivotCol are not the same before swapping[m
+[31m-        if (iPivotRow != iPivotCol) {[m
+[31m-            // loop over columns l[m
+[31m-            for (l = 0; l < isize; l++) {[m
+[31m-                // and swap all elements of rows iPivotRow and iPivotCol[m
+[31m-                ftmp = A[iPivotRow][l];[m
+[31m-                A[iPivotRow][l] = A[iPivotCol][l];[m
+[31m-                A[iPivotCol][l] = ftmp;[m
+[31m-            }[m
+[31m-        }[m
+[31m-[m
+[31m-        // record that on the i-th iteration rows iPivotRow and iPivotCol were swapped[m
+[31m-        iRowInd[i] = iPivotRow;[m
+[31m-        iColInd[i] = iPivotCol;[m
+[31m-[m
+[31m-        // check for zero on-diagonal element (singular matrix) and return with identity matrix if detected[m
+[31m-        if (A[iPivotCol][iPivotCol] == 0.0F) {[m
+[31m-            // zero determinant situation: exit with identity matrix[m
+[31m-            fmatrixAeqI(A, isize);[m
+[31m-            return;[m
+[31m-        }[m
+[31m-[m
+[31m-        // calculate the reciprocal of the pivot element knowing it's non-zero[m
+[31m-        recippiv = 1.0F / A[iPivotCol][iPivotCol];[m
+[31m-        // by definition, the diagonal element normalizes to 1[m
+[31m-        A[iPivotCol][iPivotCol] = 1.0F;[m
+[31m-        // multiply all of row iPivotCol by the reciprocal of the pivot element including the diagonal element[m
+[31m-        // the diagonal element A[iPivotCol][iPivotCol] now has value equal to the reciprocal of its previous value[m
+[31m-        for (l = 0; l < isize; l++) {[m
+[31m-            A[iPivotCol][l] *= recippiv;[m
+[31m-        }[m
+[31m-        // loop over all rows m of A[m
+[31m-        for (m = 0; m < isize; m++) {[m
+[31m-            if (m != iPivotCol) {[m
+[31m-                // scaling factor for this row m is in column iPivotCol[m
+[31m-                scaling = A[m][iPivotCol];[m
+[31m-                // zero this element[m
+[31m-                A[m][iPivotCol] = 0.0F;[m
+[31m-                // loop over all columns l of A and perform elimination[m
+[31m-                for (l = 0; l < isize; l++) {[m
+[31m-                    A[m][l] -= A[iPivotCol][l] * scaling;[m
+[31m-                }[m
+[31m-            }[m
+[31m-        }[m
+[31m-    }  // end of loop i over the matrix dimensions[m
+[31m-[m
+[31m-    // finally, loop in inverse order to apply the missing column swaps[m
+[31m-    for (l = isize - 1; l >= 0; l--) {[m
+[31m-        // set i and j to the two columns to be swapped[m
+[31m-        i = iRowInd[l];[m
+[31m-        j = iColInd[l];[m
+[31m-[m
+[31m-        // check that the two columns i and j to be swapped are not the same[m
+[31m-        if (i != j) {[m
+[31m-            // loop over all rows k to swap columns i and j of A[m
+[31m-            for (k = 0; k < isize; k++) {[m
+[31m-                ftmp = A[k][i];[m
+[31m-                A[k][i] = A[k][j];[m
+[31m-                A[k][j] = ftmp;[m
+[31m-            }[m
+[31m-        }[m
+[31m-    }[m
+[32m+[m[32mvoid fmatrixAeqInvA(float *A[], int8_t iColInd[], int8_t iRowInd[], int8_t iPivot[], int8_t isize)[m
+[32m+[m[32m{[m
+[32m+[m	[32mfloat largest;					// largest element used for pivoting[m
+[32m+[m	[32mfloat scaling;					// scaling factor in pivoting[m
+[32m+[m	[32mfloat recippiv;					// reciprocal of pivot element[m
+[32m+[m	[32mfloat ftmp;						// temporary variable used in swaps[m
+[32m+[m	[32mint8_t i, j, k, l, m;			// index counters[m
+[32m+[m	[32mint8_t iPivotRow, iPivotCol;	// row and column of pivot element[m
+[32m+[m
+[32m+[m	[32m// to avoid compiler warnings[m
+[32m+[m	[32miPivotRow = iPivotCol = 0;[m
+[32m+[m
+[32m+[m	[32m// initialize the pivot array to 0[m
+[32m+[m	[32mfor (j = 0; j < isize; j++) {[m
+[32m+[m		[32miPivot[j] = 0;[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// main loop i over the dimensions of the square matrix A[m
+[32m+[m	[32mfor (i = 0; i < isize; i++) {[m
+[32m+[m		[32m// zero the largest element found for pivoting[m
+[32m+[m		[32mlargest = 0.0F;[m
+[32m+[m		[32m// loop over candidate rows j[m
+[32m+[m		[32mfor (j = 0; j < isize; j++) {[m
+[32m+[m			[32m// check if row j has been previously pivoted[m
+[32m+[m			[32mif (iPivot[j] != 1) {[m
+[32m+[m				[32m// loop over candidate columns k[m
+[32m+[m				[32mfor (k = 0; k < isize; k++) {[m
+[32m+[m					[32m// check if column k has previously been pivoted[m
+[32m+[m					[32mif (iPivot[k] == 0) {[m
+[32m+[m						[32m// check if the pivot element is the largest found so far[m
+[32m+[m						[32mif (fabsf(A[j][k]) >= largest) {[m
+[32m+[m							[32m// and store this location as the current best candidate for pivoting[m
+[32m+[m							[32miPivotRow = j;[m
+[32m+[m							[32miPivotCol = k;[m
+[32m+[m							[32mlargest = (float) fabsf(A[iPivotRow][iPivotCol]);[m
+[32m+[m						[32m}[m
+[32m+[m					[32m} else if (iPivot[k] > 1) {[m
+[32m+[m						[32m// zero determinant situation: exit with identity matrix[m
+[32m+[m						[32mfmatrixAeqI(A, isize);[m
+[32m+[m						[32mreturn;[m
+[32m+[m					[32m}[m
+[32m+[m				[32m}[m
+[32m+[m			[32m}[m
+[32m+[m		[32m}[m
+[32m+[m		[32m// increment the entry in iPivot to denote it has been selected for pivoting[m
+[32m+[m		[32miPivot[iPivotCol]++;[m
+[32m+[m
+[32m+[m		[32m// check the pivot rows iPivotRow and iPivotCol are not the same before swapping[m
+[32m+[m		[32mif (iPivotRow != iPivotCol) {[m
+[32m+[m			[32m// loop over columns l[m
+[32m+[m			[32mfor (l = 0; l < isize; l++) {[m
+[32m+[m				[32m// and swap all elements of rows iPivotRow and iPivotCol[m
+[32m+[m				[32mftmp = A[iPivotRow][l];[m
+[32m+[m				[32mA[iPivotRow][l] = A[iPivotCol][l];[m
+[32m+[m				[32mA[iPivotCol][l] = ftmp;[m
+[32m+[m			[32m}[m
+[32m+[m		[32m}[m
+[32m+[m
+[32m+[m		[32m// record that on the i-th iteration rows iPivotRow and iPivotCol were swapped[m
+[32m+[m		[32miRowInd[i] = iPivotRow;[m
+[32m+[m		[32miColInd[i] = iPivotCol;[m
+[32m+[m
+[32m+[m		[32m// check for zero on-diagonal element (singular matrix) and return with identity matrix if detected[m
+[32m+[m		[32mif (A[iPivotCol][iPivotCol] == 0.0F) {[m
+[32m+[m			[32m// zero determinant situation: exit with identity matrix[m
+[32m+[m			[32mfmatrixAeqI(A, isize);[m
+[32m+[m			[32mreturn;[m
+[32m+[m		[32m}[m
+[32m+[m
+[32m+[m		[32m// calculate the reciprocal of the pivot element knowing it's non-zero[m
+[32m+[m		[32mrecippiv = 1.0F / A[iPivotCol][iPivotCol];[m
+[32m+[m		[32m// by definition, the diagonal element normalizes to 1[m
+[32m+[m		[32mA[iPivotCol][iPivotCol] = 1.0F;[m
+[32m+[m		[32m// multiply all of row iPivotCol by the reciprocal of the pivot element including the diagonal element[m
+[32m+[m		[32m// the diagonal element A[iPivotCol][iPivotCol] now has value equal to the reciprocal of its previous value[m
+[32m+[m		[32mfor (l = 0; l < isize; l++) {[m
+[32m+[m			[32mA[iPivotCol][l] *= recippiv;[m
+[32m+[m		[32m}[m
+[32m+[m		[32m// loop over all rows m of A[m
+[32m+[m		[32mfor (m = 0; m < isize; m++) {[m
+[32m+[m			[32mif (m != iPivotCol) {[m
+[32m+[m				[32m// scaling factor for this row m is in column iPivotCol[m
+[32m+[m				[32mscaling = A[m][iPivotCol];[m
+[32m+[m				[32m// zero this element[m
+[32m+[m				[32mA[m][iPivotCol] = 0.0F;[m
+[32m+[m				[32m// loop over all columns l of A and perform elimination[m
+[32m+[m				[32mfor (l = 0; l < isize; l++) {[m
+[32m+[m					[32mA[m][l] -= A[iPivotCol][l] * scaling;[m
+[32m+[m				[32m}[m
+[32m+[m			[32m}[m
+[32m+[m		[32m}[m
+[32m+[m	[32m} // end of loop i over the matrix dimensions[m
+[32m+[m
+[32m+[m	[32m// finally, loop in inverse order to apply the missing column swaps[m
+[32m+[m	[32mfor (l = isize - 1; l >= 0; l--) {[m
+[32m+[m		[32m// set i and j to the two columns to be swapped[m
+[32m+[m		[32mi = iRowInd[l];[m
+[32m+[m		[32mj = iColInd[l];[m
+[32m+[m
+[32m+[m		[32m// check that the two columns i and j to be swapped are not the same[m
+[32m+[m		[32mif (i != j) {[m
+[32m+[m			[32m// loop over all rows k to swap columns i and j of A[m
+[32m+[m			[32mfor (k = 0; k < isize; k++) {[m
+[32m+[m				[32mftmp = A[k][i];[m
+[32m+[m				[32mA[k][i] = A[k][j];[m
+[32m+[m				[32mA[k][j] = ftmp;[m
+[32m+[m			[32m}[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+ }[m
+ [m
+ // function re-orthonormalizes a 3x3 rotation matrix[m
+[31m-void fmatrixAeqRenormRotA(float A[][3]) {[m
+[31m-    float ftmp;  // scratch variable[m
+[31m-[m
+[31m-    // normalize the X column of the low pass filtered orientation matrix[m
+[31m-    ftmp = sqrtf(A[X][X] * A[X][X] + A[Y][X] * A[Y][X] + A[Z][X] * A[Z][X]);[m
+[31m-    if (ftmp > CORRUPTMATRIX) {[m
+[31m-        // normalize the x column vector[m
+[31m-        ftmp = 1.0F / ftmp;[m
+[31m-        A[X][X] *= ftmp;[m
+[31m-        A[Y][X] *= ftmp;[m
+[31m-        A[Z][X] *= ftmp;[m
+[31m-    } else {[m
+[31m-        // set x column vector to {1, 0, 0}[m
+[31m-        A[X][X] = 1.0F;[m
+[31m-        A[Y][X] = A[Z][X] = 0.0F;[m
+[31m-    }[m
+[31m-[m
+[31m-    // force the y column vector to be orthogonal to x using y = y-(x.y)x[m
+[31m-    ftmp = A[X][X] * A[X][Y] + A[Y][X] * A[Y][Y] + A[Z][X] * A[Z][Y];[m
+[31m-    A[X][Y] -= ftmp * A[X][X];[m
+[31m-    A[Y][Y] -= ftmp * A[Y][X];[m
+[31m-    A[Z][Y] -= ftmp * A[Z][X];[m
+[31m-[m
+[31m-    // normalize the y column vector[m
+[31m-    ftmp = sqrtf(A[X][Y] * A[X][Y] + A[Y][Y] * A[Y][Y] + A[Z][Y] * A[Z][Y]);[m
+[31m-    if (ftmp > CORRUPTMATRIX) {[m
+[31m-        // normalize the y column vector[m
+[31m-        ftmp = 1.0F / ftmp;[m
+[31m-        A[X][Y] *= ftmp;[m
+[31m-        A[Y][Y] *= ftmp;[m
+[31m-        A[Z][Y] *= ftmp;[m
+[31m-    } else {[m
+[31m-        // set y column vector to {0, 1, 0}[m
+[31m-        A[Y][Y] = 1.0F;[m
+[31m-        A[X][Y] = A[Z][Y] = 0.0F;[m
+[31m-    }[m
+[31m-[m
+[31m-    // finally set the z column vector to x vector cross y vector (automatically normalized)[m
+[31m-    A[X][Z] = A[Y][X] * A[Z][Y] - A[Z][X] * A[Y][Y];[m
+[31m-    A[Y][Z] = A[Z][X] * A[X][Y] - A[X][X] * A[Z][Y];[m
+[31m-    A[Z][Z] = A[X][X] * A[Y][Y] - A[Y][X] * A[X][Y];[m
+[32m+[m[32mvoid fmatrixAeqRenormRotA(float A[][3])[m
+[32m+[m[32m{[m
+[32m+[m	[32mfloat ftmp;					// scratch variable[m
+[32m+[m
+[32m+[m	[32m// normalize the X column of the low pass filtered orientation matrix[m
+[32m+[m	[32mftmp = sqrtf(A[X][X] * A[X][X] + A[Y][X] * A[Y][X] + A[Z][X] * A[Z][X]);[m
+[32m+[m	[32mif (ftmp > CORRUPTMATRIX) {[m
+[32m+[m		[32m// normalize the x column vector[m
+[32m+[m		[32mftmp = 1.0F / ftmp;[m
+[32m+[m		[32mA[X][X] *= ftmp;[m
+[32m+[m		[32mA[Y][X] *= ftmp;[m
+[32m+[m		[32mA[Z][X] *= ftmp;[m
+[32m+[m	[32m} else {[m
+[32m+[m		[32m// set x column vector to {1, 0, 0}[m
+[32m+[m		[32mA[X][X] = 1.0F;[m
+[32m+[m		[32mA[Y][X] = A[Z][X] = 0.0F;[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// force the y column vector to be orthogonal to x using y = y-(x.y)x[m
+[32m+[m	[32mftmp = A[X][X] * A[X][Y] + A[Y][X] * A[Y][Y] + A[Z][X] * A[Z][Y];[m
+[32m+[m	[32mA[X][Y] -= ftmp * A[X][X];[m
+[32m+[m	[32mA[Y][Y] -= ftmp * A[Y][X];[m
+[32m+[m	[32mA[Z][Y] -= ftmp * A[Z][X];[m
+[32m+[m
+[32m+[m	[32m// normalize the y column vector[m
+[32m+[m	[32mftmp = sqrtf(A[X][Y] * A[X][Y] + A[Y][Y] * A[Y][Y] + A[Z][Y] * A[Z][Y]);[m
+[32m+[m	[32mif (ftmp > CORRUPTMATRIX) {[m
+[32m+[m		[32m// normalize the y column vector[m
+[32m+[m		[32mftmp = 1.0F / ftmp;[m
+[32m+[m		[32mA[X][Y] *= ftmp;[m
+[32m+[m		[32mA[Y][Y] *= ftmp;[m
+[32m+[m		[32mA[Z][Y] *= ftmp;[m
+[32m+[m	[32m} else {[m
+[32m+[m		[32m// set y column vector to {0, 1, 0}[m
+[32m+[m		[32mA[Y][Y] = 1.0F;[m
+[32m+[m		[32mA[X][Y] = A[Z][Y] = 0.0F;[m
+[32m+[m	[32m}[m
+[32m+[m
+[32m+[m	[32m// finally set the z column vector to x vector cross y vector (automatically normalized)[m
+[32m+[m	[32mA[X][Z] = A[Y][X] * A[Z][Y] - A[Z][X] * A[Y][Y];[m
+[32m+[m	[32mA[Y][Z] = A[Z][X] * A[X][Y] - A[X][X] * A[Z][Y];[m
+[32m+[m	[32mA[Z][Z] = A[X][X] * A[Y][Y] - A[Y][X] * A[X][Y];[m
+ }[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/src/utils/robot_constants.hpp b/aimbots-src/src/utils/robot_constants.hpp[m
+[1mindex 35dfac33..70ab8d81 100644[m
+[1m--- a/aimbots-src/src/utils/robot_constants.hpp[m
+[1m+++ b/aimbots-src/src/utils/robot_constants.hpp[m
+[36m@@ -7,7 +7,7 @@[m
+ #include "robots/engineer/engineer_constants.hpp"[m
+ [m
+ #elif defined(TARGET_SWERVE_ENGINEER)[m
+[31m-#include "robots/engineer-swerve/swerve_engineer_constants.hpp"[m
+[32m+[m[32m#include "robots/engineer/swerve_engineer_constants.hpp"[m
+ [m
+ #elif defined(TARGET_HERO)[m
+ #include "robots/hero/hero_constants.hpp"[m
+[36m@@ -22,6 +22,10 @@[m
+ #elif defined(TARGET_SWERVE_STANDARD)[m
+ #include "robots/standard/swerve_standard_constants.hpp"[m
+ [m
+[32m+[m[32m#elif defined(TARGET_DART)[m
+[32m+[m[32m#include "robots/dart/dart_constants.hpp"[m
+[32m+[m[32m#include "robots/dart/dart_control_interface.hpp"[m
+[32m+[m
+ // #else[m
+ // #include "robots/standard/standard_constants.hpp"[m
+ // #define TARGET_UNDEFINED[m
+[1mdiff --git a/aimbots-src/src/utils/robot_specific_inc.hpp b/aimbots-src/src/utils/robot_specific_inc.hpp[m
+[1mindex a752bda7..5ce10842 100644[m
+[1m--- a/aimbots-src/src/utils/robot_specific_inc.hpp[m
+[1m+++ b/aimbots-src/src/utils/robot_specific_inc.hpp[m
+[36m@@ -9,8 +9,8 @@[m
+ #include "robots/engineer/engineer_control_interface.hpp"[m
+ [m
+ #elif defined(TARGET_SWERVE_ENGINEER)[m
+[31m-#include "robots/engineer-swerve/swerve_engineer_constants.hpp"[m
+[31m-#include "robots/engineer-swerve/swerve_engineer_control_interface.hpp"[m
+[32m+[m[32m#include "robots/engineer/swerve_engineer_constants.hpp"[m
+[32m+[m[32m#include "robots/engineer/swerve_engineer_control_interface.hpp"[m
+ [m
+ #elif defined(TARGET_HERO)[m
+ #include "robots/hero/hero_constants.hpp"[m
+[36m@@ -26,6 +26,12 @@[m
+ [m
+ #elif defined(TARGET_SWERVE_STANDARD)[m
+ #include "robots/standard/swerve_standard_constants.hpp"[m
+[31m-#include "robots/standard/swerve_standard_control_interface.hpp"[m
+[32m+[m
+[32m+[m[32m#elif defined(TARGET_DART)[m
+[32m+[m[32m#include "robots/dart/dart_constants.hpp"[m
+[32m+[m[32m#include "robots/dart/dart_control_interface.hpp"[m
+[32m+[m[32m// #else[m
+[32m+[m[32m// #include "robots/standard/standard_constants.hpp"[m
+[32m+[m[32m// #define TARGET_UNDEFINED[m
+ [m
+ #endif[m
+\ No newline at end of file[m
+[1mdiff --git a/aimbots-src/test/utils/Math/matrix_test.cpp b/aimbots-src/test/utils/Math/matrix_test.cpp[m
+[1mdeleted file mode 100644[m
+[1mindex d16b5def..00000000[m
+[1m--- a/aimbots-src/test/utils/Math/matrix_test.cpp[m
+[1m+++ /dev/null[m
+[36m@@ -1,52 +0,0 @@[m
+[31m-/*[m
+[31m- * Copyright (c) 2020-2021 Advanced Robotics at the University of Washington <robomstr@uw.edu>[m
+[31m- *[m
+[31m- * This file is part of aimbots-src.[m
+[31m- *[m
+[31m- * aimbots-src is free software: you can redistribute it and/or modify[m
+[31m- * it under the terms of the GNU General Public License as published by[m
+[31m- * the Free Software Foundation, either version 3 of the License, or[m
+[31m- * (at your option) any later version.[m
+[31m- *[m
+[31m- * aimbots-src is distributed in the hope that it will be useful,[m
+[31m- * but WITHOUT ANY WARRANTY; without even the implied warranty of[m
+[31m- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the[m
+[31m- * GNU General Public License for more details.[m
+[31m- *[m
+[31m- * You should have received a copy of the GNU General Public License[m
+[31m- * along with aimbots-src.  If not, see <https://www.gnu.org/licenses/>.[m
+[31m- */[m
+[31m-#include <gtest/gtest.h>[m
+[31m-[m
+[31m-#include "utils/common_types.hpp"[m
+[31m-#include "utils/math/matrix_helpers.hpp"[m
+[31m-[m
+[31m-using ::testing::NiceMock;[m
+[31m-[m
+[31m-TEST(MatrixConstructorTest, rotation_matrix_creates_rot_matricies) {[m
+[31m-    // ON_CALL(c.leftBackWheel, getEncoderUnwrapped);[m
+[31m-[m
+[31m-    // clang-format off[m
+[31m-    //define identity matrix[m
+[31m-    float rotation_array[9] = {1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};[m
+[31m-    //check if any identity returns[m
+[31m-    EXPECT_EQ(Matrix<float, 3, 3>(rotation_array), rotation_matrix(AngleUnit::Degrees, 45, 3));[m
+[31m-            //define Rx[m
+[31m-            rotation_array[0] = 1.0f; rotation_array[1] = 0.0f; rotation_array[2] = 0.0f;[m
+[31m-            rotation_array[3] = 0.0f; rotation_array[4] = c; rotation_array[5] = -s;[m
+[31m-            rotation_array[6] = 0.0f; rotation_array[7] = s; rotation_array[8] = c;[m
+[31m-     EXPECT_EQ(Matrix<float, 3, 3>(rotation_array),rotation_matrix(AngleUnit::Degrees, 45, 0));[m
+[31m-            //define Ry[m
+[31m-            rotation_array[0] = c; rotation_array[1] = 0.0f; rotation_array[2] = s;[m
+[31m-            rotation_array[3] = 0.0f; rotation_array[4] = 1.0; rotation_array[5] = 0.0f;[m
+[31m-            rotation_array[6] = -s; rotation_array[7] = 0.0f; rotation_array[8] = c;[m
+[31m-     EXPECT_EQ(Matrix<float, 3, 3>(rotation_array),rotation_matrix(AngleUnit::Degrees, 45, 1));[m
+[31m-            //define Rz[m
+[31m-            rotation_array[0] = c; rotation_array[1] = -s; rotation_array[2] = 0.0f;[m
+[31m-            rotation_array[3] = s; rotation_array[4] = c; rotation_array[5] = 0.0f;[m
+[31m-            rotation_array[6] = 0.0f; rotation_array[7] = 0.0f; rotation_array[8] = 1.0f;[m
+[31m-     EXPECT_EQ(Matrix<float, 3, 3>(rotation_array),rotation_matrix(AngleUnit::Degrees, 45, 2));[m
+[31m-    // clang-format on[m
+[31m-}[m
+[31m-[m
+[31m-// TEST(hello, world) { EXPECT_EQ(3, sum(1, 2)); }[m
