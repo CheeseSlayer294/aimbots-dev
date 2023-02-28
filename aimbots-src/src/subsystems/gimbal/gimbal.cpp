@@ -131,14 +131,13 @@ void GimbalSubsystem::setPitchMotorOutput(float output) {
     desiredPitchMotorOutput = tap::algorithms::limitVal(output, -GM6020_MAX_OUTPUT, GM6020_MAX_OUTPUT);
 }
 
-float GimbalSubsystem::getCurrentYawAngleFromChassisCenter(AngleUnit unit) const {
+tap::algorithms::ContiguousFloat GimbalSubsystem::getCurrentYawAngleFromChassisCenter(AngleUnit unit) const {
     return tap::algorithms::ContiguousFloat(
                (unit == AngleUnit::Degrees)
-                   ? modm::toDegree(currentChassisRelativeYawAngle.getValue() - modm::toRadian(YAW_START_ANGLE))
-                   : (currentChassisRelativeYawAngle.getValue() - modm::toRadian(YAW_START_ANGLE)),
+                   ? modm::toDegree(modm::toRadian(YAW_START_ANGLE) - currentChassisRelativeYawAngle.getValue())
+                   : (modm::toRadian(YAW_START_ANGLE) - currentChassisRelativeYawAngle.getValue()),
                (unit == AngleUnit::Degrees) ? -180.0f : -M_PI,
-               (unit == AngleUnit::Degrees) ? 180.0f : M_PI)
-        .getValue();
+               (unit == AngleUnit::Degrees) ? 180.0f : M_PI);
 }
 
 float GimbalSubsystem::getCurrentPitchAngleFromChassisCenter(AngleUnit unit) const {

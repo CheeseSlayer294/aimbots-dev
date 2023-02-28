@@ -13,7 +13,8 @@ GimbalChaseCommand::GimbalChaseCommand(
       drivers(drivers),
       gimbal(gimbalSubsystem),
       controller(gimbalController),
-      ballisticsSolver(ballisticsSolver)  //
+      ballisticsSolver(ballisticsSolver)
+      //
 {
     addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(gimbal));
 }
@@ -38,15 +39,20 @@ float timestampDisplay;
 void GimbalChaseCommand::execute() {
     float targetYawAngle = 0.0f;
     float targetPitchAngle = 0.0f;
-
+    
     std::optional<src::Utils::BallisticsSolver::BallisticsSolution> ballisticsSolution = ballisticsSolver->solve();
 
     if (ballisticsSolution != std::nullopt) {
         targetYawAngle = ballisticsSolution->yawAngle;
         targetPitchAngle = ballisticsSolution->pitchAngle;
 
+        // contiguousYawTarget.setValue(targetYawAngle - (M_PI - modm::toRadian(YAW_START_ANGLE)));
+        // contiguousPitchTarget.setValue(targetPitchAngle);
+        
         // ballistics returns angles between [0, 2PI), need to convert idk why
         // targetYawAngle = M_PI_2 + modm::toRadian(YAW_START_ANGLE) - targetYawAngle;
+        
+        // contiguousYawTarget.setValue(contiguousYawTarget.difference(M_PI - modm::toRadian(YAW_START_ANGLE)));
         // targetPitchAngle += modm::toRadian(PITCH_START_ANGLE);
 
         bSolTargetYawDisplay = modm::toDegree(targetYawAngle);
@@ -74,8 +80,8 @@ void GimbalChaseCommand::execute() {
 
     // fieldRelativeYawAngleDisplay = gimbal->getCurrentFieldRelativeYawAngle(AngleUnit::Degrees);
     // fieldRelativeYawAngleDisplay = gimbal->getCurrentYawAngleFromChassisCenter(AngleUnit::Degrees);
-    chassisRelativePitchAngleDisplay = gimbal->getCurrentChassisRelativePitchAngle(AngleUnit::Degrees);
-    chassisRelativeYawAngleDisplay = gimbal->getCurrentYawAngleFromChassisCenter(AngleUnit::Degrees);
+    chassisRelativeYawAngleDisplay = (gimbal->getCurrentYawAngleFromChassisCenter(AngleUnit::Degrees).getValue());
+    chassisRelativePitchAngleDisplay = (gimbal->getCurrentChassisRelativePitchAngle(AngleUnit::Degrees));
 
     //controller->runYawController(AngleUnit::Radians, targetYawAngle, false);
     //controller->runPitchController(AngleUnit::Radians, targetPitchAngle, false);

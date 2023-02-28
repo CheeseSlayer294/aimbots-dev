@@ -65,7 +65,7 @@ public:
                                             : currentChassisRelativePitchAngle.getValue();
     }
 
-    float getCurrentYawAngleFromChassisCenter(AngleUnit) const;
+    tap::algorithms::ContiguousFloat getCurrentYawAngleFromChassisCenter(AngleUnit) const;
     float getCurrentPitchAngleFromChassisCenter(AngleUnit) const;
 
     inline tap::algorithms::ContiguousFloat const& getCurrentChassisRelativeYawAngleAsContiguousFloat() const {

@@ -36,7 +36,7 @@ void ChassisFollowGimbalCommand::execute() {
     Chassis::Helper::getUserDesiredInput(drivers, chassis, &desiredX, &desiredY, &desiredRotation);
 
     if (gimbal->isOnline()) {  // if the gimbal is online, follow the gimbal's yaw
-        float yawAngleFromChassisCenter = gimbal->getCurrentYawAngleFromChassisCenter(AngleUnit::Radians);
+        float yawAngleFromChassisCenter = gimbal->getCurrentYawAngleFromChassisCenter(AngleUnit::Radians).getValue();
 
         // Find rotation correction power
         rotationController.runController(yawAngleFromChassisCenter, RADPS_TO_RPM * drivers->fieldRelativeInformant.getGz());

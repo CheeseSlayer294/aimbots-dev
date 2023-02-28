@@ -64,6 +64,7 @@ void EnemyDataConversion::updateEnemyInfo(Vector3f position, uint32_t frameCaptu
     Matrix<float, 4, 4> T_gimb2chas = src::Utils::MatrixHelper::transform_matrix(R_gimb2chas, P_gimb2chas);
 
     // save transformed position to data point
+    // what coordinate space are we transforming TO? what space were we previously in?
     enemyPositionDisplay_gimbal = src::Utils::MatrixHelper::P_crop_extend(
         T_cam2gimb * src::Utils::MatrixHelper::P_crop_extend(currentData.position.asMatrix()));
     currentData.position = src::Utils::MatrixHelper::P_crop_extend(
@@ -355,6 +356,7 @@ float theta_display;
 float phi_display;
 
 void EnemyDataConversion::updateTransformations() {
+    // float theta = gimbal->getCurrentYawAngleFromChassisCenter(AngleUnit::Radians).getValue();
     float theta = gimbal->getCurrentChassisRelativeYawAngle(AngleUnit::Radians) - modm::toRadian(YAW_START_ANGLE);
     float phi = gimbal->getCurrentChassisRelativePitchAngle(AngleUnit::Radians) - modm::toRadian(PITCH_START_ANGLE);
     theta_display = theta;
