@@ -1,4 +1,5 @@
 #pragma once
+#ifndef NO_CHASSIS
 
 #include "tap/control/chassis/chassis_subsystem_interface.hpp"
 #include "tap/motor/m3508_constants.hpp"
@@ -186,3 +187,4 @@ public:
 };
 
 };  // namespace src::Chassis
+#endif

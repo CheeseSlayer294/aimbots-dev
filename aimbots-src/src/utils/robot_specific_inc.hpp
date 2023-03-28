@@ -28,4 +28,7 @@
 #include "robots/standard/swerve_standard_constants.hpp"
 #include "robots/standard/swerve_standard_control_interface.hpp"
 
+#elif defined(TARGET_DART)
+#include "robots/dart/dart_constants.hpp"
+
 #endif

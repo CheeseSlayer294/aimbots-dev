@@ -1,3 +1,5 @@
+#ifndef NO_CHASSIS
+
 #include "subsystems/chassis/chassis.hpp"
 
 #include "tap/communication/gpio/leds.hpp"
@@ -276,3 +278,4 @@ float ChassisSubsystem::calculateRotationLimitedTranslationalWheelspeed(float ch
     return rTranslationalGain * maxWheelSpeed;
 }
 };  // namespace src::Chassis
+#endif
