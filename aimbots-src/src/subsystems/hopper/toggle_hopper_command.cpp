@@ -24,6 +24,11 @@ void ToggleHopperCommand::execute() {
 
 void ToggleHopperCommand::end(bool) {
 }
+/*
+void ToggleHopperCOmmand::changeState(){
+
+}
+*/
 
 bool ToggleHopperCommand::isReady() {
     return true;
