@@ -17,6 +17,7 @@ class ToggleHopperCommand : public TapCommand {
     void initialize() override;
     void execute() override;
     void end(bool interrupted) override;
+    void changeState() override;
 
     bool isReady() override;
     bool isFinished() const override;
