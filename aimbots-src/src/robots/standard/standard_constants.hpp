@@ -10,7 +10,7 @@
 static constexpr uint8_t DRIVEN_WHEEL_COUNT = 4;
 static constexpr uint8_t MOTORS_PER_WHEEL = 1;
 
-static constexpr uint8_t SHOOTER_MOTOR_COUNT = 2;
+static constexpr uint8_t SHOOTER_MOTOR_COUNT = 6;
 
 static constexpr float DEV_BOARD_YAW_OFFSET = 180.0f;  // in radians
 
@@ -129,8 +129,8 @@ static constexpr uint16_t shooter_speed_array[6] = {
 
 static const Matrix<uint16_t, 3, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);
 
-static constexpr float FEEDER_DEFAULT_RPM = 3000.0f;            //FEEDER RPM: 3000.0f
-static constexpr int DEFAULT_BURST_LENGTH = 5;  // balls
+static constexpr float FEEDER_DEFAULT_RPM = 3000.0f;  // FEEDER RPM: 3000.0f
+static constexpr int DEFAULT_BURST_LENGTH = 5;        // balls
 
 // CAN Bus 2
 static constexpr CANBus CHASSIS_BUS = CANBus::CAN_BUS2;
@@ -141,20 +141,28 @@ static constexpr MotorID RIGHT_FRONT_WHEEL_ID = MotorID::MOTOR3;
 static constexpr MotorID RIGHT_BACK_WHEEL_ID = MotorID::MOTOR4;
 
 // CAN Bus 1
-static constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS1;
+static constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS2;
 static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS1;
-static constexpr CANBus FEED_BUS = CANBus::CAN_BUS1;
+static constexpr CANBus FEED_BUS = CANBus::CAN_BUS2;
 
 static constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR5;
 static constexpr MotorID PITCH_MOTOR_ID = MotorID::MOTOR6;
-//
+
 static constexpr MotorID FEEDER_ID = MotorID::MOTOR7;
 //
-static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR3;
-static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR4;
+static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR1;  // middle left
+static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR2;  // middle right
+static constexpr MotorID SHOOTER_3_ID = MotorID::MOTOR3;  // bottom right
+static constexpr MotorID SHOOTER_4_ID = MotorID::MOTOR4;  // bottom left
+static constexpr MotorID SHOOTER_5_ID = MotorID::MOTOR5;  // top left
+static constexpr MotorID SHOOTER_6_ID = MotorID::MOTOR6;  // top right
 
 static constexpr bool SHOOTER_1_DIRECTION = false;
 static constexpr bool SHOOTER_2_DIRECTION = true;
+static constexpr bool SHOOTER_3_DIRECTION = true;
+static constexpr bool SHOOTER_4_DIRECTION = false;
+static constexpr bool SHOOTER_5_DIRECTION = false;
+static constexpr bool SHOOTER_6_DIRECTION = true;
 
 static constexpr bool FEEDER_DIRECTION = false;
 
