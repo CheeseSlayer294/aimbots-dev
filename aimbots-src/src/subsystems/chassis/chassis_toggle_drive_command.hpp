@@ -1,7 +1,8 @@
 #pragma once
 
-#ifndef ENGINEER
 #include "subsystems/chassis/chassis.hpp"
+#ifndef NO_CHASSIS
+
 #include "subsystems/chassis/chassis_follow_gimbal_command.hpp"
 #include "subsystems/chassis/chassis_tokyo_command.hpp"
 #include "subsystems/gimbal/gimbal.hpp"

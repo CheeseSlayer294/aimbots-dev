@@ -3,6 +3,8 @@
 #include <drivers.hpp>
 #include <subsystems/chassis/chassis.hpp>
 
+#ifndef NO_CHASSIS
+
 namespace src::Chassis::Helper {
 
 /**
@@ -23,3 +25,5 @@ void rescaleDesiredInputToPowerLimitedSpeeds(
     float* desiredRotation);
 
 }  // namespace src::Chassis::Helper
+
+#endif

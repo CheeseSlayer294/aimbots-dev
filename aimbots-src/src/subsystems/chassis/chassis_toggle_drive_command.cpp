@@ -1,5 +1,5 @@
 #include "chassis_toggle_drive_command.hpp"
-#ifndef ENGINEER
+#ifndef NO_CHASSIS
 namespace src::Chassis {
 
 ChassisToggleDriveCommand::ChassisToggleDriveCommand(src::Drivers* drivers, ChassisSubsystem* chassis, Gimbal::GimbalSubsystem* gimbal)
@@ -43,4 +43,5 @@ bool ChassisToggleDriveCommand::isReady() { return true; }
 bool ChassisToggleDriveCommand::isFinished() const { return false; }
 
 }  // namespace src::Chassis
+
 #endif

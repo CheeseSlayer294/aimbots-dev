@@ -12,15 +12,15 @@
 #include "tap/control/setpoint/commands/calibrate_command.hpp"
 #include "tap/control/toggle_command_mapping.hpp"
 //
-// #include "subsystems/feeder/feeder.hpp"
-// #include "subsystems/feeder/full_auto_feeder_command.hpp"
-// #include "subsystems/feeder/stop_feeder_command.hpp"
+#include "subsystems/feeder/feeder.hpp"
+#include "subsystems/feeder/full_auto_feeder_command.hpp"
+#include "subsystems/feeder/stop_feeder_command.hpp"
 //
-// #include "subsystems/gimbal/controllers/gimbal_chassis_relative_controller.hpp"
+#include "subsystems/gimbal/controllers/gimbal_chassis_relative_controller.hpp"
 // #include "subsystems/gimbal/controllers/gimbal_field_relative_controller.hpp"
-// #include "subsystems/gimbal/gimbal.hpp"
+#include "subsystems/gimbal/gimbal.hpp"
 // #include "subsystems/gimbal/gimbal_chase_command.hpp"
-// #include "subsystems/gimbal/gimbal_control_command.hpp"
+#include "subsystems/gimbal/gimbal_control_command.hpp"
 // #include "subsystems/gimbal/gimbal_field_relative_control_command.hpp"
 //
 #include "subsystems/shooter/brake_shooter_command.hpp"
@@ -28,17 +28,9 @@
 #include "subsystems/shooter/shooter.hpp"
 #include "subsystems/shooter/stop_shooter_command.hpp"
 #include "subsystems/shooter/stop_shooter_comprised_command.hpp"
-//
-// #include "subsystems/hopper/close_hopper_command.hpp"
-// #include "subsystems/hopper/hopper.hpp"
-// #include "subsystems/hopper/open_hopper_command.hpp"
-// #include "subsystems/hopper/toggle_hopper_command.hpp"
-//
-// #include "subsystems/gui/gui_display.hpp"
-// #include "subsystems/gui/gui_display_command.hpp"
 
-// using namespace src::Feeder;
-// using namespace src::Gimbal;
+using namespace src::Feeder;
+using namespace src::Gimbal;
 using namespace src::Shooter;
 // using namespace src::Hopper;
 // using namespace src::GUI;
@@ -58,49 +50,25 @@ using namespace tap::communication::serial;
 namespace DartControl {
 
 // Define subsystems here ------------------------------------------------
-// FeederSubsystem feeder(drivers());
-// GimbalSubsystem gimbal(drivers());
+FeederSubsystem feeder(drivers());
+GimbalSubsystem gimbal(drivers());
 ShooterSubsystem shooter(drivers());
-// HopperSubsystem hopper(drivers());
-// GUI_DisplaySubsystem gui(drivers());
 
 // Robot Specific Controllers ------------------------------------------------
+GimbalChassisRelativeController gimbalChassisRelativeController(&gimbal);
 
 // Define commands here ---------------------------------------------------
-// GimbalControlCommand gimbalControlCommand(drivers(), &gimbal, &gimbalChassisRelativeController);
+GimbalControlCommand gimbalControlCommand(drivers(), &gimbal, &gimbalChassisRelativeController);
 
-// FullAutoFeederCommand runFeederCommand(drivers(), &feeder, FEEDER_DEFAULT_RPM, 0.80f);
-// FullAutoFeederCommand runFeederCommandFromMouse(drivers(), &feeder, FEEDER_DEFAULT_RPM, 0.80f);
-// StopFeederCommand stopFeederCommand(drivers(), &feeder);
+FullAutoFeederCommand runFeederCommand(drivers(), &feeder, FEEDER_DEFAULT_RPM, 0.80f);
+FullAutoFeederCommand runFeederCommandFromMouse(drivers(), &feeder, FEEDER_DEFAULT_RPM, 0.80f);
+StopFeederCommand stopFeederCommand(drivers(), &feeder);
 
 RunShooterCommand runShooterCommand(drivers(), &shooter);
 RunShooterCommand runShooterWithFeederCommand(drivers(), &shooter);
 StopShooterComprisedCommand stopShooterComprisedCommand(drivers(), &shooter);
 
-// OpenHopperCommand openHopperCommand(drivers(), &hopper);
-// OpenHopperCommand openHopperCommand2(drivers(), &hopper);
-// CloseHopperCommand closeHopperCommand(drivers(), &hopper);
-// CloseHopperCommand closeHopperCommand2(drivers(), &hopper);
-// ToggleHopperCommand toggleHopperCommand(drivers(), &hopper);
-
-// GUI_DisplayCommand guiDisplayCommand(drivers(), &gui);
-
 // Define command mappings here -------------------------------------------
-HoldCommandMapping leftSwitchMid(
-    drivers(),
-    {},
-    // {&chassisToggleDriveCommand, &gimbalFieldRelativeControlCommand},
-    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::MID));
-
-// Enables both chassis and gimbal control and closes hopper
-HoldCommandMapping leftSwitchUp(
-    drivers(),
-    {},
-    // {&chassisTokyoCommand, &gimbalFieldRelativeControlCommand2},
-    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
-
-// opens hopper
-HoldCommandMapping rightSwitchDown(drivers(), {}, RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN));
 
 // Runs shooter only and closes hopper
 HoldCommandMapping rightSwitchMid(drivers(), {&runShooterCommand}, RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::MID));
@@ -108,45 +76,27 @@ HoldCommandMapping rightSwitchMid(drivers(), {&runShooterCommand}, RemoteMapStat
 // Runs shooter with feeder and closes hopper
 HoldRepeatCommandMapping rightSwitchUp(
     drivers(),
-    {},
-    // {&runFeederCommand, &runShooterWithFeederCommand, &closeHopperCommand2},
+    {&runFeederCommand, &runShooterWithFeederCommand},
     RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP),
     true);
 
-HoldCommandMapping leftClickMouse(drivers(), {}, RemoteMapState(RemoteMapState::MouseButton::LEFT));
-
-// This is the command for starting up the GUI.  Uncomment once subsystem does something more useful.
-/*PressCommandMapping ctrlC(
-    drivers(),
-    {&guiDisplayCommand},
-    RemoteMapState({Remote::Key::CTRL, Remote::Key::C}));*/
-
-// HoldCommandMapping rightClickMouse(
-//     drivers(),
-//     {&},
-//     RemoteMapState(RemoteMapState::MouseButton::LEFT));
-
 // Register subsystems here -----------------------------------------------
 void registerSubsystems(src::Drivers *drivers) {
-    // drivers->commandScheduler.registerSubsystem(&feeder);
-    // drivers->commandScheduler.registerSubsystem(&gimbal);
+    drivers->commandScheduler.registerSubsystem(&feeder);
+    drivers->commandScheduler.registerSubsystem(&gimbal);
     drivers->commandScheduler.registerSubsystem(&shooter);
-    // drivers->commandScheduler.registerSubsystem(&hopper);
-    // drivers->commandScheduler.registerSubsystem(&gui);
 }
 
 // Initialize subsystems here ---------------------------------------------
 void initializeSubsystems() {
-    // feeder.initialize();
-    // gimbal.initialize();
+    feeder.initialize();
+    gimbal.initialize();
     shooter.initialize();
-    // hopper.initialize();
-    // gui.initialize();
 }
 
 // Set default command here -----------------------------------------------
 void setDefaultCommands(src::Drivers *) {
-    // feeder.setDefaultCommand(&stopFeederCommand);
+    feeder.setDefaultCommand(&stopFeederCommand);
     shooter.setDefaultCommand(&stopShooterComprisedCommand);
 }
 
@@ -161,13 +111,8 @@ void startupCommands(src::Drivers *) {
 
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
-    drivers->commandMapper.addMap(&leftSwitchUp);
-    drivers->commandMapper.addMap(&leftSwitchMid);
     drivers->commandMapper.addMap(&rightSwitchUp);
     drivers->commandMapper.addMap(&rightSwitchMid);
-    drivers->commandMapper.addMap(&rightSwitchDown);
-    drivers->commandMapper.addMap(&leftClickMouse);
-    // drivers->commandMapper.addMap(&ctrlC);
 }
 
 }  // namespace DartControl

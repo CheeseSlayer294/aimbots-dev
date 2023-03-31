@@ -1,10 +1,10 @@
-#ifndef NO_CHASSIS
-
 #include "subsystems/chassis/chassis.hpp"
 
 #include "tap/communication/gpio/leds.hpp"
 
 #include "utils/common_types.hpp"
+#include "utils/robot_specific_inc.hpp"
+#ifndef NO_CHASSIS
 
 #include "drivers.hpp"
 
@@ -202,7 +202,6 @@ void ChassisSubsystem::calculateMecanum(float x, float y, float r, float maxWhee
 
     desiredRotation = r;
 }
-
 #endif
 
 #ifdef SWERVE
@@ -278,4 +277,5 @@ float ChassisSubsystem::calculateRotationLimitedTranslationalWheelspeed(float ch
     return rTranslationalGain * maxWheelSpeed;
 }
 };  // namespace src::Chassis
+
 #endif

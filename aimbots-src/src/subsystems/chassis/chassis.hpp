@@ -1,5 +1,4 @@
 #pragma once
-#ifndef NO_CHASSIS
 
 #include "tap/control/chassis/chassis_subsystem_interface.hpp"
 #include "tap/motor/m3508_constants.hpp"
@@ -7,6 +6,7 @@
 #include "utils/common_types.hpp"
 #include "utils/motion/power_limiter/power_limiter.hpp"
 #include "utils/robot_specific_inc.hpp"
+#ifndef NO_CHASSIS
 
 #include "drivers.hpp"
 
@@ -187,4 +187,5 @@ public:
 };
 
 };  // namespace src::Chassis
+
 #endif

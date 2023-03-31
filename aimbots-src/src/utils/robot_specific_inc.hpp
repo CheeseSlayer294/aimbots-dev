@@ -30,5 +30,6 @@
 
 #elif defined(TARGET_DART)
 #include "robots/dart/dart_constants.hpp"
+#include "robots/dart/dart_control_interface.hpp"
 
 #endif
