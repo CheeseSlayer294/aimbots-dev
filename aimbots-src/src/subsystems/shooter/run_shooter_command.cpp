@@ -9,7 +9,7 @@
 
 #include "drivers.hpp"
 
-//#ifndef TARGET_ENGINEER
+// #ifndef TARGET_ENGINEER
 
 namespace src::Shooter {
 
@@ -26,12 +26,12 @@ void RunShooterCommand::initialize() {
 tap::communication::serial::RefSerialData::Rx::TurretData refSysRobotTurretDataDisplay;
 
 void RunShooterCommand::execute() {
-    using RefSerialRxData = tap::communication::serial::RefSerialData::Rx;
-
     // defaults to slowest usable speed for robot
     uint16_t flywheelRPM = SHOOTER_SPEED_MATRIX[0][1];
-    uint16_t refSpeedLimit = 0;
 
+#if defined(TARGET_STANDARD) || defined(TARGET_SENTRY)
+    using RefSerialRxData = tap::communication::serial::RefSerialData::Rx;
+    uint16_t refSpeedLimit = 0;
     auto refSysRobotTurretData = drivers->refSerial.getRobotData().turret;
     refSysRobotTurretDataDisplay = refSysRobotTurretData;
 
@@ -46,7 +46,7 @@ void RunShooterCommand::execute() {
             refSpeedLimit = refSysRobotTurretData.barrelSpeedLimit17ID2;
             break;
         }
-            // #endif
+
         case RefSerialRxData::MechanismID::TURRET_42MM: {
             refSpeedLimit = refSysRobotTurretData.barrelSpeedLimit42;
             break;
@@ -61,6 +61,7 @@ void RunShooterCommand::execute() {
             break;
         }
     }
+#endif
 
     shooter->ForAllShooterMotors(&ShooterSubsystem::setTargetRPM, static_cast<float>(flywheelRPM));
     shooter->ForAllShooterMotors(&ShooterSubsystem::updateMotorVelocityPID);
@@ -72,10 +73,7 @@ void RunShooterCommand::end(bool) {
 
 bool RunShooterCommand::isReady() { return true; }
 
-bool RunShooterCommand::isFinished() const {
-    return false;
-}
+bool RunShooterCommand::isFinished() const { return false; }
 }  // namespace src::Shooter
 
 #endif
-

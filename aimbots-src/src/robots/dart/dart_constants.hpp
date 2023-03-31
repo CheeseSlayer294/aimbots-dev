@@ -87,17 +87,8 @@ static const Matrix<uint16_t, 3, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);
 // static constexpr int DEFAULT_BURST_LENGTH = 5;        // balls
 
 // CAN Bus 1
-static constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS1;
-
-static constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR5;
-static constexpr MotorID PITCH_MOTOR_ID = MotorID::MOTOR6;
-
-static constexpr bool YAW_DIRECTION = true;
-static constexpr bool PITCH_DIRECTION = true;
-
-// CAN Bus 2
-static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS2;
-static constexpr CANBus FEED_BUS = CANBus::CAN_BUS2;
+static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS1;
+static constexpr CANBus FEED_BUS = CANBus::CAN_BUS1;
 
 static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR1;  // middle left
 static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR2;  // middle right
@@ -115,6 +106,14 @@ static constexpr bool FEEDER_DIRECTION = false;
 
 static constexpr float FEEDER_DEFAULT_RPM = 3000.0f;  // FEEDER RPM: 3000.0f
 
+// CAN Bus 2
+static constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS2;
+
+static constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR5;
+static constexpr MotorID PITCH_MOTOR_ID = MotorID::MOTOR6;
+
+static constexpr bool YAW_DIRECTION = true;
+static constexpr bool PITCH_DIRECTION = true;
 /**
  * This max output is measured in the c620 robomaster translated current.
  * Per the datasheet, the controllable current range is -16384 ~ 0 ~ 16384.

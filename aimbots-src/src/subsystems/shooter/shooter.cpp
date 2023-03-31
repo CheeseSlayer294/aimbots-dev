@@ -15,12 +15,17 @@ ShooterSubsystem::ShooterSubsystem(tap::Drivers* drivers)
       flywheel2(drivers, SHOOTER_2_ID, SHOOTER_BUS, SHOOTER_2_DIRECTION, "Flywheel Two"),
       flywheel1PID(SHOOTER_VELOCITY_PID_CONFIG),
       flywheel2PID(SHOOTER_VELOCITY_PID_CONFIG),
-#ifdef TARGET_SENTRY
-      flywheel3(drivers, SHOOTER_3_ID, SHOOTER_BUS, SHOOTER_3_DIRECTION, "Flywheel Three"),
-      flywheel4(drivers, SHOOTER_4_ID, SHOOTER_BUS, SHOOTER_4_DIRECTION, "Flywheel Four"),
+#if defined(TARGET_SENTRY) || defined(TARGET_DART)
+      flywheel3(drivers, SHOOTER_3_ID, SHOOTER_BUS, SHOOTER_1_DIRECTION, "Flywheel Three"),
+      flywheel4(drivers, SHOOTER_4_ID, SHOOTER_BUS, SHOOTER_2_DIRECTION, "Flywheel Four"),
       flywheel3PID(SHOOTER_VELOCITY_PID_CONFIG),
       flywheel4PID(SHOOTER_VELOCITY_PID_CONFIG),
-
+#endif
+#ifdef TARGET_DART
+      flywheel5(drivers, SHOOTER_5_ID, SHOOTER_BUS, SHOOTER_1_DIRECTION, "Flywheel Five"),
+      flywheel6(drivers, SHOOTER_6_ID, SHOOTER_BUS, SHOOTER_2_DIRECTION, "Flywheel Six"),
+      flywheel5PID(SHOOTER_VELOCITY_PID_CONFIG),
+      flywheel6PID(SHOOTER_VELOCITY_PID_CONFIG),
 #endif
       targetRPMs(Matrix<float, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
       desiredOutputs(Matrix<int32_t, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
@@ -32,11 +37,21 @@ ShooterSubsystem::ShooterSubsystem(tap::Drivers* drivers)
     motors[LEFT][0] = &flywheel2;   // BOT_RIGHT == LEFT
     velocityPIDs[RIGHT][0] = &flywheel1PID;
     velocityPIDs[LEFT][0] = &flywheel2PID;
-#ifdef TARGET_SENTRY
+#if defined(TARGET_SENTRY)
     motors[TOP_LEFT][0] = &flywheel3;
     motors[BOT_LEFT][0] = &flywheel4;
     velocityPIDs[TOP_LEFT][0] = &flywheel3PID;
     velocityPIDs[BOT_LEFT][0] = &flywheel4PID;
+#endif
+#ifdef TARGET_DART
+    motors[BOT_RIGHT][0] = &flywheel3;
+    motors[BOT_LEFT][0] = &flywheel4;
+    velocityPIDs[BOT_RIGHT][0] = &flywheel3PID;
+    velocityPIDs[BOT_LEFT][0] = &flywheel4PID;
+    motors[TOP_LEFT][0] = &flywheel5;
+    motors[TOP_RIGHT][0] = &flywheel6;
+    velocityPIDs[TOP_LEFT][0] = &flywheel5PID;
+    velocityPIDs[TOP_RIGHT][0] = &flywheel6PID;
 #endif
 }
 
@@ -59,23 +74,23 @@ float FWBotLeft = 0.0f;  // BOT_LEFT
 // Update the actual RPMs of the motors; the calculation is called from ShooterCommand
 void ShooterSubsystem::refresh() {
     // Debug info
-    if (flywheel1.isMotorOnline()) {
-        shaftSpeedDisplay = flywheel1.getShaftRPM();
-        PIDoutDisplay = flywheel1PID.getOutput();
+    //     if (flywheel1.isMotorOnline()) {
+    //         shaftSpeedDisplay = flywheel1.getShaftRPM();
+    //         PIDoutDisplay = flywheel1PID.getOutput();
 
-        FWRight1 = flywheel1.getShaftRPM();
-    }
-    if (flywheel2.isMotorOnline()) {
-        FWLeft1 = flywheel2.getShaftRPM();
-    }
-#ifdef TARGET_SENTRY
-    if (flywheel3.isMotorOnline()) {
-        FWTopLeft = flywheel3.getShaftRPM();
-    }
-    if (flywheel4.isMotorOnline()) {
-        FWBotLeft = flywheel4.getShaftRPM();
-    }
-#endif
+    //         FWRight1 = flywheel1.getShaftRPM();
+    //     }
+    //     if (flywheel2.isMotorOnline()) {
+    //         FWLeft1 = flywheel2.getShaftRPM();
+    //     }
+    // #ifdef TARGET_SENTRY
+    //     if (flywheel3.isMotorOnline()) {
+    //         FWTopLeft = flywheel3.getShaftRPM();
+    //     }
+    //     if (flywheel4.isMotorOnline()) {
+    //         FWBotLeft = flywheel4.getShaftRPM();
+    //     }
+    // #endif
 
     ForAllShooterMotors(&ShooterSubsystem::setDesiredOutputToMotor);
 }
