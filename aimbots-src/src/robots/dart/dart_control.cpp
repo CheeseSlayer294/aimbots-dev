@@ -67,7 +67,6 @@ StopFeederCommand stopFeederCommand(drivers(), &feeder);
 RunShooterCommand runShooterCommand(drivers(), &shooter);
 RunShooterCommand runShooterWithFeederCommand(drivers(), &shooter);
 StopShooterComprisedCommand stopShooterComprisedCommand(drivers(), &shooter);
-StopShooterCommand stopShooterCommand(drivers(), &shooter);
 
 // Define command mappings here -------------------------------------------
 
@@ -97,7 +96,7 @@ void initializeSubsystems() {
 // Set default command here -----------------------------------------------
 void setDefaultCommands(src::Drivers *) {
     feeder.setDefaultCommand(&stopFeederCommand);
-    shooter.setDefaultCommand(&stopShooterCommand);
+    shooter.setDefaultCommand(&stopShooterComprisedCommand);
 }
 
 // Set commands scheduled on startup

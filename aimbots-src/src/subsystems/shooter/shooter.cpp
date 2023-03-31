@@ -16,14 +16,14 @@ ShooterSubsystem::ShooterSubsystem(tap::Drivers* drivers)
       flywheel1PID(SHOOTER_VELOCITY_PID_CONFIG),
       flywheel2PID(SHOOTER_VELOCITY_PID_CONFIG),
 #if defined(TARGET_SENTRY) || defined(TARGET_DART)
-      flywheel3(drivers, SHOOTER_3_ID, SHOOTER_BUS, SHOOTER_1_DIRECTION, "Flywheel Three"),
-      flywheel4(drivers, SHOOTER_4_ID, SHOOTER_BUS, SHOOTER_2_DIRECTION, "Flywheel Four"),
+      flywheel3(drivers, SHOOTER_3_ID, SHOOTER_BUS, SHOOTER_3_DIRECTION, "Flywheel Three"),
+      flywheel4(drivers, SHOOTER_4_ID, SHOOTER_BUS, SHOOTER_4_DIRECTION, "Flywheel Four"),
       flywheel3PID(SHOOTER_VELOCITY_PID_CONFIG),
       flywheel4PID(SHOOTER_VELOCITY_PID_CONFIG),
 #endif
 #ifdef TARGET_DART
-      flywheel5(drivers, SHOOTER_5_ID, SHOOTER_BUS, SHOOTER_1_DIRECTION, "Flywheel Five"),
-      flywheel6(drivers, SHOOTER_6_ID, SHOOTER_BUS, SHOOTER_2_DIRECTION, "Flywheel Six"),
+      flywheel5(drivers, SHOOTER_5_ID, SHOOTER_BUS, SHOOTER_5_DIRECTION, "Flywheel Five"),
+      flywheel6(drivers, SHOOTER_6_ID, SHOOTER_BUS, SHOOTER_6_DIRECTION, "Flywheel Six"),
       flywheel5PID(SHOOTER_VELOCITY_PID_CONFIG),
       flywheel6PID(SHOOTER_VELOCITY_PID_CONFIG),
 #endif

@@ -129,8 +129,8 @@ static constexpr uint16_t shooter_speed_array[6] = {
 
 static const Matrix<uint16_t, 3, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);
 
-static constexpr float FEEDER_DEFAULT_RPM = 3000.0f;            //FEEDER RPM: 3000.0f
-static constexpr int DEFAULT_BURST_LENGTH = 5;  // balls
+static constexpr float FEEDER_DEFAULT_RPM = 3000.0f;  // FEEDER RPM: 3000.0f
+static constexpr int DEFAULT_BURST_LENGTH = 5;        // balls
 
 // CAN Bus 2
 static constexpr CANBus CHASSIS_BUS = CANBus::CAN_BUS2;
