@@ -11,6 +11,7 @@ project.xml.log
 .vscode/.cortex-debug.registers.state.json
 .vscode/dryrun.log
 .vscode/targets.log
+.vscode/
 .sconsign.dblite
 .robot_type.txt
 
