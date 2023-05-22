@@ -41,6 +41,10 @@
 //
 #include "informants/communication/communication_response_handler.hpp"
 #include "informants/communication/communication_response_subsytem.hpp"
+//
+#include "utils/display/client_display_command.hpp"
+#include "utils/display/client_display_subsystem.hpp"
+//
 
 using namespace src::Chassis;
 using namespace src::Feeder;
@@ -49,6 +53,8 @@ using namespace src::Shooter;
 using namespace src::Hopper;
 using namespace src::Communication;
 using namespace src::RobotStates;
+using namespace src::utils::display;
+
 /*
  * NOTE: We are using the DoNotUse_getDrivers() function here
  *      because this file defines all subsystems and command
@@ -70,8 +76,7 @@ GimbalSubsystem gimbal(drivers());
 ShooterSubsystem shooter(drivers());
 HopperSubsystem hopper(drivers());
 CommunicationResponseSubsytem response(*drivers());
-// CommunicationResponseHandler responseHandler(*drivers());
-// RobotStatesSubsytem robotStates(*drivers());
+ClientDisplaySubsystem clientDisplay(*drivers());
 
 // Robot Specific Controllers ------------------------------------------------
 GimbalChassisRelativeController gimbalChassisRelativeController(&gimbal);
@@ -103,6 +108,10 @@ CloseHopperCommand closeHopperCommand2(drivers(), &hopper);
 ToggleHopperCommand toggleHopperCommand(drivers(), &hopper);
 
 CommunicationResponseHandler responseHandler(*drivers());
+
+// client display
+ClientDisplayCommand clientDisplayCommand(*drivers(), drivers()->commandScheduler, clientDisplay);
+
 // Define command mappings here -------------------------------------------
 HoldCommandMapping leftSwitchMid(
     drivers(),
@@ -133,6 +142,11 @@ HoldRepeatCommandMapping rightSwitchUp(
 
 HoldCommandMapping leftClickMouse(drivers(), {&runFeederCommandFromMouse}, RemoteMapState(RemoteMapState::MouseButton::LEFT));
 
+// The user can press b+ctrl when the remote right switch is in the down position to restart the
+// client display command. This is necessary since we don't know when the robot is connected to the
+// server and thus don't know when to start sending the initial HUD graphics.
+// PressCommandMapping bCtrlPressed(drivers(), {&clientDisplayCommand}, RemoteMapState({Remote::Key::CTRL, Remote::Key::B}));
+
 // HoldCommandMapping rightClickMouse(
 //     drivers(),
 //     {&},
@@ -146,6 +160,7 @@ void registerSubsystems(src::Drivers *drivers) {
     drivers->commandScheduler.registerSubsystem(&shooter);
     drivers->commandScheduler.registerSubsystem(&hopper);
     drivers->commandScheduler.registerSubsystem(&response);
+    drivers->commandScheduler.registerSubsystem(&clientDisplay);
 }
 
 // Initialize subsystems here ---------------------------------------------
@@ -156,6 +171,7 @@ void initializeSubsystems() {
     shooter.initialize();
     hopper.initialize();
     response.initialize();
+    clientDisplay.initialize();
 }
 
 // Set default command here -----------------------------------------------
@@ -172,6 +188,7 @@ void startupCommands(src::Drivers *drivers) {
     //       that will move all the parts so we
     //       can make sure they're fully operational.
     drivers->refSerial.attachRobotToRobotMessageHandler(SENTRY_RESPONSE_MESSAGE_ID, &responseHandler);
+    drivers->commandScheduler.addCommand(&clientDisplayCommand);
 }
 
 // Register IO mappings here -----------------------------------------------
