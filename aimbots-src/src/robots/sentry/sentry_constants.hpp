@@ -2,10 +2,12 @@
 #include "utils/common_types.hpp"
 #include "utils/math/matrix_helpers.hpp"
 
+#define TOKYO_COMPATIBLE
+
 /**
  * @brief Defines the number of motors created for the chassis.
  */
-static constexpr uint8_t DRIVEN_WHEEL_COUNT = 1;
+static constexpr uint8_t DRIVEN_WHEEL_COUNT = 4;
 static constexpr uint8_t MOTORS_PER_WHEEL = 1;
 
 static constexpr uint8_t SHOOTER_MOTOR_COUNT = 4;
@@ -116,24 +118,26 @@ static constexpr int DEFAULT_BURST_LENGTH = 10;  // total balls in burst
 static constexpr int MAX_BURST_LENGTH = 20;
 static constexpr int MIN_BURST_LENGTH = 4;
 
+// CAN Bus 2
+static constexpr CANBus CHASSIS_BUS = CANBus::CAN_BUS2;
+
+static constexpr MotorID LEFT_BACK_WHEEL_ID = MotorID::MOTOR1;
+static constexpr MotorID LEFT_FRONT_WHEEL_ID = MotorID::MOTOR2;
+static constexpr MotorID RIGHT_FRONT_WHEEL_ID = MotorID::MOTOR3;
+static constexpr MotorID RIGHT_BACK_WHEEL_ID = MotorID::MOTOR4;
+
 // CAN Bus 1
-static constexpr MotorID RAIL_WHEEL_ID = MotorID::MOTOR3;
-static constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR5;
-static constexpr MotorID PITCH_MOTOR_ID = MotorID::MOTOR6;
-static constexpr MotorID FEEDER_ID = MotorID::MOTOR8;
-
-static constexpr CANBus CHASSIS_BUS = CANBus::CAN_BUS1;
 static constexpr CANBus GIMBAL_BUS = CANBus::CAN_BUS1;
-
-static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS2;
-
+static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS1;
 static constexpr CANBus FEED_BUS = CANBus::CAN_BUS1;
 
-// CAN Bus 2
-static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR1;
-static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR2;
-static constexpr MotorID SHOOTER_3_ID = MotorID::MOTOR3;
-static constexpr MotorID SHOOTER_4_ID = MotorID::MOTOR4;
+static constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR5;
+static constexpr MotorID PITCH_MOTOR_ID = MotorID::MOTOR6;
+//
+static constexpr MotorID FEEDER_ID = MotorID::MOTOR7;
+//
+static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR3;
+static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR4;
 
 static constexpr bool SHOOTER_1_DIRECTION = true;
 static constexpr bool SHOOTER_2_DIRECTION = true;
@@ -163,19 +167,19 @@ static const Matrix<float, 1, 3> left_sentry_rail_pole_location_matrix(left_sent
 // x, y, z in meters
 // x is along length of field, y is along width of field, z is vertical
 
-static constexpr float RAIL_POLE_DIAMETER = 0.061f;
+// static constexpr float RAIL_POLE_DIAMETER = 0.061f;
 
-static constexpr float robot_starting_rail_location_array[3] = {((WHEELBASE_WIDTH + RAIL_POLE_DIAMETER) / 2.0f), 0.0f, 0.0f};
-static const Matrix<float, 1, 3> robot_starting_rail_location(robot_starting_rail_location_array);
+// static constexpr float robot_starting_rail_location_array[3] = {((WHEELBASE_WIDTH + RAIL_POLE_DIAMETER) / 2.0f), 0.0f, 0.0f};
+// static const Matrix<float, 1, 3> robot_starting_rail_location(robot_starting_rail_location_array);
 
-static constexpr float FULL_RAIL_LENGTH = 2.130f;                                                       // meters, pole center to pole center
-static constexpr float FULL_RAIL_LENGTH_CM = 213.0f;                                                    // cm
-static constexpr float USABLE_RAIL_LENGTH = FULL_RAIL_LENGTH - (WHEELBASE_WIDTH + RAIL_POLE_DIAMETER);  // in meters
+// static constexpr float FULL_RAIL_LENGTH = 2.130f;                                                       // meters, pole center to pole center
+// static constexpr float FULL_RAIL_LENGTH_CM = 213.0f;                                                    // cm
+// static constexpr float USABLE_RAIL_LENGTH = FULL_RAIL_LENGTH - (WHEELBASE_WIDTH + RAIL_POLE_DIAMETER);  // in meters
 
-static const Matrix<float, 1, 3> ROBOT_STARTING_POSITION =
-    left_sentry_rail_pole_location_matrix + robot_starting_rail_location * src::utils::MatrixHelper::rotation_matrix(AngleUnit::Degrees, 45.0f, 2);
+// static const Matrix<float, 1, 3> ROBOT_STARTING_POSITION =
+//     left_sentry_rail_pole_location_matrix + robot_starting_rail_location * src::utils::MatrixHelper::rotation_matrix(AngleUnit::Degrees, 45.0f, 2);
 
-static constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f) * (44.0f / 18.0f);
+static constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f);
 
 // field-relative math is based on
 
@@ -221,3 +225,17 @@ static_assert(WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE >= 0);
  * we start slowing down translational speed.
  */
 static constexpr float MIN_ROTATION_THRESHOLD = 800.0f;
+
+/**
+ * @brief TOKYO CONSTANTS
+ */
+// Fraction that user input is multiplied by when "drifting"
+static constexpr float TOKYO_TRANSLATIONAL_SPEED_MULTIPLIER = 0.6f;
+// Fraction of the maximum translation speed for when rotation speed should be reduced
+static constexpr float TOKYO_TRANSLATION_THRESHOLD_TO_DECREASE_ROTATION_SPEED = 0.5f;
+// Fraction of max chassis speed applied to rotation speed
+static constexpr float TOKYO_ROTATIONAL_SPEED_FRACTION_OF_MAX = 0.75f;
+// Fraction to cut rotation speed by when the robot is "drifting"
+static constexpr float TOKYO_ROTATIONAL_SPEED_MULTIPLIER_WHEN_TRANSLATING = 0.7f;
+// Rotational speed increment per iteration to apply until rotation setpoint is reached
+static constexpr float TOKYO_ROTATIONAL_SPEED_INCREMENT = 50.0f;  // rpm
