@@ -75,7 +75,7 @@ FeederSubsystem feeder(drivers());
 GimbalSubsystem gimbal(drivers());
 ShooterSubsystem shooter(drivers());
 HopperSubsystem hopper(drivers());
-CommunicationResponseSubsytem response(*drivers());
+// CommunicationResponseSubsytem response(*drivers());
 ClientDisplaySubsystem clientDisplay(*drivers());
 
 // Robot Specific Controllers ------------------------------------------------
@@ -107,7 +107,7 @@ CloseHopperCommand closeHopperCommand(drivers(), &hopper);
 CloseHopperCommand closeHopperCommand2(drivers(), &hopper);
 ToggleHopperCommand toggleHopperCommand(drivers(), &hopper);
 
-CommunicationResponseHandler responseHandler(*drivers());
+// CommunicationResponseHandler responseHandler(*drivers());
 
 // client display
 ClientDisplayCommand clientDisplayCommand(*drivers(), drivers()->commandScheduler, clientDisplay, hopper, gimbal);
@@ -159,7 +159,7 @@ void registerSubsystems(src::Drivers *drivers) {
     drivers->commandScheduler.registerSubsystem(&gimbal);
     drivers->commandScheduler.registerSubsystem(&shooter);
     drivers->commandScheduler.registerSubsystem(&hopper);
-    drivers->commandScheduler.registerSubsystem(&response);
+    // drivers->commandScheduler.registerSubsystem(&response);
     drivers->commandScheduler.registerSubsystem(&clientDisplay);
 }
 
@@ -170,7 +170,7 @@ void initializeSubsystems() {
     gimbal.initialize();
     shooter.initialize();
     hopper.initialize();
-    response.initialize();
+    // response.initialize();
     clientDisplay.initialize();
 }
 
@@ -187,7 +187,7 @@ void startupCommands(src::Drivers *drivers) {
     // TODO: Possibly add some sort of hardware test command
     //       that will move all the parts so we
     //       can make sure they're fully operational.
-    drivers->refSerial.attachRobotToRobotMessageHandler(SENTRY_RESPONSE_MESSAGE_ID, &responseHandler);
+    // drivers->refSerial.attachRobotToRobotMessageHandler(SENTRY_RESPONSE_MESSAGE_ID, &responseHandler);
     drivers->commandScheduler.addCommand(&clientDisplayCommand);
 }
 
