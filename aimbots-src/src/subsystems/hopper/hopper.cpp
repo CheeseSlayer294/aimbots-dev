@@ -1,6 +1,7 @@
 #ifdef TARGET_STANDARD
 
 #include "subsystems/hopper/hopper.hpp"
+#include "utils/robot_specific_inc.hpp"
 
 #include "drivers.hpp"
 #include "tap/communication/gpio/pwm.hpp"
@@ -40,12 +41,25 @@ bool HopperSubsystem::isHopperReady() const {
     // the delay is mostly just to keep commands from ending b4 they should, bc isRampTargetMet() is based on pwm ramp finishing
 }
 
+uint8_t state = 0;
 uint8_t HopperSubsystem::getHopperState() const {
+    state = hopper_state;
     return hopper_state;
 }
 
+uint8_t new_state_display = 0;
 void HopperSubsystem::setHopperState(uint8_t new_state) {
+    new_state_display = new_state;
     hopper_state = new_state;
+}
+
+bool HopperSubsystem::isHopperOpen() const  {
+   if(hopper_state == 1){
+         return true;
+    }
+    else{
+         return false;
+   }
 }
 };  // namespace src::Hopper
 
