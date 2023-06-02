@@ -148,8 +148,8 @@ static void updateIo(src::Drivers *drivers) {
     drivers->cvCommunicator.updateSerial();
 
     //utils::Music::playChainSawMan(drivers);
-    utils::Music::playPacMan(drivers);
-    //utils::Music::playWeAreNumberOne(drivers);
+    //utils::Music::playPacMan(drivers);
+    utils::Music::playWeAreNumberOne(drivers);
 
     imuStatus = drivers->fieldRelativeInformant.getImuState();
 
