@@ -37,71 +37,45 @@ static constexpr uint32_t NOTE_Eb6 = 1244;
 static constexpr uint32_t NOTE_E6 = 1318;
 static constexpr uint32_t NOTE_F6 = 1396;
 
-// Windows XP Startup BPM
-static constexpr uint32_t XP_BPM = 110;
-static constexpr uint32_t XP_MS_PER_16th = (uint32_t)(((1.0f / XP_BPM) * 60.0f * 1000.0f) / 4.0f);
-
 struct MusicNote {
     uint32_t frequency;
 };
+// We Are Number One
 
-static uint32_t lastXPTime = 0;
-static uint32_t currentXPNote = 0;
-static uint32_t lastXPFreq = 0;
-static bool xpTuneFinished = false;
+static bool isWeNum1Done = false;
 
-static MusicNote xpStartupNotes[16] = {
-    {NOTE_Eb6},{NOTE_Eb6},{NOTE_Eb6},{NOTE_Eb5},
-    {NOTE_Bb5},{0},{NOTE_Ab5},{NOTE_Ab5},
-    {NOTE_Eb5},{0},{NOTE_Eb6},{NOTE_Eb6},
-    {NOTE_Bb5},{NOTE_Bb5},{0},{0}
+static constexpr uint32_t WeNum1_BPM = 168;
+static constexpr uint32_t WeNum1_MS_PER_16th = (uint32_t)(((1.0f / WeNum1_BPM) * 60.0f * 1000.0f) / 4.0f);
+
+static uint32_t lastWeNum1Time = 0;
+static uint32_t currentWeNum1Note = 0;
+static uint32_t lastWeNum1Freq = 0;
+
+static MusicNote WeAreNumberOneNotes[] = {
+    {NOTE_F5},{NOTE_F5},{NOTE_F5},{NOTE_F5},{NOTE_F5},{NOTE_F5},{NOTE_C6},{NOTE_C6},
+    {NOTE_B5},{NOTE_C6},{NOTE_B5},{NOTE_C6},{NOTE_B5},{NOTE_B5},{NOTE_C6},{NOTE_C6},
+    {NOTE_Ab5},{NOTE_Ab5},{NOTE_Ab5},{NOTE_Ab5},{NOTE_F5},{NOTE_F5},{NOTE_F5},{NOTE_F5},
+    {NOTE_F5},{NOTE_F5},{NOTE_F5},{NOTE_F5},{NOTE_Ab4},{NOTE_Ab4},{NOTE_C6},{NOTE_C6},
+    {NOTE_Db6},{NOTE_Db6},{NOTE_Db6},{NOTE_Db6},{NOTE_Ab4},{NOTE_Ab4},{NOTE_Ab4},{NOTE_Ab4},
+    {NOTE_Db6},{NOTE_Db6},{NOTE_Db6},{NOTE_Db6},{NOTE_Eb6},{NOTE_Eb6},{NOTE_Eb6},{NOTE_Eb6},
+    {NOTE_C6},{NOTE_C6},{NOTE_Db6},{NOTE_Db6},{NOTE_C6},{NOTE_C6},{NOTE_Db6},{NOTE_Db6},
+    {NOTE_C6},{NOTE_C6},{NOTE_C6},{NOTE_C6},{NOTE_E6},{NOTE_E6},{NOTE_E6},{NOTE_E6},{0}
     };
 
-static constexpr size_t XP_NOTE_COUNT = sizeof(xpStartupNotes) / sizeof(MusicNote);
+static constexpr size_t WeNum1_NOTE_COUNT = sizeof(WeAreNumberOneNotes) / sizeof(MusicNote);
 
-void continuePlayingXPStartupTune(src::Drivers* drivers) {
-    if (xpTuneFinished) return;
-    if (lastXPTime == 0) lastXPTime = tap::arch::clock::getTimeMilliseconds();
+void playWeAreNumberOne(src::Drivers* drivers) {
+    if (isWeNum1Done) return;
+    if (lastWeNum1Time == 0) lastWeNum1Time = tap::arch::clock::getTimeMilliseconds();
     uint32_t currentTime = tap::arch::clock::getTimeMilliseconds();
-    uint32_t timeSinceLast = currentTime - lastXPTime;
+    uint32_t timeSinceLast = currentTime - lastWeNum1Time;
 
-    if (timeSinceLast >= XP_MS_PER_16th) {
-        lastXPTime = tap::arch::clock::getTimeMilliseconds();
-        if (lastXPFreq != xpStartupNotes[currentXPNote].frequency) tap::buzzer::playNote(&drivers->pwm, xpStartupNotes[currentXPNote].frequency);
-        lastXPFreq = xpStartupNotes[currentXPNote].frequency;
-        currentXPNote++;
-        xpTuneFinished = currentXPNote == XP_NOTE_COUNT;
-    }
-}
-
-// Tokyo Drift Theme
-
-static constexpr uint32_t TD_BPM = 120;
-static constexpr uint32_t TD_MS_PER_16th = (uint32_t)(((1.0f / TD_BPM) * 60.0f * 1000.0f) / 4.0f);
-
-static uint32_t lastTDTime = 0;
-static uint32_t currentTDNote = 0;
-static uint32_t lastTDFreq = 0;
-
-static MusicNote tokyoDriftNotes[16] = {
-    {NOTE_Bb4},{NOTE_Bb4},{NOTE_Bb4},{NOTE_B4},
-    {NOTE_B4},{NOTE_B4},{NOTE_Eb5},{NOTE_Eb5},
-    {NOTE_Bb5},{0},{0},{0},
-    {NOTE_Bb5},{0},{0},{0}
-    };
-
-static constexpr size_t TD_NOTE_COUNT = sizeof(tokyoDriftNotes) / sizeof(MusicNote);
-
-void continuePlayingTokyoDriftTune(src::Drivers* drivers) {
-    if (lastTDTime == 0) lastTDTime = tap::arch::clock::getTimeMilliseconds();
-    uint32_t currentTime = tap::arch::clock::getTimeMilliseconds();
-    uint32_t timeSinceLast = currentTime - lastTDTime;
-
-    if (timeSinceLast >= TD_MS_PER_16th) {
-        lastTDTime = tap::arch::clock::getTimeMilliseconds();
-        if (lastTDFreq != tokyoDriftNotes[currentTDNote].frequency) tap::buzzer::playNote(&drivers->pwm, tokyoDriftNotes[currentTDNote].frequency);
-        lastTDFreq = tokyoDriftNotes[currentTDNote].frequency;
-        currentTDNote = (currentTDNote + 1) % TD_NOTE_COUNT;
+    if (timeSinceLast >= WeNum1_MS_PER_16th) {
+        lastWeNum1Time = tap::arch::clock::getTimeMilliseconds();
+        if (lastWeNum1Freq != WeAreNumberOneNotes[currentWeNum1Note].frequency) tap::buzzer::playNote(&drivers->pwm, WeAreNumberOneNotes[currentWeNum1Note].frequency);
+        lastWeNum1Freq = WeAreNumberOneNotes[currentWeNum1Note].frequency;
+        currentWeNum1Note++;
+        isWeNum1Done = currentWeNum1Note == WeNum1_NOTE_COUNT;
     }
 }
 
