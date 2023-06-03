@@ -146,9 +146,8 @@ static void updateIo(src::Drivers *drivers) {
 #endif
     drivers->kinematicInformant.updateRobotFrames();
     drivers->cvCommunicator.updateSerial();
-
     // drivers->enemyDataConverter.updateEnemyInfo();
-    // utils::Music::continuePlayingXPStartupTune(drivers);
+
     utils::Music::playPacMan(drivers);
 
     imuStatus = drivers->kinematicInformant.getIMUState();
