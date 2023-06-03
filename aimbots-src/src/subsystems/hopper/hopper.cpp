@@ -1,20 +1,23 @@
 #ifdef TARGET_STANDARD
 
 #include "subsystems/hopper/hopper.hpp"
+
+#include "tap/communication/gpio/pwm.hpp"
+
+#include "utils/common_types.hpp"
 #include "utils/robot_specific_inc.hpp"
 
 #include "drivers.hpp"
-#include "tap/communication/gpio/pwm.hpp"
-#include "utils/common_types.hpp"
 
 #define REMAP_HOPPER(x) (REMAP(x, HOPPER_MIN_ANGLE, HOPPER_MAX_ANGLE, HOPPER_MIN_PWM, HOPPER_MAX_PWM))
 
 namespace src::Hopper {
 
-HopperSubsystem::HopperSubsystem(tap::Drivers* drivers) : Subsystem(drivers),
-                                                          drivers(drivers),
-                                                          hopperMotor(drivers, HOPPER_PIN, HOPPER_MAX_PWM, HOPPER_MIN_PWM, HOPPER_PWM_RAMP_SPEED),
-                                                          hopper_state(2) {}
+HopperSubsystem::HopperSubsystem(tap::Drivers* drivers)
+    : Subsystem(drivers),
+      drivers(drivers),
+      hopperMotor(drivers, HOPPER_PIN, HOPPER_MAX_PWM, HOPPER_MIN_PWM, HOPPER_PWM_RAMP_SPEED),
+      hopper_state(2) {}
 
 void HopperSubsystem::initialize() {
     drivers->pwm.setTimerFrequency(tap::gpio::Pwm::Timer::TIMER1, 330);  // Timer 1 for C1 Pin
@@ -22,9 +25,7 @@ void HopperSubsystem::initialize() {
 
 float testVal = 0.85f;
 
-void HopperSubsystem::refresh() {
-    hopperMotor.updateSendPwmRamp();
-}
+void HopperSubsystem::refresh() { hopperMotor.updateSendPwmRamp(); }
 
 float hopperAngleSetDisplay = 0.0f;
 
@@ -53,13 +54,12 @@ void HopperSubsystem::setHopperState(uint8_t new_state) {
     hopper_state = new_state;
 }
 
-bool HopperSubsystem::isHopperOpen() const  {
-   if(hopper_state == 1){
-         return true;
+bool HopperSubsystem::isHopperOpen() const {
+    if (hopper_state == OPEN) {
+        return true;
+    } else {
+        return false;
     }
-    else{
-         return false;
-   }
 }
 };  // namespace src::Hopper
 
