@@ -15,23 +15,17 @@ void ToggleHopperCommand::initialize() {
         hopper->setHopperState(CLOSED);
     } else {
         hopper->setHopperAngle(state ? HOPPER_CLOSED_ANGLE : HOPPER_OPEN_ANGLE);
-        hopper->setHopperState(!state);
+        hopper->setHopperState(state ? CLOSED : OPEN);
     }
 }
 
-void ToggleHopperCommand::execute() {
-}
+void ToggleHopperCommand::execute() {}
 
-void ToggleHopperCommand::end(bool) {
-}
+void ToggleHopperCommand::end(bool) {}
 
-bool ToggleHopperCommand::isReady() {
-    return true;
-}
+bool ToggleHopperCommand::isReady() { return true; }
 
-bool ToggleHopperCommand::isFinished() const {
-    return hopper->isHopperReady();
-}
+bool ToggleHopperCommand::isFinished() const { return hopper->isHopperReady(); }
 };  // namespace src::Hopper
 
 #endif
