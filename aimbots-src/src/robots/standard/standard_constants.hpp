@@ -121,11 +121,11 @@ static constexpr SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG = {
 
 static constexpr uint16_t shooter_speed_array[6] = {
     15,
-    3900,  // {ball m/s, flywheel rpm}
+    4200,  // {ball m/s, flywheel rpm}
     18,
-    4500,
+    5000,
     30,
-    9000};
+    8000};
 
 static const Matrix<uint16_t, 3, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);
 
