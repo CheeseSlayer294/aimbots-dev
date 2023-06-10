@@ -11,21 +11,16 @@ CloseHopperCommand::CloseHopperCommand(src::Drivers* drivers, HopperSubsystem* h
 
 void CloseHopperCommand::initialize() {
     hopper->setHopperAngle(HOPPER_CLOSED_ANGLE);
+    hopper->setHopperState(CLOSED);
 }
 
-void CloseHopperCommand::execute() {
-}
+void CloseHopperCommand::execute() {}
 
-void CloseHopperCommand::end(bool) {
-}
+void CloseHopperCommand::end(bool) {}
 
-bool CloseHopperCommand::isReady() {
-    return true;
-}
+bool CloseHopperCommand::isReady() { return true; }
 
-bool CloseHopperCommand::isFinished() const {
-    return hopper->isHopperReady();
-}
+bool CloseHopperCommand::isFinished() const { return hopper->isHopperReady(); }
 
 };  // namespace src::Hopper
 #endif

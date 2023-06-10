@@ -11,6 +11,7 @@ OpenHopperCommand::OpenHopperCommand(src::Drivers* drivers, HopperSubsystem* hop
 
 void OpenHopperCommand::initialize() {
     hopper->setHopperAngle(HOPPER_OPEN_ANGLE);
+    hopper->setHopperState(OPEN);
 }
 
 void OpenHopperCommand::execute() {

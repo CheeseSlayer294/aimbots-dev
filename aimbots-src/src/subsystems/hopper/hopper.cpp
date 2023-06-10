@@ -39,7 +39,7 @@ void HopperSubsystem::setHopperAngle(float desiredAngle) {
 bool HopperSubsystem::isHopperReady() const {
     return (hopperMotor.isRampTargetMet() && (tap::arch::clock::getTimeMilliseconds() - actionStartTime) > HOPPER_MIN_ACTION_DELAY);
     // return true;
-    // the delay is mostly just to keep commands from ending b4 they should, bc isRampTargetMet() is based on pwm ramp finishing
+    // the delay is 5mostly just to keep commands from ending b4 they should, bc isRampTargetMet() is based on pwm ramp finishing
 }
 
 uint8_t state_;
