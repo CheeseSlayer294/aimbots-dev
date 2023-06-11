@@ -18,7 +18,9 @@ ChassisFollowGimbalCommand::ChassisFollowGimbalCommand(src::Drivers* drivers, Ch
     addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(chassis));
 }
 
-void ChassisFollowGimbalCommand::initialize() {}
+void ChassisFollowGimbalCommand::initialize() {
+    chassis->setTokyoDrift(false);
+}
 
 // Debug variables
 float gimbalYawFieldRelativeDisplay = 0.0f;

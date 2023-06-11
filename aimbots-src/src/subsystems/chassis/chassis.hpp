@@ -135,6 +135,9 @@ public:
         return Matrix<float, 3, 1>::zeroMatrix();
     }
 
+    bool getTokyoDrift() const;
+    void setTokyoDrift(bool drift) { tokyoDrift = drift; }
+
 #ifndef ENV_UNIT_TESTS
 private:
 #else
@@ -166,6 +169,8 @@ public:
     src::utils::Control::PowerLimiting::PowerLimiter powerLimiter;
 
     Matrix<float, 4, 3> wheelLocationMatrix;
+
+    bool tokyoDrift;
 
 public:
 #ifdef TARGET_SENTRY
