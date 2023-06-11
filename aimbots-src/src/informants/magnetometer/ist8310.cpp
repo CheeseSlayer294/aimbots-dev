@@ -6,13 +6,13 @@
 namespace src::Informants {
 
 
-float DBG_magX_uT  = 420.0f;
-float DBG_magY_uT  = 420.0f;
-float DBG_magZ_uT  = 420.0f;
+float DBG_magX_uT  = 0.0f;
+float DBG_magY_uT  = 0.0f;
+float DBG_magZ_uT  = 0.0f;
 
-float DBG_magX_raw = 420.0f;
-float DBG_magY_raw = 420.0f;
-float DBG_magZ_raw = 420.0f;
+float DBG_magX_raw = 0.0f;
+float DBG_magY_raw = 0.0f;
+float DBG_magZ_raw = 0.0f;
 
 
 void Ist8310::init()
