@@ -41,14 +41,20 @@ bool Ist8310::update()
     }
 
     PT_CALL( writeToRegister( Ist8310Info::Register::Control1, Ist8310Info::RegisterData::Control1_OutputDataRate_SingleMeasurement ) );
+    modm::delay_ms( 6 );
+
     PT_CALL( writeToRegister( Ist8310Info::Register::AverageControl, Ist8310Info::RegisterData::Average_16x ) );
+    modm::delay_ms( 6 );
 
     for( ;; )
     {
         PT_WAIT_UNTIL( timer.execute() );
 
         PT_CALL( writeToRegister( Ist8310Info::Register::Control1, Ist8310Info::RegisterData::Control1_OutputDataRate_SingleMeasurement ) );
+        modm::delay_ms( 6 );
+
         PT_CALL( readRegister( Ist8310Info::Register::OutputData, 6 ) );
+        modm::delay_ms( 6 );
 
         parseRawData();
 
