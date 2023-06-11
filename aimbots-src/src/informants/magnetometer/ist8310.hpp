@@ -10,6 +10,7 @@
 namespace src::Informants {
 
 class Ist8310 : modm::I2cDevice<Ist8310Info::I2CMaster>, modm::pt::Protothread {
+public:
     Ist8310()
         : modm::I2cDevice<Ist8310Info::I2CMaster>( Ist8310Info::I2C_ADDRESS )
         , timer( 50 )

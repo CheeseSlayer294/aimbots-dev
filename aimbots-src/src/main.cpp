@@ -45,7 +45,6 @@
 //
 #include "robots/robot_control.hpp"
 #include "utils/music/player.hpp"
-#include "utils/nxp_imu/magnetometer/ist8310_data.hpp"
 
 /* define timers here -------------------------------------------------------*/
 tap::arch::PeriodicMilliTimer sendMotorTimeout(2);
@@ -125,7 +124,7 @@ static void initializeIo(src::Drivers *drivers) {
 #ifdef TARGET_SENTRY
     drivers->railDistanceSensor.initialize();
 #endif
-    // drivers->magnetometer.init();
+    drivers->magnetometer.init();
     drivers->cvCommunicator.initialize();
 }
 
@@ -146,6 +145,7 @@ static void updateIo(src::Drivers *drivers) {
 #endif
     drivers->kinematicInformant.updateRobotFrames();
     drivers->cvCommunicator.updateSerial();
+    drivers->magnetometer.update();
 
     // drivers->enemyDataConverter.updateEnemyInfo();
     // utils::Music::continuePlayingXPStartupTune(drivers);

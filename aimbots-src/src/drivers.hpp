@@ -25,7 +25,7 @@
 #include "informants/kinematic_informant.hpp"
 #include "informants/ultrasonic_distance_sensor.hpp"
 #include "informants/vision/jetson_communicator.hpp"
-#include "utils/nxp_imu/magnetometer/ist8310.hpp"
+#include "informants/magnetometer/ist8310.hpp"
 #include "utils/robot_specific_inc.hpp"
 
 namespace src {
@@ -44,7 +44,7 @@ public:
 
 public:
     Control::OperatorInterface controlOperatorInterface;
-    utils::Ist8310 magnetometer;
+    Informants::Ist8310 magnetometer;
     Informants::vision::JetsonCommunicator cvCommunicator;
     Informants::KinematicInformant kinematicInformant;
 };  // class Drivers
