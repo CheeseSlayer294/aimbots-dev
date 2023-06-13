@@ -148,9 +148,8 @@ static void updateIo(src::Drivers *drivers) {
     drivers->cvCommunicator.updateSerial();
     // drivers->enemyDataConverter.updateEnemyInfo();
 
-    // utils::Music::playPacMan(drivers);
-    utils::Music::playMystery(drivers);
-
+    utils::Music::playCrabRave(drivers);
+    
     imuStatus = drivers->kinematicInformant.getIMUState();
 
     float yaw = drivers->kinematicInformant.getChassisIMUAngle(src::Informants::AngularAxis::YAW_AXIS, AngleUnit::Radians);
