@@ -48,11 +48,37 @@ static constexpr MotorID RIGHT_BACK_WHEEL_ID = MotorID::MOTOR4;
 static constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR5;
 static constexpr MotorID PITCH_MOTOR_ID = MotorID::MOTOR6;
 
+static constexpr CANBus LINEAR_STAGE_BUS = CANBus::CAN_BUS2;
+
+static const int STAGE_MOTOR_COUNT = 3;
+
+static const bool X_STAGE_DIRECTION = true;
+static const bool Y_STAGE_DIRECTION = true;
+static const bool Z_STAGE_DIRECTION = true;
+
+static constexpr MotorID LINEAR_STAGE_X_MOTOR_ID = MotorID::MOTOR1;
+static constexpr MotorID LINEAR_STAGE_Y_MOTOR_ID = MotorID::MOTOR2;
+static constexpr MotorID LINEAR_STAGE_Z_MOTOR_ID = MotorID::MOTOR3;
+
 enum WheelRPMIndex {  // index used to easily navigate wheel matrices
     LB = 0,
     LF = 1,
     RF = 2,
     RB = 3,
+};
+
+static constexpr SmoothPIDConfig STAGE_VELOCITY_PID_CONFIG = {
+    .kp = 18.0f,
+    .ki = 0.0f,
+    .kd = 2.0f,
+    .maxICumulative = 10.0f,
+    .maxOutput = M3508_MAX_OUTPUT,
+    .tQDerivativeKalman = 1.0f,
+    .tRDerivativeKalman = 1.0f,
+    .tQProportionalKalman = 1.0f,
+    .tRProportionalKalman = 1.0f,
+    .errDeadzone = 0.0f,
+    .errorDerivativeFloor = 0.0f,
 };
 
 /**

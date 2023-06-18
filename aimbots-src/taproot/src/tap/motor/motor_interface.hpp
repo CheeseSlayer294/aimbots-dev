@@ -26,10 +26,8 @@
 
 #include <cstdint>
 
-namespace tap::motor
-{
-class MotorInterface
-{
+namespace tap::motor {
+class MotorInterface {
 public:
     virtual void initialize() = 0;
     virtual int64_t getEncoderUnwrapped() const = 0;
