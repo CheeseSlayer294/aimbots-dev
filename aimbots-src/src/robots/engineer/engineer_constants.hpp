@@ -1,6 +1,8 @@
 #pragma once
 #include "utils/common_types.hpp"
 
+#define ENGINEER
+
 static constexpr uint8_t DRIVEN_WHEEL_COUNT = 4;
 static constexpr uint8_t MOTORS_PER_WHEEL = 1;
 
@@ -37,7 +39,7 @@ static constexpr float CHASSIS_GEARBOX_RATIO = (1.0f / 19.0f);
 
 static constexpr float YAW_OFFSET_ANGLE = M_PI_2;
 static constexpr float PITCH_OFFSET_ANGLE = M_PI_2;
-#error "DM Richard on Discord if you see this (or just calculate the pitch stop limits yourself idc)"
+// #error "DM Richard on Discord if you see this (or just calculate the pitch stop limits yourself idc)"
 static constexpr float PITCH_AXIS_SOFTSTOP_LOW = 0.0f;
 static constexpr float PITCH_AXIS_SOFTSTOP_HIGH = 0.0f;
 
@@ -92,3 +94,31 @@ static constexpr float ENERGY_BUFFER_LIMIT_THRESHOLD = 40.0f;
 static constexpr float ENERGY_BUFFER_CRIT_THRESHOLD = 5;
 static constexpr uint16_t POWER_CONSUMPTION_THRESHOLD = 20;
 static constexpr float CURRENT_ALLOCATED_FOR_ENERGY_BUFFER_LIMITING = 30000;
+
+
+//allows for engineer to compule easily 
+#warning "this should be changed but it is an easy fix for now"
+
+static constexpr float GIMBAL_X_OFFSET = 0.0f;
+static constexpr float GIMBAL_Y_OFFSET = 0.0f;
+static constexpr float FOLLOW_GIMBAL_ANGLE_THRESHOLD = modm::toRadian(20.0f);
+static constexpr SmoothPIDConfig ROTATION_POSITION_PID_CONFIG = {
+    .kp = 1.25f,
+    .ki = 0.0f,
+    .kd = 0.03f,
+    .maxICumulative = 10.0f,
+    .maxOutput = 1.0f,
+    .tQDerivativeKalman = 1.0f,
+    .tRDerivativeKalman = 1.0f,
+    .tQProportionalKalman = 1.0f,
+    .tRProportionalKalman = 1.0f,
+    .errDeadzone = 0.0f,
+    .errorDerivativeFloor = 0.0f,
+};
+static constexpr float PITCH_AXIS_START_ANGLE = modm::toRadian(0.0f);
+static constexpr float GIMBAL_PITCH_GEAR_RATIO = (30.0f / 102.0f);  // for 2023 Standard
+static constexpr float PITCH_AXIS_SOFTSTOP_LOW = modm::toRadian(-23.0f);
+static constexpr float PITCH_AXIS_SOFTSTOP_HIGH = modm::toRadian(22.0f);
+static constexpr float YAW_AXIS_START_ANGLE = modm::toRadian(0.0f);
+static constexpr float GIMBAL_YAW_GEAR_RATIO = (1.0f / 2.0f);  // for 2023 Standard
+
