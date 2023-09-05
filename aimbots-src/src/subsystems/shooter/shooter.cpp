@@ -7,7 +7,10 @@
 
 namespace src::Shooter {
 
-ShooterSubsystem::ShooterSubsystem(tap::Drivers* drivers, src::Utils::RefereeHelperTurreted* refHelper)
+ShooterSubsystem::ShooterSubsystem(
+    tap::Drivers* drivers, 
+    src::Utils::RefereeHelperTurreted* refHelper,
+    uint8_t shooterMotorCount)
     : Subsystem(drivers),
       flywheel1(drivers, SHOOTER_1_ID, SHOOTER_BUS, SHOOTER_1_DIRECTION, "Flywheel One"),
       flywheel2(drivers, SHOOTER_2_ID, SHOOTER_BUS, SHOOTER_2_DIRECTION, "Flywheel Two"),
@@ -24,7 +27,8 @@ ShooterSubsystem::ShooterSubsystem(tap::Drivers* drivers, src::Utils::RefereeHel
       desiredOutputs(Matrix<int32_t, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
       motors(Matrix<DJIMotor*, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
       velocityPIDs(Matrix<SmoothPID*, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
-      refHelper(refHelper)
+      refHelper(refHelper),
+      shooterMotorCount(shooterMotorCount)
 //
 {
     motors[RIGHT][0] = &flywheel1;  // TOP_RIGHT == RIGHT
@@ -123,4 +127,32 @@ void ShooterSubsystem::setDesiredOutputToMotor(MotorIndex motorIdx) {
         motors[motorIdx][0]->setDesiredOutput(desiredOutputs[motorIdx][0]);
     }
 }
+
+/**
+ * Allows user to call a DJIMotor member function on all shooter motors
+ *
+ * @param function pointer to a member function of DJIMotor
+ * @param args arguments to pass to the member function
+ */
+template <class... Args>
+void ForAllShooterMotors(void (DJIMotor::*func)(Args...), Args... args) {
+    for (auto i = 0; i < shooterMotorCount; i++) {
+        (motors[i][0]->*func)(args...);
+    }
+}
+
+/**
+ * Allows user to call a ShooterSubsystem function on all shooter motors.
+ *
+ * @param function pointer to a member function of ShooterSubsystem that takes a MotorIndex as it's first argument
+ * @param args arguments to pass to the member function
+ */
+template <class... Args>
+void ForAllShooterMotors(void (ShooterSubsystem::*func)(MotorIndex, Args...), Args... args) {
+    for (auto i = 0; i < shooterMotorCount; i++) {
+        MotorIndex mi = static_cast<MotorIndex>(i);
+        (this->*func)(mi, args...);
+    }
+}
+
 };  // namespace src::Shooter

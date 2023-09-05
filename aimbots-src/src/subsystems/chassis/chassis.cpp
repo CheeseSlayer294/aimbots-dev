@@ -10,7 +10,16 @@ using namespace tap::algorithms;
 
 namespace src::Chassis {
 
-ChassisSubsystem::ChassisSubsystem(src::Drivers* drivers)
+ChassisSubsystem::ChassisSubsystem(
+        src::Drivers* drivers, 
+        uint8_t DRIVEN_WHEEL_COUNT, 
+        uint8_t MOTORS_PER_WHEEL,
+        int WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE,
+        int MIN_CHASSIS_POWER,
+        int MIN_WHEEL_SPEED_SINGLE_MOTOR,
+        int MAX_WHEEL_SPEED_SINGLE_MOTOR
+
+    )
     : ChassisSubsystemInterface(drivers),
       drivers(drivers),
 

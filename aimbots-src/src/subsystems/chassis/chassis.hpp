@@ -5,7 +5,7 @@
 
 #include "utils/common_types.hpp"
 #include "utils/motion/power_limiter/power_limiter.hpp"
-#include "utils/robot_specific_inc.hpp"
+//#include "utils/robot_specific_inc.hpp"
 
 #include "drivers.hpp"
 
@@ -38,7 +38,14 @@ enum ChassisVelIndex {
 class ChassisSubsystem : public tap::control::chassis::ChassisSubsystemInterface {
 public:
     ChassisSubsystem(  // Default chassis constructor
-        src::Drivers* drivers);
+        src::Drivers* drivers,
+        uint8_t DRIVEN_WHEEL_COUNT, 
+        uint8_t MOTORS_PER_WHEEL,
+        int WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE,
+        int MIN_CHASSIS_POWER,
+        int MIN_WHEEL_SPEED_SINGLE_MOTOR,
+        int MAX_WHEEL_SPEED_SINGLE_MOTOR
+        );
 
     /**
      * Allows user to call a DJIMotor member function on all chassis motors
