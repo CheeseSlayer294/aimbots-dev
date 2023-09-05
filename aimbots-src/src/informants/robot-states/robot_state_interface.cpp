@@ -7,7 +7,10 @@ using namespace src::Communication;
 
 namespace src::RobotStates {
 
-RobotStates::RobotStates(tap::Drivers& drivers) : tap::control::Subsystem(&drivers), drivers(drivers), messageHandler(drivers) {
+RobotStates::RobotStates(tap::Drivers& drivers)
+    : tap::control::Subsystem(&drivers),
+      drivers(drivers),
+      messageHandler(drivers) {
     robotStates = Matrix<Robot, 2, 9>().zeroMatrix();
     robotStates[Team::RED][0] = Robot(Matrix<short, 3, 1>().zeroMatrix(), 1, 0, Team::RED);  // HERO
     robotStates[Team::RED][1] = Robot(Matrix<short, 3, 1>().zeroMatrix(), 2, 0, Team::RED);  // ENGINEER
@@ -46,7 +49,9 @@ void RobotStates::updateRobotStatePosition(int number, Team teamColor, short x, 
     robotStates[teamColor][number - 1].setZ(z);
 }
 
-void RobotStates::updateRobotStateHealth(int number, Team teamColor, int health) { robotStates[teamColor][number - 1].setHealth(health); }
+void RobotStates::updateRobotStateHealth(int number, Team teamColor, int health) {
+    robotStates[teamColor][number - 1].setHealth(health);
+}
 
 #ifdef TARGET_SENTRY
 void RobotStates::updateTeamMessage() {
@@ -83,7 +88,9 @@ void updateStandardMessage() {
     // standardMessage[4] = robotStates[color][2].getY();
 }
 
-#elif TRAGET_HERO
+// I don't know if this was intentional
+//  #elif TRAGET_HERO
+#elif TARGET_HERO
 
 void updateHeroMessage() {
     Team color = /*tap::communication::serial::RefSerial::isBlueTeam(id) ? Team::BLUE : */ Team::RED;
@@ -112,7 +119,8 @@ void RobotStates::refresh() {
     this->updateTeamMessage();
 #elif TARGET_STANDARD
     this->updateStandardMessage();
-#elif TRAGET_HERO
+// #elif TRAGET_HERO
+#elif TARGET_HERO
     this->updateHeroMessage();
 #endif
 }
