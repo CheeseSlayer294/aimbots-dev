@@ -9,11 +9,6 @@
 // delete this when done refactoring pls !!!
 // #include "utils/robot_specific_inc.hpp"
 
-// running list of constants as I see them
-/*
-SHOOTER_MOTOR_COUNT
-*/
-
 namespace src::Shooter {
 
 enum MotorIndex {
@@ -32,9 +27,10 @@ public:
     ShooterSubsystem(
         tap::Drivers* drivers,
         src::Utils::RefereeHelperTurreted* refHelper,
-        uint8_t SHOOTER_MOTOR_COUNT,
-        MotorID shooter_1_id,
-        MotorID shooter_2_id);
+        uint8_t SHOOTER_MOTOR_COUNT
+        // ,MotorID shooter_1_id,
+        // MotorID shooter_2_id
+    );
 
     mockable void initialize() override;
     void refresh() override;
@@ -79,7 +75,7 @@ public:
 
     bool isOnline() const {
         for (auto i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
-            if (!motors[i][0]->isMotorOnline()) {
+            if (!motors[i]->isMotorOnline()) {
                 return false;
             }
         }
@@ -104,11 +100,18 @@ public:  // why is this public:
 
     // CONSTANTS
     uint8_t SHOOTER_MOTOR_COUNT;
-    //
-    Matrix<float, SHOOTER_MOTOR_COUNT, 1> targetRPMs;
-    Matrix<int32_t, SHOOTER_MOTOR_COUNT, 1> desiredOutputs;
-    Matrix<DJIMotor*, SHOOTER_MOTOR_COUNT, 1> motors;
-    Matrix<SmoothPID*, SHOOTER_MOTOR_COUNT, 1> velocityPIDs;
+
+    // ultra fucked
+
+    // Matrix<float, SHOOTER_MOTOR_COUNT, 1> targetRPMs;
+    // Matrix<int32_t, SHOOTER_MOTOR_COUNT, 1> desiredOutputs;
+    // Matrix<DJIMotor*, SHOOTER_MOTOR_COUNT, 1> motors;
+    // Matrix<SmoothPID*, SHOOTER_MOTOR_COUNT, 1> velocityPIDs;
+
+    std::vector<float> targetRPMs;
+    std::vector<int32_t> desiredOutputs;
+    std::vector<DJIMotor*> motors;
+    std::vector<SmoothPID*> velocityPIDs;
 
     src::Utils::RefereeHelperTurreted* refHelper;
 };

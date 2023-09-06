@@ -6,8 +6,6 @@
 #define BARREL_SWAP_COMPATIBLE
 // #define TURRET_HAS_IMU
 
-
-
 /**
  * @brief Defines the number of motors created for the chassis.
  */
@@ -269,6 +267,8 @@ static constexpr MotorID FEEDER_ID = MotorID::MOTOR7;
 //
 static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR3;
 static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR4;
+// array version
+static constexpr MotorID SHOOTER_ID_ARRAY[SHOOTER_MOTOR_COUNT] = {MotorID::MOTOR3, MotorID::MOTOR4};
 //
 static constexpr MotorID SWAP_MOTOR_ID = MotorID::MOTOR1;  // TODO: check motor ID for Barrel Swap
 

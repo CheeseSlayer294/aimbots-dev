@@ -8,9 +8,9 @@
 namespace src::Shooter {
 
 ShooterSubsystem::ShooterSubsystem(
-    tap::Drivers* drivers, 
+    tap::Drivers* drivers,
     src::Utils::RefereeHelperTurreted* refHelper,
-    uint8_t shooterMotorCount)
+    uint8_t SHOOTER_MOTOR_COUNT)
     : Subsystem(drivers),
       flywheel1(drivers, SHOOTER_1_ID, SHOOTER_BUS, SHOOTER_1_DIRECTION, "Flywheel One"),
       flywheel2(drivers, SHOOTER_2_ID, SHOOTER_BUS, SHOOTER_2_DIRECTION, "Flywheel Two"),
@@ -23,12 +23,12 @@ ShooterSubsystem::ShooterSubsystem(
       flywheel4PID(SHOOTER_VELOCITY_PID_CONFIG),
 
 #endif
+      SHOOTER_MOTOR_COUNT(SHOOTER_MOTOR_COUNT),
       targetRPMs(Matrix<float, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
       desiredOutputs(Matrix<int32_t, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
       motors(Matrix<DJIMotor*, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
       velocityPIDs(Matrix<SmoothPID*, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
-      refHelper(refHelper),
-      shooterMotorCount(shooterMotorCount)
+      refHelper(refHelper)
 //
 {
     motors[RIGHT][0] = &flywheel1;  // TOP_RIGHT == RIGHT
