@@ -27,7 +27,11 @@ public:
     ShooterSubsystem(
         tap::Drivers* drivers,
         src::Utils::RefereeHelperTurreted* refHelper,
-        uint8_t SHOOTER_MOTOR_COUNT
+        uint8_t SHOOTER_MOTOR_COUNT,
+        SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG,
+        CANBus SHOOTER_BUS,
+        MotorID SHOOTER_ID_ARRAY[],
+        bool SHOOTER_DIRECTION_ARRAY[]
         // ,MotorID shooter_1_id,
         // MotorID shooter_2_id
     );
@@ -75,7 +79,7 @@ public:
 
     bool isOnline() const {
         for (auto i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
-            if (!motors[i]->isMotorOnline()) {
+            if (!motors[i][0]->isMotorOnline()) {
                 return false;
             }
         }
@@ -90,8 +94,12 @@ private:
 
 public:  // why is this public:
 #endif
-    DJIMotor flywheel1, flywheel2;
-    SmoothPID flywheel1PID, flywheel2PID;
+    // just set this bigger than how many shooter motors team is using
+    static constexpr int ARRAY_SIZE = 10;
+    // DJIMotor flywheel1, flywheel2;
+    // DJIMotor flywheel_array[ARRAY_SIZE];
+    // SmoothPID flywheel1PID, flywheel2PID;
+    // SmoothPID flywheel_PID_array[ARRAY_SIZE];
 
 #ifdef TARGET_SENTRY
     DJIMotor flywheel3, flywheel4;
@@ -101,17 +109,17 @@ public:  // why is this public:
     // CONSTANTS
     uint8_t SHOOTER_MOTOR_COUNT;
 
-    // ultra fucked
+    // we should never be using more than 10 shooter motors
+    Matrix<float, ARRAY_SIZE, 1> targetRPMs;
+    Matrix<int32_t, ARRAY_SIZE, 1> desiredOutputs;
+    Matrix<DJIMotor*, ARRAY_SIZE, 1> motors;
+    Matrix<SmoothPID*, ARRAY_SIZE, 1> velocityPIDs;
 
-    // Matrix<float, SHOOTER_MOTOR_COUNT, 1> targetRPMs;
-    // Matrix<int32_t, SHOOTER_MOTOR_COUNT, 1> desiredOutputs;
-    // Matrix<DJIMotor*, SHOOTER_MOTOR_COUNT, 1> motors;
-    // Matrix<SmoothPID*, SHOOTER_MOTOR_COUNT, 1> velocityPIDs;
-
-    std::vector<float> targetRPMs;
-    std::vector<int32_t> desiredOutputs;
-    std::vector<DJIMotor*> motors;
-    std::vector<SmoothPID*> velocityPIDs;
+    // maybe I'll just stick to matrix, then...
+    //  std::array<float, 8> targetRPMs;
+    //  std::array<int32_t, 8> desiredOutputs;
+    //  std::array<DJIMotor*, 8> motors;
+    //  std::array<SmoothPID*, 8> velocityPIDs;
 
     src::Utils::RefereeHelperTurreted* refHelper;
 };
