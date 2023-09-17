@@ -125,7 +125,32 @@ BarrelID currentBarrel = BARREL_IDS[0];
 src::Utils::RefereeHelperTurreted refHelper(drivers(), currentBarrel, 30);
 
 // Define subsystems here ------------------------------------------------
-ChassisSubsystem chassis(drivers());
+ChassisSubsystem chassis(
+    drivers(),
+    DRIVEN_WHEEL_COUNT,
+    MOTORS_PER_WHEEL,
+    WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE,
+    MIN_CHASSIS_POWER,
+    MIN_WHEEL_SPEED_SINGLE_MOTOR,
+    MAX_WHEEL_SPEED_SINGLE_MOTOR,
+    CHASSIS_VELOCITY_PID_CONFIG,
+    LEFT_BACK_WHEEL_ID,
+    LEFT_FRONT_WHEEL_ID,
+    RIGHT_FRONT_WHEEL_ID,
+    RIGHT_BACK_WHEEL_ID,
+    CHASSIS_BUS,
+    STARTING_ENERGY_BUFFER,
+    ENERGY_BUFFER_LIMIT_THRESHOLD,
+    ENERGY_BUFFER_CRIT_THRESHOLD,
+    POWER_LIMIT_SAFETY_FACTOR,
+    CHASSIS_GEARBOX_RATIO,
+    WHEELBASE_WIDTH,
+    WHEELBASE_LENGTH,
+    WHEELBASE_HYPOTENUSE,
+    WHEEL_RADIUS,
+    GIMBAL_X_OFFSET,
+    GIMBAL_Y_OFFSET,
+    MIN_ROTATION_THRESHOLD);
 FeederSubsystem feeder(drivers());
 GimbalSubsystem gimbal(drivers());
 ShooterSubsystem shooter(

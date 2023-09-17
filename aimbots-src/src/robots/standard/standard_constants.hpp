@@ -307,6 +307,8 @@ static constexpr float WHEELBASE_WIDTH = 0.3849f;
 
 static constexpr float WHEELBASE_LENGTH = 0.3284f;
 
+static constexpr float WHEELBASE_HYPOTENUSE = 2 / (WHEELBASE_WIDTH + WHEELBASE_LENGTH);
+
 static constexpr float GIMBAL_X_OFFSET = 0.0f;
 static constexpr float GIMBAL_Y_OFFSET = 0.0f;
 

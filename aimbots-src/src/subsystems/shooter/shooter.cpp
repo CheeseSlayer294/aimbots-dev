@@ -13,8 +13,8 @@ ShooterSubsystem::ShooterSubsystem(
     uint8_t SHOOTER_MOTOR_COUNT,
     SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG,
     CANBus SHOOTER_BUS,
-    MotorID SHOOTER_ID_ARRAY[],
-    bool SHOOTER_DIRECTION_ARRAY[])
+    const MotorID* SHOOTER_ID_ARRAY,
+    const bool* SHOOTER_DIRECTION_ARRAY)
     : Subsystem(drivers),
       SHOOTER_MOTOR_COUNT(SHOOTER_MOTOR_COUNT),
       targetRPMs(Matrix<float, ARRAY_SIZE, 1>::zeroMatrix()),
@@ -141,7 +141,7 @@ void ShooterSubsystem::setDesiredOutputToMotor(MotorIndex motorIdx) {
  */
 template <class... Args>
 void ForAllShooterMotors(void (DJIMotor::*func)(Args...), Args... args) {
-    for (auto i = 0; i < shooterMotorCount; i++) {
+    for (auto i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
         (motors[i][0]->*func)(args...);
     }
 }
@@ -154,7 +154,7 @@ void ForAllShooterMotors(void (DJIMotor::*func)(Args...), Args... args) {
  */
 template <class... Args>
 void ForAllShooterMotors(void (ShooterSubsystem::*func)(MotorIndex, Args...), Args... args) {
-    for (auto i = 0; i < shooterMotorCount; i++) {
+    for (auto i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
         MotorIndex mi = static_cast<MotorIndex>(i);
         (this->*func)(mi, args...);
     }

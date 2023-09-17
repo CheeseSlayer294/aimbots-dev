@@ -9,6 +9,7 @@
 #include <tap/control/command.hpp>
 #include <tap/control/comprised_command.hpp>
 
+#include "tap/algorithms/contiguous_float.hpp"
 #include "tap/algorithms/math_user_utils.hpp"
 #include "tap/communication/gpio/digital.hpp"  //maybe not
 #include "tap/communication/serial/ref_serial_data.hpp"
@@ -21,7 +22,6 @@
 #include "modm/math/interpolation/linear.hpp"
 #include "modm/math/matrix.hpp"
 #include "pid/smooth_pid_wrap.hpp"
-
 
 inline float pow2(float x) { return x * x; }
 
@@ -119,6 +119,8 @@ using Vector3f = modm::Vector3f;
 using Vector4f = modm::Vector4f;
 template <typename T, std::size_t N>
 using Deque = modm::BoundedDeque<T, N>;
+
+using ContiguousFloat = tap::algorithms::ContiguousFloat;
 
 template <class... Args>
 using DJIMotorFunc = void (DJIMotor::*)(Args...);

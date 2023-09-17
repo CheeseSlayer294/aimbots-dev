@@ -30,8 +30,8 @@ public:
         uint8_t SHOOTER_MOTOR_COUNT,
         SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG,
         CANBus SHOOTER_BUS,
-        MotorID SHOOTER_ID_ARRAY[],
-        bool SHOOTER_DIRECTION_ARRAY[]
+        const MotorID* SHOOTER_ID_ARRAY,
+        const bool* SHOOTER_DIRECTION_ARRAY
         // ,MotorID shooter_1_id,
         // MotorID shooter_2_id
     );
@@ -122,5 +122,11 @@ public:  // why is this public:
     //  std::array<SmoothPID*, 8> velocityPIDs;
 
     src::Utils::RefereeHelperTurreted* refHelper;
+
+    template <class... Args>
+    void ForAllShooterMotors(void (DJIMotor::*func)(Args...), Args... args) {}
+
+    template <class... Args>
+    void ForAllShooterMotors(void (ShooterSubsystem::*func)(MotorIndex, Args...), Args... args) {}
 };
 };  // namespace src::Shooter
