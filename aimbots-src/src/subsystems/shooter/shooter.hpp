@@ -6,8 +6,7 @@
 
 #include "utils/common_types.hpp"
 #include "utils/ref_system/ref_helper_turreted.hpp"
-// delete this when done refactoring pls !!!
-// #include "utils/robot_specific_inc.hpp"
+#include "utils/robot_specific_inc.hpp"
 
 namespace src::Shooter {
 
@@ -24,17 +23,34 @@ enum MotorIndex {
 
 class ShooterSubsystem : public tap::control::Subsystem {
 public:
-    ShooterSubsystem(
-        tap::Drivers* drivers,
-        src::Utils::RefereeHelperTurreted* refHelper,
-        uint8_t SHOOTER_MOTOR_COUNT,
-        SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG,
-        CANBus SHOOTER_BUS,
-        const MotorID* SHOOTER_ID_ARRAY,
-        const bool* SHOOTER_DIRECTION_ARRAY
-        // ,MotorID shooter_1_id,
-        // MotorID shooter_2_id
-    );
+    ShooterSubsystem(tap::Drivers* drivers, src::Utils::RefereeHelperTurreted* refHelper);
+
+    /**
+     * Allows user to call a DJIMotor member function on all shooter motors
+     *
+     * @param function pointer to a member function of DJIMotor
+     * @param args arguments to pass to the member function
+     */
+    template <class... Args>
+    void ForAllShooterMotors(void (DJIMotor::*func)(Args...), Args... args) {
+        for (auto i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
+            (motors[i][0]->*func)(args...);
+        }
+    }
+
+    /**
+     * Allows user to call a ShooterSubsystem function on all shooter motors.
+     *
+     * @param function pointer to a member function of ShooterSubsystem that takes a MotorIndex as it's first argument
+     * @param args arguments to pass to the member function
+     */
+    template <class... Args>
+    void ForAllShooterMotors(void (ShooterSubsystem::*func)(MotorIndex, Args...), Args... args) {
+        for (auto i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
+            MotorIndex mi = static_cast<MotorIndex>(i);
+            (this->*func)(mi, args...);
+        }
+    }
 
     mockable void initialize() override;
     void refresh() override;
@@ -89,44 +105,23 @@ public:
 #ifndef ENV_UNIT_TESTS
 private:
 #else
-private:
-    ;
-
-public:  // why is this public:
+public:
 #endif
-    // just set this bigger than how many shooter motors team is using
-    static constexpr int ARRAY_SIZE = 10;
-    // DJIMotor flywheel1, flywheel2;
-    // DJIMotor flywheel_array[ARRAY_SIZE];
-    // SmoothPID flywheel1PID, flywheel2PID;
-    // SmoothPID flywheel_PID_array[ARRAY_SIZE];
+
+    DJIMotor flywheel1, flywheel2;
+    SmoothPID flywheel1PID, flywheel2PID;
 
 #ifdef TARGET_SENTRY
     DJIMotor flywheel3, flywheel4;
     SmoothPID flywheel3PID, flywheel4PID;
 #endif
 
-    // CONSTANTS
-    uint8_t SHOOTER_MOTOR_COUNT;
+    Matrix<float, SHOOTER_MOTOR_COUNT, 1> targetRPMs;
+    Matrix<int32_t, SHOOTER_MOTOR_COUNT, 1> desiredOutputs;
+    Matrix<DJIMotor*, SHOOTER_MOTOR_COUNT, 1> motors;
 
-    // we should never be using more than 10 shooter motors
-    Matrix<float, ARRAY_SIZE, 1> targetRPMs;
-    Matrix<int32_t, ARRAY_SIZE, 1> desiredOutputs;
-    Matrix<DJIMotor*, ARRAY_SIZE, 1> motors;
-    Matrix<SmoothPID*, ARRAY_SIZE, 1> velocityPIDs;
-
-    // maybe I'll just stick to matrix, then...
-    //  std::array<float, 8> targetRPMs;
-    //  std::array<int32_t, 8> desiredOutputs;
-    //  std::array<DJIMotor*, 8> motors;
-    //  std::array<SmoothPID*, 8> velocityPIDs;
+    Matrix<SmoothPID*, SHOOTER_MOTOR_COUNT, 1> velocityPIDs;
 
     src::Utils::RefereeHelperTurreted* refHelper;
-
-    template <class... Args>
-    void ForAllShooterMotors(void (DJIMotor::*func)(Args...), Args... args) {}
-
-    template <class... Args>
-    void ForAllShooterMotors(void (ShooterSubsystem::*func)(MotorIndex, Args...), Args... args) {}
 };
 };  // namespace src::Shooter

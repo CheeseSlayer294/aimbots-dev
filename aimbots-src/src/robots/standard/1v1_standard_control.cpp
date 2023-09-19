@@ -122,10 +122,7 @@ src::Utils::RefereeHelperTurreted refHelper(drivers(), currentBarrel, 15);
 ChassisSubsystem chassis(drivers());
 FeederSubsystem feeder(drivers());
 GimbalSubsystem gimbal(drivers());
-ShooterSubsystem shooter(
-    drivers(),
-    &refHelper,
-    SHOOTER_MOTOR_COUNT);
+ShooterSubsystem shooter(drivers(), &refHelper);
 HopperSubsystem hopper(
     drivers(),
     HOPPER_PIN,
