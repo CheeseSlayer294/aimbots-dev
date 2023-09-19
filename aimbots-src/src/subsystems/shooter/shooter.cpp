@@ -7,36 +7,46 @@
 
 namespace src::Shooter {
 
-ShooterSubsystem::ShooterSubsystem(tap::Drivers* drivers, src::Utils::RefereeHelperTurreted* refHelper)
+ShooterSubsystem::ShooterSubsystem(
+    tap::Drivers* drivers,
+    src::Utils::RefereeHelperTurreted* refHelper,
+    uint8_t SHOOTER_MOTOR_COUNT,
+    SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG,
+    CANBus SHOOTER_BUS,
+    const MotorID* SHOOTER_ID_ARRAY,
+    const bool* SHOOTER_DIRECTION_ARRAY)
     : Subsystem(drivers),
-      flywheel1(drivers, SHOOTER_1_ID, SHOOTER_BUS, SHOOTER_1_DIRECTION, "Flywheel One"),
-      flywheel2(drivers, SHOOTER_2_ID, SHOOTER_BUS, SHOOTER_2_DIRECTION, "Flywheel Two"),
-      flywheel1PID(SHOOTER_VELOCITY_PID_CONFIG),
-      flywheel2PID(SHOOTER_VELOCITY_PID_CONFIG),
-#ifdef TARGET_SENTRY
-      flywheel3(drivers, SHOOTER_3_ID, SHOOTER_BUS, SHOOTER_3_DIRECTION, "Flywheel Three"),
-      flywheel4(drivers, SHOOTER_4_ID, SHOOTER_BUS, SHOOTER_4_DIRECTION, "Flywheel Four"),
-      flywheel3PID(SHOOTER_VELOCITY_PID_CONFIG),
-      flywheel4PID(SHOOTER_VELOCITY_PID_CONFIG),
-
-#endif
-      targetRPMs(Matrix<float, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
-      desiredOutputs(Matrix<int32_t, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
-      motors(Matrix<DJIMotor*, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
-      velocityPIDs(Matrix<SmoothPID*, SHOOTER_MOTOR_COUNT, 1>::zeroMatrix()),
-      refHelper(refHelper)
-//
+      SHOOTER_MOTOR_COUNT(SHOOTER_MOTOR_COUNT),
+      targetRPMs(Matrix<float, ARRAY_SIZE, 1>::zeroMatrix()),
+      desiredOutputs(Matrix<int32_t, ARRAY_SIZE, 1>::zeroMatrix()),
+      motors(Matrix<DJIMotor*, ARRAY_SIZE, 1>::zeroMatrix()),
+      velocityPIDs(Matrix<SmoothPID*, ARRAY_SIZE, 1>::zeroMatrix()),
+      refHelper(refHelper) /*,
+       flywheel1(drivers, SHOOTER_ID_ARRAY[0], SHOOTER_BUS, SHOOTER_DIRECTION_ARRAY[0], "Flywheel One"),
+       flywheel2(drivers, SHOOTER_ID_ARRAY[1], SHOOTER_BUS, SHOOTER_DIRECTION_ARRAY[1], "Flywheel Two"),
+       flywheel1PID(SHOOTER_VELOCITY_PID_CONFIG),
+       flywheel2PID(SHOOTER_VELOCITY_PID_CONFIG)
+ #ifdef TARGET_SENTRY
+           flywheel3(drivers, SHOOTER_ID_ARRAY[2], SHOOTER_BUS, SHOOTER_DIRECTION_ARRAY[2], "Flywheel Three"),
+       flywheel4(drivers, SHOOTER_ID_ARRAY[3], SHOOTER_BUS, SHOOTER_DIRECTION_ARRAY[3], "Flywheel Four"),
+       flywheel3PID(SHOOTER_VELOCITY_PID_CONFIG),
+       flywheel4PID(SHOOTER_VELOCITY_PID_CONFIG),
+ #endif*/
 {
-    motors[RIGHT][0] = &flywheel1;  // TOP_RIGHT == RIGHT
-    motors[LEFT][0] = &flywheel2;   // BOT_RIGHT == LEFT
-    velocityPIDs[RIGHT][0] = &flywheel1PID;
-    velocityPIDs[LEFT][0] = &flywheel2PID;
-#ifdef TARGET_SENTRY
-    motors[TOP_LEFT][0] = &flywheel3;
-    motors[BOT_LEFT][0] = &flywheel4;
-    velocityPIDs[TOP_LEFT][0] = &flywheel3PID;
-    velocityPIDs[BOT_LEFT][0] = &flywheel4PID;
-#endif
+    for (int i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
+        motors[i][0] = &DJIMotor(drivers, SHOOTER_ID_ARRAY[i], SHOOTER_BUS, SHOOTER_DIRECTION_ARRAY[i], "flywheel");
+        velocityPIDs[i][0] = &SmoothPID(SHOOTER_VELOCITY_PID_CONFIG);
+    }
+    // motors[RIGHT][0] = &flywheel1;  // TOP_RIGHT == RIGHT
+    // motors[LEFT][0] = &flywheel2;   // BOT_RIGHT == LEFT
+    // velocityPIDs[RIGHT][0] = &flywheel1PID;
+    // velocityPIDs[LEFT][0] = &flywheel2PID;
+    // #ifdef TARGET_SENTRY
+    //     motors[TOP_LEFT][0] = &flywheel3;
+    //     motors[BOT_LEFT][0] = &flywheel4;
+    //     velocityPIDs[TOP_LEFT][0] = &flywheel3PID;
+    //     velocityPIDs[BOT_LEFT][0] = &flywheel4PID;
+    // #endif
 }
 
 void ShooterSubsystem::initialize() {
@@ -58,21 +68,21 @@ float FWBotLeft = 0.0f;  // BOT_LEFT
 // Update the actual RPMs of the motors; the calculation is called from ShooterCommand
 void ShooterSubsystem::refresh() {
     // Debug info
-    if (flywheel1.isMotorOnline()) {
-        shaftSpeedDisplay = flywheel1.getShaftRPM();
-        PIDoutDisplay = flywheel1PID.getOutput();
+    if (motors[0][0]->isMotorOnline()) {
+        shaftSpeedDisplay = motors[0][0]->getShaftRPM();
+        PIDoutDisplay = velocityPIDs[0][0]->getOutput();
 
-        FWRight1 = flywheel1.getShaftRPM();
+        FWRight1 = motors[0][0]->getShaftRPM();
     }
-    if (flywheel2.isMotorOnline()) {
-        FWLeft1 = flywheel2.getShaftRPM();
+    if (motors[1][0]->isMotorOnline()) {
+        FWLeft1 = motors[1][0]->getShaftRPM();
     }
 #ifdef TARGET_SENTRY
-    if (flywheel3.isMotorOnline()) {
-        FWTopLeft = flywheel3.getShaftRPM();
+    if (motors[2][0]->isMotorOnline()) {
+        FWTopLeft = motors[2][0]->getShaftRPM();
     }
-    if (flywheel4.isMotorOnline()) {
-        FWBotLeft = flywheel4.getShaftRPM();
+    if (motors[3][0]->isMotorOnline()) {
+        FWBotLeft = motors[3][0]->getShaftRPM();
     }
 #endif
     ForAllShooterMotors(&ShooterSubsystem::setDesiredOutputToMotor);
@@ -84,9 +94,8 @@ void ShooterSubsystem::refresh() {
 float ShooterSubsystem::getHighestMotorSpeed() const {
     float highestMotorSpeed = 0.0f;
     for (int i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
-        MotorIndex mi = static_cast<MotorIndex>(i);
-        if (motors[mi][0]->isMotorOnline()) {
-            float motorSpeed = motors[mi][0]->getShaftRPM();
+        if (motors[i][0]->isMotorOnline()) {
+            float motorSpeed = motors[i][0]->getShaftRPM();
             if (fabs(motorSpeed) > highestMotorSpeed) {
                 highestMotorSpeed = motorSpeed;
             }
@@ -123,4 +132,32 @@ void ShooterSubsystem::setDesiredOutputToMotor(MotorIndex motorIdx) {
         motors[motorIdx][0]->setDesiredOutput(desiredOutputs[motorIdx][0]);
     }
 }
+
+/**
+ * Allows user to call a DJIMotor member function on all shooter motors
+ *
+ * @param function pointer to a member function of DJIMotor
+ * @param args arguments to pass to the member function
+ */
+template <class... Args>
+void ForAllShooterMotors(void (DJIMotor::*func)(Args...), Args... args) {
+    for (auto i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
+        (motors[i][0]->*func)(args...);
+    }
+}
+
+/**
+ * Allows user to call a ShooterSubsystem function on all shooter motors.
+ *
+ * @param function pointer to a member function of ShooterSubsystem that takes a MotorIndex as it's first argument
+ * @param args arguments to pass to the member function
+ */
+template <class... Args>
+void ForAllShooterMotors(void (ShooterSubsystem::*func)(MotorIndex, Args...), Args... args) {
+    for (auto i = 0; i < SHOOTER_MOTOR_COUNT; i++) {
+        MotorIndex mi = static_cast<MotorIndex>(i);
+        (this->*func)(mi, args...);
+    }
+}
+
 };  // namespace src::Shooter

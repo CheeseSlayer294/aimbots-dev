@@ -6,15 +6,11 @@
 #define BARREL_SWAP_COMPATIBLE
 // #define TURRET_HAS_IMU
 
-
-
 /**
  * @brief Defines the number of motors created for the chassis.
  */
 static constexpr uint8_t DRIVEN_WHEEL_COUNT = 4;
 static constexpr uint8_t MOTORS_PER_WHEEL = 1;
-
-static constexpr uint8_t SHOOTER_MOTOR_COUNT = 2;
 
 /**
  * @brief GIMBAL SETUP
@@ -267,14 +263,20 @@ static constexpr CANBus BARREL_BUS = CANBus::CAN_BUS1;  // TODO: check CAN ID fo
 //
 static constexpr MotorID FEEDER_ID = MotorID::MOTOR7;
 //
+static constexpr uint8_t SHOOTER_MOTOR_COUNT = 2;
+//
 static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR3;
 static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR4;
+// array version
+static constexpr MotorID SHOOTER_ID_ARRAY[SHOOTER_MOTOR_COUNT] = {SHOOTER_1_ID, SHOOTER_2_ID};
 //
 static constexpr MotorID SWAP_MOTOR_ID = MotorID::MOTOR1;  // TODO: check motor ID for Barrel Swap
 
 static constexpr bool SHOOTER_1_DIRECTION = false;
 static constexpr bool SHOOTER_2_DIRECTION = true;
-
+// array version
+static constexpr bool SHOOTER_DIRECTION_ARRAY[SHOOTER_MOTOR_COUNT] = {SHOOTER_1_DIRECTION, SHOOTER_2_DIRECTION};
+//
 static constexpr bool FEEDER_DIRECTION = false;
 
 static constexpr bool BARREL_SWAP_DIRECTION = true;
@@ -304,6 +306,8 @@ static constexpr float WHEEL_RADIUS = 0.076f;
 static constexpr float WHEELBASE_WIDTH = 0.3849f;
 
 static constexpr float WHEELBASE_LENGTH = 0.3284f;
+
+static constexpr float WHEELBASE_HYPOTENUSE = 2 / (WHEELBASE_WIDTH + WHEELBASE_LENGTH);
 
 static constexpr float GIMBAL_X_OFFSET = 0.0f;
 static constexpr float GIMBAL_Y_OFFSET = 0.0f;

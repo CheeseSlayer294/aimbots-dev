@@ -5,7 +5,7 @@
 
 #include "utils/common_types.hpp"
 #include "utils/motion/power_limiter/power_limiter.hpp"
-#include "utils/robot_specific_inc.hpp"
+// #include "utils/robot_specific_inc.hpp"
 
 #include "drivers.hpp"
 
@@ -38,7 +38,31 @@ enum ChassisVelIndex {
 class ChassisSubsystem : public tap::control::chassis::ChassisSubsystemInterface {
 public:
     ChassisSubsystem(  // Default chassis constructor
-        src::Drivers* drivers);
+        src::Drivers* drivers,
+        uint8_t DRIVEN_WHEEL_COUNT,
+        uint8_t MOTORS_PER_WHEEL,
+        int WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE,
+        int MIN_CHASSIS_POWER,
+        int MIN_WHEEL_SPEED_SINGLE_MOTOR,
+        int MAX_WHEEL_SPEED_SINGLE_MOTOR,
+        SmoothPIDConfig CHASSIS_VELOCITY_PID_CONFIG,
+        MotorID LEFT_BACK_WHEEL_ID,
+        MotorID LEFT_FRONT_WHEEL_ID,
+        MotorID RIGHT_FRONT_WHEEL_ID,
+        MotorID RIGHT_BACK_WHEEL_ID,
+        CANBus CHASSIS_BUS,
+        float STARTING_ENERGY_BUFFER,
+        float ENERGY_BUFFER_LIMIT_THRESHOLD,
+        float ENERGY_BUFFER_CRIT_THRESHOLD,
+        float POWER_LIMIT_SAFETY_FACTOR,
+        float CHASSIS_GEARBOX_RATIO,
+        float WHEELBASE_WIDTH,
+        float WHEELBASE_LENGTH,
+        float WHEELBASE_HYPOTENUSE,
+        float WHEEL_RADIUS,
+        float GIMBAL_X_OFFSET,
+        float GIMBAL_Y_OFFSET,
+        float MIN_ROTATION_THRESHOLD);
 
     /**
      * Allows user to call a DJIMotor member function on all chassis motors
@@ -118,6 +142,7 @@ public:
      * @return Returns the maximum wheel speed that can be reasonably achieved while maintaining the current power limit.
      */
     static inline float getMaxRefWheelSpeed(bool refSerialOnline, int chassisPowerLimit) {
+        // inline float getMaxRefWheelSpeed(bool refSerialOnline, int chassisPowerLimit) {
         if (refSerialOnline) {
             float desWheelSpeed =
                 WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE * static_cast<float>(chassisPowerLimit - MIN_CHASSIS_POWER) +
@@ -148,19 +173,22 @@ public:
      * Converts the velocity matrix from raw RPM to wheel velocity in m/s.
      */
     inline modm::Matrix<float, 4, 1> convertRawRPM(const modm::Matrix<float, 4, 1>& mat) const {
-        static constexpr float ratio = 2.0f * M_PI * CHASSIS_GEARBOX_RATIO / 60.0f;
+        // static constexpr float ratio = 2.0f * M_PI * CHASSIS_GEARBOX_RATIO / 60.0f;
+        float ratio = 2.0f * M_PI * CHASSIS_GEARBOX_RATIO / 60.0f;
         return mat * ratio;
     }
 
     Matrix<float, 3, 1> getActualVelocityChassisRelative() const override {
-        Matrix<float, DRIVEN_WHEEL_COUNT, 1> wheelVelocities;
+        Matrix<float, (int)ARBITRARY_MAX_DRIVEN_WHEEL_COUNT, 1> wheelVelocities;
 
         wheelVelocities[LF][0] = leftFrontWheel.getShaftRPM();
         wheelVelocities[RF][0] = rightFrontWheel.getShaftRPM();
         wheelVelocities[LB][0] = leftBackWheel.getShaftRPM();
         wheelVelocities[RB][0] = rightBackWheel.getShaftRPM();
 
-        return wheelVelToChassisVelMat * convertRawRPM(wheelVelocities);
+#warning getActualVelocityChassisRelative DOESN'T WORK
+        // return wheelVelToChassisVelMat * convertRawRPM((wheelVelocities));
+        return 0;
     }
 
     bool getTokyoDrift() const;
@@ -171,6 +199,31 @@ private:
 #else
 public:
 #endif
+    uint8_t DRIVEN_WHEEL_COUNT;
+    uint8_t MOTORS_PER_WHEEL;
+    static int WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE;
+    static int MIN_CHASSIS_POWER;
+    static int MIN_WHEEL_SPEED_SINGLE_MOTOR;
+    static int MAX_WHEEL_SPEED_SINGLE_MOTOR;
+    SmoothPIDConfig CHASSIS_VELOCITY_PID_CONFIG;
+    MotorID LEFT_BACK_WHEEL_ID;
+    MotorID LEFT_FRONT_WHEEL_ID;
+    MotorID RIGHT_FRONT_WHEEL_ID;
+    MotorID RIGHT_BACK_WHEEL_ID;
+    CANBus CHASSIS_BUS;
+    float STARTING_ENERGY_BUFFER;
+    float ENERGY_BUFFER_LIMIT_THRESHOLD;
+    float ENERGY_BUFFER_CRIT_THRESHOLD;
+    float POWER_LIMIT_SAFETY_FACTOR;
+    float CHASSIS_GEARBOX_RATIO;
+    float WHEELBASE_WIDTH;
+    float WHEELBASE_LENGTH;
+    float WHEELBASE_HYPOTENUSE;
+    float WHEEL_RADIUS;
+    float GIMBAL_X_OFFSET;
+    float GIMBAL_Y_OFFSET;
+    float MIN_ROTATION_THRESHOLD;
+
     src::Drivers* drivers;
     float desiredRotation = 0.0f;
 
@@ -180,12 +233,19 @@ public:
     DJIMotor leftBackYaw, leftFrontYaw, rightFrontYaw, rightBackYaw;
     SmoothPID leftBackYawPosPID, leftFrontYawPosPID, rightFrontYawPosPID, rightBackYawPosPID;
 #endif
-    Matrix<float, DRIVEN_WHEEL_COUNT, MOTORS_PER_WHEEL> targetRPMs;
-    Matrix<float, DRIVEN_WHEEL_COUNT, MOTORS_PER_WHEEL> desiredOutputs;
+    static constexpr uint8_t ARBITRARY_MAX_DRIVEN_WHEEL_COUNT = 16;
+    static constexpr uint8_t ARBITRARY_MAX_MOTORS_PER_WHEEL = 4;
 
-    Matrix<DJIMotor*, DRIVEN_WHEEL_COUNT, MOTORS_PER_WHEEL> motors;
+    // Matrix<float, DRIVEN_WHEEL_COUNT, MOTORS_PER_WHEEL> targetRPMs;
+    // Matrix<float, DRIVEN_WHEEL_COUNT, MOTORS_PER_WHEEL> desiredOutputs;
+    Matrix<float, ARBITRARY_MAX_DRIVEN_WHEEL_COUNT, ARBITRARY_MAX_MOTORS_PER_WHEEL> targetRPMs;
+    Matrix<float, ARBITRARY_MAX_DRIVEN_WHEEL_COUNT, ARBITRARY_MAX_MOTORS_PER_WHEEL> desiredOutputs;
 
-    Matrix<SmoothPID*, DRIVEN_WHEEL_COUNT, MOTORS_PER_WHEEL> velocityPIDs;
+    // Matrix<DJIMotor*, DRIVEN_WHEEL_COUNT, MOTORS_PER_WHEEL> motors;
+    Matrix<DJIMotor*, ARBITRARY_MAX_DRIVEN_WHEEL_COUNT, ARBITRARY_MAX_MOTORS_PER_WHEEL> motors;
+
+    // Matrix<SmoothPID*, DRIVEN_WHEEL_COUNT, MOTORS_PER_WHEEL> velocityPIDs;
+    Matrix<SmoothPID*, ARBITRARY_MAX_DRIVEN_WHEEL_COUNT, ARBITRARY_MAX_MOTORS_PER_WHEEL> velocityPIDs;
 
     src::Utils::Control::PowerLimiting::PowerLimiter powerLimiter;
 

@@ -44,8 +44,8 @@ void rescaleDesiredInputToPowerLimitedSpeeds(
     // the maximum translational speed that we can achieve while maintaining the desired rotation speed
     float rTranslationalGain = chassis->calculateRotationLimitedTranslationalWheelspeed(*desiredRotation, maxWheelSpeed);
 
-    *desiredX = limitVal<float>(*desiredX * maxWheelSpeed, -rTranslationalGain, rTranslationalGain);
-    *desiredY = limitVal<float>(*desiredY * maxWheelSpeed, -rTranslationalGain, rTranslationalGain);
+    *desiredX = tap::algorithms::limitVal<float>(*desiredX * maxWheelSpeed, -rTranslationalGain, rTranslationalGain);
+    *desiredY = tap::algorithms::limitVal<float>(*desiredY * maxWheelSpeed, -rTranslationalGain, rTranslationalGain);
 }
 
 void randomizeSpinCharacteristics(
@@ -64,7 +64,7 @@ void randomizeSpinCharacteristics(
 // Pass a ChassisRelative Error to this function, and it will return the error for the nearest chassis corner
 float findNearestChassisErrorTo(float chassisRelativeTargetAngle, SnapSymmetryConfig snapSymmetryConfig) {
     float angleBetweenCorners = M_TWOPI / static_cast<float>(snapSymmetryConfig.numSnapPositions);
-    ContiguousFloat targetContiguousAngle(chassisRelativeTargetAngle, 0, M_TWOPI);
+    tap::algorithms::ContiguousFloat targetContiguousAngle(chassisRelativeTargetAngle, 0, M_TWOPI);
 
     float nearestCornerError = targetContiguousAngle.difference(snapSymmetryConfig.snapAngle);
 
