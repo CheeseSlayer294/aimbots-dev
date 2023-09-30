@@ -34,8 +34,8 @@ void FullAutoIndexerCommand::execute() {
 
 void FullAutoIndexerCommand::end(bool) { indexer->setTargetRPM(0.0f); }
 
-bool FullAutoIndexerCommand::isReady() { return refHelper->canCurrBarrelShootSafely(); }
+bool FullAutoIndexerCommand::isReady() { return true; }
 
-bool FullAutoIndexerCommand::isFinished() const { return !refHelper->canCurrBarrelShootSafely(); }
+bool FullAutoIndexerCommand::isFinished() const { return false; }
 
 }  // namespace src::Indexer

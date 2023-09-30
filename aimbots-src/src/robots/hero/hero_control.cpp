@@ -240,7 +240,7 @@ void initializeSubsystems() {
 
 // Set default command here -----------------------------------------------
 void setDefaultCommands(src::Drivers *) {
-    feeder.setDefaultCommand(&stopFeederCommand);
+    // feeder.setDefaultCommand(&stopFeederCommand);
     indexer.setDefaultCommand(&stopIndexerCommand);
     shooter.setDefaultCommand(&stopShooterComprisedCommand);
 }
@@ -263,7 +263,7 @@ void registerIOMappings(src::Drivers *drivers) {
     drivers->commandMapper.addMap(&leftSwitchMid);
     drivers->commandMapper.addMap(&leftSwitchUp);
     drivers->commandMapper.addMap(&rightSwitchUp);
-    drivers->commandMapper.addMap(&rightSwitchMid);
+    // drivers->commandMapper.addMap(&rightSwitchMid);
     // drivers->commandMapper.addMap(&bCtrlPressed);
     // drivers->commandMapper.addMap(&leftClickMouse);
 }

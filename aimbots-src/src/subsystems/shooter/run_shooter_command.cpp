@@ -31,10 +31,14 @@ tap::communication::serial::RefSerialData::Rx::TurretData refSysRobotTurretDataD
 uint16_t flywheelRPMDisplay = 0;
 uint16_t flywheelCurrentRPMDisplay = 0;
 
+bool commandIsRunning = false;
+
 float currentHeatDisplay = 0.0f;
 float heatLimitDisplay = 0.0f;
 
 void RunShooterCommand::execute() {
+
+    commandIsRunning = true;
 
     currentHeatDisplay = refHelper->getCurrBarrelHeat();
     heatLimitDisplay = refHelper->getCurrBarrelLimit();
@@ -68,6 +72,7 @@ void RunShooterCommand::execute() {
 
 void RunShooterCommand::end(bool) {
     // No cleanup needed
+    commandIsRunning = false;
 }
 
 bool RunShooterCommand::isReady() { return true; }
