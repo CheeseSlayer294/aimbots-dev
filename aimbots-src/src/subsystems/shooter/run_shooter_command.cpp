@@ -55,6 +55,13 @@ void RunShooterCommand::execute() {
         }
     }
 
+    if (drivers->remote.getSwitch(Remote::Switch::LEFT_SWITCH) == Remote::SwitchState::MID) {
+        flywheelRPM = SHOOTER_SPEED_MATRIX[0][1];
+    }
+    else {
+        flywheelRPM = SHOOTER_SPEED_MATRIX[1][1];
+    }
+
     shooter->ForAllShooterMotors(&ShooterSubsystem::setTargetRPM, static_cast<float>(flywheelRPM));
     shooter->ForAllShooterMotors(&ShooterSubsystem::updateMotorVelocityPID);
 }

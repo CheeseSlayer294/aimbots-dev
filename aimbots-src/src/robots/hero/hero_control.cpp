@@ -186,25 +186,24 @@ StopShooterComprisedCommand stopShooterComprisedCommand(drivers(), &shooter);
 // Define command mappings here -------------------------------------------
 HoldCommandMapping leftSwitchMid(
     drivers(),
-    {&chassisToggleDriveCommand, &gimbalFieldRelativeControlCommand, &feederIndexerCommand},
+    {/*&chassisToggleDriveCommand, &gimbalFieldRelativeControlCommand, &feederIndexerCommand*/&runShooterCommand},
     RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::MID));
 
 // Enables both chassis and gimbal control and closes hopper
 HoldCommandMapping leftSwitchUp(
     drivers(),
-    {&chassisTokyoCommand, &gimbalFieldRelativeControlCommand2},
+    {/*&chassisTokyoCommand, &gimbalFieldRelativeControlCommand2, */&runShooterWithFeederCommand},
     RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
-
 
 HoldCommandMapping rightSwitchMid(
     drivers(),
-    {&runShooterCommand},
+    {/*&runShooterCommand*/},
     RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::MID));
 
 // Runs shooter with feeder and closes hopper
 HoldRepeatCommandMapping rightSwitchUp(
     drivers(),
-    {&runFeederCommand, &runIndexerCommand, &runShooterWithFeederCommand},
+    {/*&runFeederCommand, */&runIndexerCommand/*, &runShooterWithFeederCommand*/},
     RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP),
     true);
 
@@ -266,7 +265,7 @@ void registerIOMappings(src::Drivers *drivers) {
     drivers->commandMapper.addMap(&rightSwitchUp);
     drivers->commandMapper.addMap(&rightSwitchMid);
     // drivers->commandMapper.addMap(&bCtrlPressed);
-    drivers->commandMapper.addMap(&leftClickMouse);
+    // drivers->commandMapper.addMap(&leftClickMouse);
 }
 
 }  // namespace HeroControl
