@@ -15,7 +15,9 @@ void CloseHopperCommand::initialize() {
     hopper->setHopperState(CLOSED);
 }
 
-void CloseHopperCommand::execute() {}
+void CloseHopperCommand::execute() {
+    //stuff normally goes here
+}
 
 void CloseHopperCommand::end(bool) {}
 
