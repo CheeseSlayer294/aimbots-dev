@@ -20,7 +20,7 @@ static constexpr SmoothPIDConfig FEEDER_VELOCITY_PID_CONFIG = {
     .ki = 0.0f,
     .kd = 0.8f,
     .maxICumulative = 10.0f,
-    .maxOutput = M2006_MAX_OUTPUT,
+    .maxOutput = M2006_MAX_OUTPUT, //TODO: Check Motor Type
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 1.0f,
     .tQProportionalKalman = 1.0f,
@@ -31,7 +31,7 @@ static constexpr SmoothPIDConfig FEEDER_VELOCITY_PID_CONFIG = {
 
 static constexpr float DEFAULT_BURST_LENGTH = 5;
 
-static constexpr float FEEDER_DEFAULT_RPM = 3000.0f;
+static constexpr float FEEDER_DEFAULT_RPM = 20.0f;
 
 
 //SHOOTER CONSTANTS ------------------------------------------------------------------
@@ -49,7 +49,7 @@ static constexpr SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG = {
     .ki = 0.10f,
     .kd = 0.00f,
     .maxICumulative = 10.0f,
-    .maxOutput = M3508_MAX_OUTPUT,
+    .maxOutput = M3508_MAX_OUTPUT, //TODO: Check Motor Type
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 1.0f,
     .tQProportionalKalman = 1.0f,

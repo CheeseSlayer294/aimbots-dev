@@ -18,14 +18,10 @@
 #include "tap/control/toggle_command_mapping.hpp"
 //
 #include "subsystems/feeder/feeder.hpp"
-#include "subsystems/feeder/full_auto_feeder_command.hpp"
-#include "subsystems/feeder/stop_feeder_command.hpp"
+//TODO: Add Command Includes Here
 //
-#include "subsystems/shooter/brake_shooter_command.hpp"
-#include "subsystems/shooter/run_shooter_command.hpp"
 #include "subsystems/shooter/shooter.hpp"
-#include "subsystems/shooter/stop_shooter_command.hpp"
-#include "subsystems/shooter/stop_shooter_comprised_command.hpp"
+//TODO: ADd Command Includes Here
 
 using namespace src::Feeder;
 using namespace src::Shooter;
@@ -59,36 +55,14 @@ src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSI
 
 
 // Define commands here ---------------------------------------------------
-FullAutoFeederCommand runFeederCommand(drivers(), &feeder, &refHelper, FEEDER_DEFAULT_RPM, 0.80f);
-FullAutoFeederCommand runFeederCommandFromMouse(drivers(), &feeder, &refHelper, FEEDER_DEFAULT_RPM, 0.80f);
-StopFeederCommand stopFeederCommand(drivers(), &feeder);
 
-RunShooterCommand runShooterCommand(drivers(), &shooter, &refHelper);
-RunShooterCommand runShooterWithFeederCommand(drivers(), &shooter, &refHelper);
-StopShooterComprisedCommand stopShooterComprisedCommand(drivers(), &shooter);
 
 // Define command mappings here -------------------------------------------
 
-HoldCommandMapping rightSwitchMid(
+/*HoldCommandMapping rightSwitchMid(
     drivers(),
-    {&runShooterCommand},
-    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::MID));
-
-HoldRepeatCommandMapping rightSwitchUp(
-    drivers(),
-    {&runFeederCommand, &runShooterWithFeederCommand},
-    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP),
-    true);
-
-HoldCommandMapping leftClickMouse(
-    drivers(),
-    {&runFeederCommandFromMouse},
-    RemoteMapState(RemoteMapState::MouseButton::LEFT));
-
-// HoldCommandMapping rightClickMouse(
-//     drivers(),
-//     {&},
-//     RemoteMapState(RemoteMapState::MouseButton::LEFT));
+    {&insertCommandHere},
+    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::MID));*/
 
 // Register subsystems here -----------------------------------------------
 void registerSubsystems(src::Drivers *drivers) {
@@ -104,8 +78,7 @@ void initializeSubsystems() {
 
 // Set default command here -----------------------------------------------
 void setDefaultCommands(src::Drivers *) {
-    feeder.setDefaultCommand(&stopFeederCommand);
-    shooter.setDefaultCommand(&stopShooterComprisedCommand);
+    //TODO: Add something here
 }
 
 // Set commands scheduled on startup
@@ -119,9 +92,7 @@ void startupCommands(src::Drivers *) {
 
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
-    drivers->commandMapper.addMap(&rightSwitchUp);
-    drivers->commandMapper.addMap(&rightSwitchMid);
-    drivers->commandMapper.addMap(&leftClickMouse);
+    //drivers->commandMapper.addMap(&rightSwitchMid);  TODO: Add Mappings Here
 }
 
 }  // namespace CVTestbenchControl
@@ -137,4 +108,4 @@ void initializeSubsystemCommands(src::Drivers *drivers) {
 }
 }  // namespace src::Control
 
-#endif  // TARGET_STANDARD
+#endif  // TARGET_CVTESTBENCH
