@@ -20,7 +20,7 @@ static constexpr SmoothPIDConfig FEEDER_VELOCITY_PID_CONFIG = {
     .ki = 0.0f,
     .kd = 0.8f,
     .maxICumulative = 10.0f,
-    .maxOutput = M2006_MAX_OUTPUT, //TODO: Check Motor Type
+    .maxOutput = M3508_MAX_OUTPUT, //TODO: Check Motor Type
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 1.0f,
     .tQProportionalKalman = 1.0f,
@@ -42,14 +42,14 @@ static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR3; //TODO: Need to check
 static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR4; //TODO: Need to check
 //
 static constexpr bool SHOOTER_1_DIRECTION = false; //TODO: Need to check
-static constexpr bool SHOOTER_2_DIRECTION = true; //TODO: Need to check
+static constexpr bool SHOOTER_2_DIRECTION = false; //TODO: Need to check
 
 static constexpr SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG = {
     .kp = 40.0f,
     .ki = 0.10f,
     .kd = 0.00f,
     .maxICumulative = 10.0f,
-    .maxOutput = M3508_MAX_OUTPUT, //TODO: Check Motor Type
+    .maxOutput = M2006_MAX_OUTPUT, //TODO: Check Motor Type
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 1.0f,
     .tQProportionalKalman = 1.0f,
@@ -59,10 +59,9 @@ static constexpr SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG = {
 };
 
 // clang-format off
-static constexpr uint16_t shooter_speed_array[6] = {
+static constexpr uint16_t shooter_speed_array[4] = {
     15, 3900,  // {ball m/s, flywheel rpm}
-    18, 4500,
-    30, 9000};
+    18, 4500};
 // clang-format on
 
 static const Matrix<uint16_t, 3, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);
