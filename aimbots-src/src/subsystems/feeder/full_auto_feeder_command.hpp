@@ -1,13 +1,14 @@
 #pragma once
 
 
+#include "tap/control/subsystem.hpp"
 #include "subsystems/feeder/feeder.hpp"
 
 #include "utils/common_types.hpp"
 #include "utils/robot_specific_inc.hpp"
 
 #include "drivers.hpp"
-  
+
 #ifdef FEEDER_COMPATIBLE
 
 namespace src::Feeder {
