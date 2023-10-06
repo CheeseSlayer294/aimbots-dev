@@ -21,7 +21,7 @@
 //TODO: Add Command Includes Here
 //
 #include "subsystems/shooter/shooter.hpp"
-//TODO: ADd Command Includes Here
+#include "subsystems/shooter/stop_shooter_command.hpp"
 
 using namespace src::Feeder;
 using namespace src::Shooter;
@@ -55,7 +55,7 @@ src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSI
 
 
 // Define commands here ---------------------------------------------------
-
+StopShooterCommand stopShooterCommand(drivers(), &shooter);
 
 // Define command mappings here -------------------------------------------
 
@@ -78,7 +78,7 @@ void initializeSubsystems() {
 
 // Set default command here -----------------------------------------------
 void setDefaultCommands(src::Drivers *) {
-    //TODO: Add something here
+    shooter.setDefaultCommand(&stopShooterCommand);
 }
 
 // Set commands scheduled on startup
