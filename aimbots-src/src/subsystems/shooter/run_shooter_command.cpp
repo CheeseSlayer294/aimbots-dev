@@ -5,12 +5,13 @@
 
 namespace src::Shooter{
 
-RunShooterCommand::RunShooterCommand(tap::Drivers* drivers, ShooterSubsystem* shooter, int shooterRPM)
+RunShooterCommand::RunShooterCommand(src::Drivers* drivers, ShooterSubsystem* shooter, int shooterRPM)
     : drivers(drivers),
       shooter(shooter),
       shooterRPM(shooterRPM)
 {
-    addSubsystemRequirment(dynamic_cast<tap::control::Subsystem*->(shooter));
+    addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(shooter));
+
 }
 
     
@@ -27,7 +28,7 @@ RunShooterCommand::RunShooterCommand(tap::Drivers* drivers, ShooterSubsystem* sh
 
     bool RunShooterCommand::isReady(){return true;}
 
-    bool RunShooterCommand::isFinished(){return false;}
+    bool RunShooterCommand::isFinished()const{return false;}
 
 
 
