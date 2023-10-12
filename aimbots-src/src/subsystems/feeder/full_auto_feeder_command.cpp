@@ -9,14 +9,18 @@ namespace src::Feeder{
         this->FEEDER_RPM = FEEDER_RPM;
     }
 
-    void RunFeederCommand::intialize(){
+    void RunFeederCommand::initialize(){
         feeder->setTargetRPM(FEEDER_RPM);
-
     }
-    void RunFeederCommand::execute() {}
-    void RunFeederCommand::end(bool interrupted){}
+
+    void RunFeederCommand::execute() {
+        // feed motor with RPM speed
+    }
+    void RunFeederCommand::end(bool interrupted){
+        feeder->setTargetRPM(0.0f);
+    }
     bool RunFeederCommand::isReady() {return true;}
-    bool RunFeederCommand::isFinished() const override{return false;}
+    bool RunFeederCommand::isFinished() const { return false;}
     
 
     

@@ -13,11 +13,11 @@
 
 namespace src::Feeder {
 
-class RunFeederCommand: public TapCommand{
+class RunFeederCommand : public TapCommand {
 public:
     RunFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder, float FEEDER_RPM);
     
-    void intialize() override;
+    void initialize() override;
     void execute() override;
     void end(bool interrupted) override;
 
