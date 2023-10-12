@@ -16,13 +16,16 @@
 #include "tap/control/press_command_mapping.hpp"
 #include "tap/control/setpoint/commands/calibrate_command.hpp"
 #include "tap/control/toggle_command_mapping.hpp"
+
 //
 #include "subsystems/feeder/feeder.hpp"
-//TODO: Add Command Includes Here
+#include "subsystems/feeder/full_auto_feeder_command.hpp"
+#include "subsystems/feeder/stop_feeder_command.hpp"
 //
 #include "subsystems/shooter/shooter.hpp"
 #include "subsystems/shooter/stop_shooter_command.hpp"
-
+#include "subsystems/shooter/run_shooter_command.hpp"
+// jonathan is the best
 using namespace src::Feeder;
 using namespace src::Shooter;
 
@@ -56,8 +59,24 @@ src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSI
 
 // Define commands here ---------------------------------------------------
 StopShooterCommand stopShooterCommand(drivers(), &shooter);
+RunShooterCommand runShooterCommand1(drivers(), &shooter, 69);
+RunShooterCommand runShooterCommand2(drivers(), &shooter, 69);
+RunFeederCommand runFeederCommand(drivers(), &feeder, FEEDER_DEFAULT_RPM);
+StopFeederCommand stopFeederCommand(drivers(), &feeder);
 
 // Define command mappings here -------------------------------------------
+
+
+HoldCommandMapping leftSwitchMid(
+    drivers(),
+    {&runShooterCommand1},
+    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::MID));
+
+HoldCommandMapping leftSwitchUp(
+    drivers(),
+    {&runShooterCommand2, &runFeederCommand},
+    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP)
+);
 
 /*HoldCommandMapping rightSwitchMid(
     drivers(),
@@ -79,6 +98,7 @@ void initializeSubsystems() {
 // Set default command here -----------------------------------------------
 void setDefaultCommands(src::Drivers *) {
     shooter.setDefaultCommand(&stopShooterCommand);
+    feeder.setDefaultCommand(&stopFeederCommand);
 }
 
 // Set commands scheduled on startup
@@ -92,7 +112,8 @@ void startupCommands(src::Drivers *) {
 
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
-    //drivers->commandMapper.addMap(&rightSwitchMid);  TODO: Add Mappings Here
+    drivers->commandMapper.addMap(&leftSwitchMid);
+    drivers->commandMapper.addMap(&leftSwitchUp);
 }
 
 }  // namespace CVTestbenchControl

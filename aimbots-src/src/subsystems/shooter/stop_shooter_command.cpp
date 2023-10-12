@@ -11,9 +11,9 @@ StopShooterCommand::StopShooterCommand(Drivers* drivers, ShooterSubsystem* shoot
 
 void StopShooterCommand::initialize() {}
 
-void StopShooterCommand::execute()
-{
-    shooter->ForAllShooterMotors(&ShooterSubsystem::setTargetRPM, 0.0f);
+void StopShooterCommand::execute() {
+    shooter->setTargetRPM(LEFT, 0);
+    shooter->setTargetRPM(RIGHT, 0);
 }
 
 void StopShooterCommand::end(bool interrupted) {}
