@@ -23,4 +23,4 @@ bool StopFeederCommand::isFinished() const { return false; }
 
 };
 
-#endif // closes ifdeff
+#endif // closes ifdef
