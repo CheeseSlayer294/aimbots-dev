@@ -14,6 +14,8 @@ void StopShooterCommand::initialize() {}
 void StopShooterCommand::execute() {
     shooter->setTargetRPM(LEFT, 0);
     shooter->setTargetRPM(RIGHT, 0);
+
+    shooter->ForAllShooterMotors(&ShooterSubsystem::updateMotorVelocityPID);
 }
 
 void StopShooterCommand::end(bool interrupted) {}

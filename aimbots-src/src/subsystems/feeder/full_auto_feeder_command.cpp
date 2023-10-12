@@ -3,10 +3,10 @@
 
 namespace src::Feeder{
     
-    RunFeederCommand::RunFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder, float FEEDER_RPM){
-        this->drivers = drivers;
-        this->feeder = feeder;
-        this->FEEDER_RPM = FEEDER_RPM;
+    RunFeederCommand::RunFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder, float FEEDER_RPM) 
+        : drivers(drivers),
+        feeder(feeder),
+        FEEDER_RPM(FEEDER_RPM){
         addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(feeder));
     }
 

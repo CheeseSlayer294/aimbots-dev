@@ -20,10 +20,13 @@ RunShooterCommand::RunShooterCommand(src::Drivers* drivers, ShooterSubsystem* sh
     void RunShooterCommand::execute() {
         MotorIndex mi = static_cast<MotorIndex>(0);
         MotorIndex mi2 = static_cast<MotorIndex>(1);
-        shooter->setTargetRPM(mi, 3900);
-        shooter->setTargetRPM(mi2, 3900);
+        // shooter->setTargetRPM(mi, 3900);
+        // shooter->setTargetRPM(mi2, 3900);
         isRunning_display = true;
         currentRPM_display = shooter->getMotorSpeed(LEFT);
+
+        shooter->ForAllShooterMotors(&ShooterSubsystem::setTargetRPM, static_cast<float>(3900));
+        shooter->ForAllShooterMotors(&ShooterSubsystem::updateMotorVelocityPID);
     }
 
     void RunShooterCommand::initialize(){}
