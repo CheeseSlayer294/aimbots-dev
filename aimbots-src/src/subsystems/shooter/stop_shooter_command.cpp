@@ -5,16 +5,15 @@
 namespace src::Shooter {
 
 StopShooterCommand::StopShooterCommand(Drivers* drivers, ShooterSubsystem* shooter)
-    : drivers(drivers), shooter(shooter) {
-        addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(shooter));
-    }
+    : drivers(drivers), shooter(shooter)
+{
+    addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(shooter));
+}
 
 void StopShooterCommand::initialize() {}
 
 void StopShooterCommand::execute() {
-    shooter->setTargetRPM(LEFT, 0);
-    shooter->setTargetRPM(RIGHT, 0);
-
+    shooter->ForAllShooterMotors(&ShooterSubsystem::setTargetRPM, 0.0f);
     shooter->ForAllShooterMotors(&ShooterSubsystem::updateMotorVelocityPID);
 }
 

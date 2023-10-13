@@ -1,30 +1,25 @@
 #include "full_auto_feeder_command.hpp"
 
+namespace src::Feeder {
 
-namespace src::Feeder{
-    
-    RunFeederCommand::RunFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder, float FEEDER_RPM) 
-        : drivers(drivers),
-        feeder(feeder),
-        FEEDER_RPM(FEEDER_RPM){
-        addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(feeder));
-    }
+RunFeederCommand::RunFeederCommand(src::Drivers* drivers, FeederSubsystem* feeder, float feederRPM) 
+    : drivers(drivers),
+    feeder(feeder),
+    feederRPM(feederRPM)
+{
+    addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(feeder));
+}
 
-    void RunFeederCommand::initialize() {}
+void RunFeederCommand::initialize() {}
 
-    bool isRunning_display = false;
-    float currentRPM_display = 0.0f;
+void RunFeederCommand::execute() {
+    feeder->setTargetRPM(feederRPM);
+}
 
-    void RunFeederCommand::execute() {
-        feeder->setTargetRPM(FEEDER_RPM);
-        isRunning_display = true;
-        currentRPM_display = feeder->getTargetRPM();
-    }
+void RunFeederCommand::end(bool interrupted) {}
 
-    void RunFeederCommand::end(bool interrupted) {}
+bool RunFeederCommand::isReady() { return true; }
 
-    bool RunFeederCommand::isReady() {return true;}
-    
-    bool RunFeederCommand::isFinished() const { return false;}
+bool RunFeederCommand::isFinished() const { return false; }
+
 };
-    

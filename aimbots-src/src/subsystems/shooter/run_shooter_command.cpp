@@ -3,41 +3,29 @@
 #include "subsystems/shooter/run_shooter_command.hpp"
 #ifdef SHOOTER_COMPATIBLE
 
-namespace src::Shooter{
+namespace src::Shooter {
 
-RunShooterCommand::RunShooterCommand(src::Drivers* drivers, ShooterSubsystem* shooter, int shooterRPM)
+RunShooterCommand::RunShooterCommand(src::Drivers* drivers, ShooterSubsystem* shooter, float shooterRPM)
     : drivers(drivers),
       shooter(shooter),
       shooterRPM(shooterRPM)
 {
     addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(shooter));
+}
+
+void RunShooterCommand::execute() {
+    shooter->ForAllShooterMotors(&ShooterSubsystem::setTargetRPM, shooterRPM);
+    shooter->ForAllShooterMotors(&ShooterSubsystem::updateMotorVelocityPID);
+}
+
+void RunShooterCommand::initialize() {}
+
+void RunShooterCommand::end(bool interupted) {}
+
+bool RunShooterCommand::isReady() { return true; }
+
+bool RunShooterCommand::isFinished() const { return false; }
 
 }
 
-    bool isRunning_display = false;
-    float currentRPM_display = 0.0f;
-
-    void RunShooterCommand::execute() {
-        MotorIndex mi = static_cast<MotorIndex>(0);
-        MotorIndex mi2 = static_cast<MotorIndex>(1);
-        // shooter->setTargetRPM(mi, 3900);
-        // shooter->setTargetRPM(mi2, 3900);
-        isRunning_display = true;
-        currentRPM_display = shooter->getMotorSpeed(LEFT);
-
-        shooter->ForAllShooterMotors(&ShooterSubsystem::setTargetRPM, static_cast<float>(3900));
-        shooter->ForAllShooterMotors(&ShooterSubsystem::updateMotorVelocityPID);
-    }
-
-    void RunShooterCommand::initialize(){}
-
-    void RunShooterCommand::end(bool interupted){}
-
-    bool RunShooterCommand::isReady(){return true;}
-
-    bool RunShooterCommand::isFinished()const{return false;}
-
-
-
-}
 #endif

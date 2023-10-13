@@ -9,9 +9,9 @@
 #define GIMBAL_UNTETHERED
 
 //FEEDER CONSTANTS ---------------------------------------------------------------
-static constexpr CANBus FEED_BUS = CANBus::CAN_BUS1; //TODO: Need to check
+static constexpr CANBus FEED_BUS = CANBus::CAN_BUS1;
 
-static constexpr MotorID FEEDER_ID = MotorID::MOTOR2; //TODO: Need to check
+static constexpr MotorID FEEDER_ID = MotorID::MOTOR2;
 //
 static constexpr bool FEEDER_DIRECTION = false; //TODO: Need to check
 
@@ -20,7 +20,7 @@ static constexpr SmoothPIDConfig FEEDER_VELOCITY_PID_CONFIG = {
     .ki = 0.0f,
     .kd = 0.8f,
     .maxICumulative = 10.0f,
-    .maxOutput = M2006_MAX_OUTPUT, //TODO: Check Motor Type
+    .maxOutput = M2006_MAX_OUTPUT,
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 1.0f,
     .tQProportionalKalman = 1.0f,
@@ -36,20 +36,20 @@ static constexpr float FEEDER_DEFAULT_RPM = 4000.0f;
 
 //SHOOTER CONSTANTS ------------------------------------------------------------------
 
-static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS1; //TODO: Need to check
+static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS1;
 //
-static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR1; //TODO: Need to check
-static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR4; //TODO: Need to check
+static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR1;
+static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR4;
 //
-static constexpr bool SHOOTER_1_DIRECTION = true; //TODO: Need to check
-static constexpr bool SHOOTER_2_DIRECTION = false; //TODO: Need to check
+static constexpr bool SHOOTER_1_DIRECTION = true;
+static constexpr bool SHOOTER_2_DIRECTION = false;
 
 static constexpr SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG = {
     .kp = 30.0f,
     .ki = 0.10f,
     .kd = 0.00f,
     .maxICumulative = 10.0f,
-    .maxOutput = M3508_MAX_OUTPUT, //TODO: Check Motor Type
+    .maxOutput = M3508_MAX_OUTPUT,
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 1.0f,
     .tQProportionalKalman = 1.0f,

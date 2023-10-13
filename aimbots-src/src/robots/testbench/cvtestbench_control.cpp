@@ -59,8 +59,8 @@ src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSI
 
 // Define commands here ---------------------------------------------------
 StopShooterCommand stopShooterCommand(drivers(), &shooter);
-RunShooterCommand runShooterCommand1(drivers(), &shooter, 69);
-RunShooterCommand runShooterCommand2(drivers(), &shooter, 69);
+RunShooterCommand runShooterCommand1(drivers(), &shooter, 3900);
+RunShooterCommand runShooterCommand2(drivers(), &shooter, 3900);
 RunFeederCommand runFeederCommand(drivers(), &feeder, FEEDER_DEFAULT_RPM);
 StopFeederCommand stopFeederCommand(drivers(), &feeder);
 
@@ -77,11 +77,6 @@ HoldCommandMapping leftSwitchUp(
     {&runShooterCommand2, &runFeederCommand},
     RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP)
 );
-
-/*HoldCommandMapping rightSwitchMid(
-    drivers(),
-    {&insertCommandHere},
-    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::MID));*/
 
 // Register subsystems here -----------------------------------------------
 void registerSubsystems(src::Drivers *drivers) {

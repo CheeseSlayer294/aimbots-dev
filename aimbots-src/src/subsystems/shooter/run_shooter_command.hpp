@@ -9,12 +9,11 @@
 
 #ifdef SHOOTER_COMPATIBLE
 
-namespace src::Shooter{
+namespace src::Shooter {
 
 class RunShooterCommand : public TapCommand {
-
 public:
-    RunShooterCommand(src::Drivers* drivers, ShooterSubsystem* shooter, int shooterRPM);
+    RunShooterCommand(src::Drivers* drivers, ShooterSubsystem* shooter, float shooterRPM);
 
     void initialize() override;
     void execute() override; 
@@ -22,14 +21,14 @@ public:
 
     bool isReady() override;
     bool isFinished() const override;
-    const char* getName() const override { return "run shooter";}
+    const char* getName() const override { return "run shooter command"; }
 
 private:
     src::Drivers* drivers;
     ShooterSubsystem* shooter;
-    int shooterRPM;
-
+    float shooterRPM;
 };
+
 };
 
 #endif
