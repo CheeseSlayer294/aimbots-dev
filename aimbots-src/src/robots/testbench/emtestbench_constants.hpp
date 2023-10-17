@@ -7,7 +7,19 @@
 #define GIMBAL_UNTETHERED
 
 //TESTBENCH POSITION CONSTANTS -----------------------------------------------------------
-
+static constexpr SmoothPIDConfig EMTESTBENCH_POSITION_PID_CONFIG = {
+    .kp = 0.0f,
+    .ki = 0.0f,
+    .kd = 0.8f,
+    .maxICumulative = 10.0f,
+    .maxOutput = M2006_MAX_OUTPUT,
+    .tQDerivativeKalman = 1.0f,
+    .tRDerivativeKalman = 1.0f,
+    .tQProportionalKalman = 1.0f,
+    .tRProportionalKalman = 1.0f,
+    .errDeadzone = 0.0f,
+    .errorDerivativeFloor = 0.0f,
+};
 
 //TESTBENCH VELOCITY CONSTANTS -----------------------------------------------------------
 
@@ -231,3 +243,8 @@ static constexpr int DEFAULT_BURST_LENGTH = 2;
 static constexpr float CIMU_CALIBRATION_EULER_X = modm::toRadian(180.0f);
 static constexpr float CIMU_CALIBRATION_EULER_Y = modm::toRadian(0.0f);
 static constexpr float CIMU_CALIBRATION_EULER_Z = modm::toRadian(180.0f);
+
+//-----------------
+static constexpr MotorID POS_MOTOR_ID = MotorID::MOTOR1;
+static constexpr CANBus POS_MOTOR_BUS = CANBus::CAN_BUS1;
+static constexpr bool POS_MOTOR_DIRECTION = false;
