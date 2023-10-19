@@ -155,7 +155,6 @@ static constexpr MotorID YAW_MOTOR_ID = MotorID::MOTOR5;
 static constexpr MotorID PITCH_MOTOR_ID = MotorID::MOTOR6;
 //
 static constexpr MotorID FEEDER_ID = MotorID::MOTOR7;
-static constexpr MotorID vel_ID = MotorID::MOTOR1;
 //
 static constexpr MotorID SHOOTER_1_ID = MotorID::MOTOR3;
 static constexpr MotorID SHOOTER_2_ID = MotorID::MOTOR4;
@@ -164,7 +163,6 @@ static constexpr bool SHOOTER_1_DIRECTION = false;
 static constexpr bool SHOOTER_2_DIRECTION = true;
 
 static constexpr bool FEEDER_DIRECTION = true;
-static constexpr bool vel_DIRECTION = true;
 
 enum WheelRPMIndex {  // index used to easily navigate wheel matrices
     LB = 0,

@@ -17,7 +17,10 @@
 #include "tap/control/setpoint/commands/calibrate_command.hpp"
 #include "tap/control/toggle_command_mapping.hpp"
 //
-//TODO: using namespace insertSubsystemNamespaceHere
+#include "subsystems/vel_tester/run_velocity_command.hpp"
+#include "subsystems/vel_tester/vel_tester.hpp"
+using namespace src::vel_tester;
+// TODO: using namespace insertSubsystemNamespaceHere
 
 /*
  * NOTE: We are using the DoNotUse_getDrivers() function here
@@ -38,7 +41,7 @@ BarrelID currentBarrel = BarrelID::TURRET_17MM_1;
 src::Utils::RefereeHelperTurreted refHelper(drivers(), currentBarrel, 10);
 
 // Define subsystems here ------------------------------------------------
-
+Velocity_Control vel_tester(drivers());
 
 // Ballistics Solver -------------------------------------------------------
 src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSITION_FROM_GIMBAL_ORIGIN);
@@ -46,7 +49,8 @@ src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSI
 // Configs -----------------------------------------------------------------
 
 // Define commands here ---------------------------------------------------
-//TODO: Commands
+// TODO: Commands
+Velocity_Control_Command Velocity_Control_Command(drivers(), &vel_tester);
 
 // Define command mappings here -------------------------------------------
 
@@ -55,22 +59,26 @@ src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSI
 //     {&},
 //     RemoteMapState(RemoteMapState::MouseButton::LEFT));
 
-//TODO: Create Command Mappings
+// TODO: Create Command Mappings
+HoldCommandMapping leftSwitchUp(
+    drivers(),
+    {&Velocity_Control_Command},
+    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
 
 // Register subsystems here -----------------------------------------------
 void registerSubsystems(src::Drivers *drivers) {
-    //TODO: Register Subsystem
+    // TODO: Register Subsystem
+    drivers->commandScheduler.registerSubsystem(&vel_tester);
 }
 
 // Initialize subsystems here ---------------------------------------------
 void initializeSubsystems() {
-    //TODO: Initialize Subsystem
+    // TODO: Initialize Subsystem
+    vel_tester.initialize();
 }
 
 // Set default command here -----------------------------------------------
-void setDefaultCommands(src::Drivers *) {
-    
-}
+void setDefaultCommands(src::Drivers *) {}
 
 // Set commands scheduled on startup
 void startupCommands(src::Drivers *) {
@@ -83,10 +91,11 @@ void startupCommands(src::Drivers *) {
 
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
-    //TODO: Register Command Mappings
+    // TODO: Register Command Mappings
+    drivers->commandMapper.addMap(&leftSwitchUp);
 }
 
-}  // namespace CVTestbenchControl
+}  // namespace EMTestbenchControl
 
 namespace src::Control {
 // Initialize subsystems ---------------------------------------------------

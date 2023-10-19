@@ -283,7 +283,6 @@ static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS1;
 static constexpr CANBus FEED_BUS = CANBus::CAN_BUS1;
 static constexpr CANBus INDEX_BUS = CANBus::CAN_BUS1;
 
-static constexpr CANBus vel_BUS = CANBus::CAN_BUS1;
 //
 static constexpr MotorID FEEDER_ID = MotorID::MOTOR7;
 static constexpr MotorID INDEXER_ID = MotorID::MOTOR2;

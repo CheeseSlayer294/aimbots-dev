@@ -8,8 +8,6 @@
 
 #include "drivers.hpp"
 
-#ifdef vel_COMPATIBLE
-
 namespace src::vel_tester {
 class Velocity_Control : public tap::control::Subsystem {
 public:
@@ -30,4 +28,3 @@ private:
     DJIMotor testMotor;
 };
 }  // namespace src::vel_tester
-#endif

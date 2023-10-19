@@ -204,21 +204,6 @@ static constexpr SmoothPIDConfig CHASSIS_VELOCITY_PID_CONFIG = {
     .errorDerivativeFloor = 0.0f,
 };
 
-static constexpr SmoothPIDConfig vel_PID_CONFIG =
-    {
-        .kp = 0.0f,  // 40
-        .ki = 0.0f,
-        .kd = 0.0f,  // 0.01
-        .maxICumulative = 0.0f,
-        .maxOutput = M2006_MAX_OUTPUT,
-        .tQDerivativeKalman = 0.0f,
-        .tRDerivativeKalman = 0.0f,
-        .tQProportionalKalman = 0.0f,
-        .tRProportionalKalman = 0.0f,
-        .errDeadzone = 0.0f,
-        .errorDerivativeFloor = 0.0f,
-}
-
 static constexpr SmoothPIDConfig FEEDER_VELOCITY_PID_CONFIG = {
     .kp = 25.0f,  // 40
     .ki = 0.0f,

@@ -8,9 +8,25 @@
 
 //TESTBENCH POSITION CONSTANTS -----------------------------------------------------------
 
+// TESTBENCH VELOCITY CONSTANTS -----------------------------------------------------------
+static constexpr SmoothPIDConfig vel_PID_CONFIG =
+    {
+        .kp = 0.0f,  // 40
+        .ki = 0.0f,
+        .kd = 0.0f,  // 0.01
+        .maxICumulative = 0.0f,
+        .maxOutput = M2006_MAX_OUTPUT,
+        .tQDerivativeKalman = 0.0f,
+        .tRDerivativeKalman = 0.0f,
+        .tQProportionalKalman = 0.0f,
+        .tRProportionalKalman = 0.0f,
+        .errDeadzone = 0.0f,
+        .errorDerivativeFloor = 0.0f,
+};
 
-//TESTBENCH VELOCITY CONSTANTS -----------------------------------------------------------
-
+static constexpr CANBus vel_BUS = CANBus::CAN_BUS1;
+static constexpr bool vel_DIRECTION = true;
+static constexpr MotorID vel_ID = MotorID::MOTOR1;
 
 //GIMBAL CONSTANTS -----------------------------------------------------------------------
 /**
