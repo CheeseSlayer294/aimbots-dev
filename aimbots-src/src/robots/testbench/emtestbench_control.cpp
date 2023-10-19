@@ -17,6 +17,8 @@
 #include "tap/control/setpoint/commands/calibrate_command.hpp"
 #include "tap/control/toggle_command_mapping.hpp"
 //
+#include "subsystems/pos_tester/pos_tester.hpp"
+
 //TODO: using namespace insertSubsystemNamespaceHere
 
 /*
@@ -30,6 +32,7 @@ src::driversFunc drivers = src::DoNotUse_getDrivers;
 using namespace tap;
 using namespace tap::control;
 using namespace tap::communication::serial;
+using namespace src::PosTester;
 
 namespace EMTestbenchControl {
 
@@ -38,7 +41,7 @@ BarrelID currentBarrel = BarrelID::TURRET_17MM_1;
 src::Utils::RefereeHelperTurreted refHelper(drivers(), currentBarrel, 10);
 
 // Define subsystems here ------------------------------------------------
-
+PosTesterSubsystem posTester(drivers());
 
 // Ballistics Solver -------------------------------------------------------
 src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSITION_FROM_GIMBAL_ORIGIN);
@@ -59,12 +62,12 @@ src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSI
 
 // Register subsystems here -----------------------------------------------
 void registerSubsystems(src::Drivers *drivers) {
-    //TODO: Register Subsystem
+    drivers->commandScheduler.registerSubsystem(&posTester);
 }
 
 // Initialize subsystems here ---------------------------------------------
 void initializeSubsystems() {
-    //TODO: Initialize Subsystem
+    posTester.initialize();
 }
 
 // Set default command here -----------------------------------------------
