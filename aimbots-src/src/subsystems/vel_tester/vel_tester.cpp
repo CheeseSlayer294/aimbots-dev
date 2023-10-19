@@ -2,14 +2,15 @@
 
 namespace src::Vel_Tester {
 
-Vel_TesterSubsystem::Vel_TesterSubsystem(tap::Drivers* drivers)
+ Vel_TesterSubsystem::Vel_TesterSubsystem(src::Drivers* drivers)
     : Subsystem(drivers),
       targetRPM(0),
       desiredOutput(0),
-      velTesterPID(FEEDER_VELOCITY_PID_CONFIG), //we have this reference right??
-      vel_testerMotor(drivers, FEEDER_ID, FEED_BUS, FEEDER_DIRECTION, "Feeder Motor")
+      velTesterPID(TESTBENCH_VELOCITY_PID_CONFIG), //we have this reference right??
+      vel_testerMotor(drivers, VEL_MOTOR_ID, VEL_BUS, VEL_MOTOR_DIRECTION, "Vel Motor")
 
 {
+    BuildVelTestMotor();
 }
 
 
@@ -25,17 +26,16 @@ void Vel_TesterSubsystem::refresh() {
 
 void Vel_TesterSubsystem::updateMotorVelocityPID() {
     float err = targetRPM - vel_testerMotor.getShaftRPM();
-    vel_TestVelPID.runControllerDerivateError(err);
-    desiredOutput = vel_TestVelPID.getOutput();
+    velTesterPID.runControllerDerivateError(err);
+    desiredOutput = velTesterPID.getOutput();
 }
 
-float Vel_TesterSubsystem::setTargetRPM(float rpm) {
+void Vel_TesterSubsystem::setTargetRPM(float rpm) {
     this->targetRPM = rpm;
-    return targetRPM;
 }
 
 void Vel_TesterSubsystem::setDesiredOutput(){
-    vel_testerMotor.setDesiredOutput(static_cast<int32_t>(DesiredOutput));
+    vel_testerMotor.setDesiredOutput(static_cast<int32_t>(desiredOutput));
 }
 
 

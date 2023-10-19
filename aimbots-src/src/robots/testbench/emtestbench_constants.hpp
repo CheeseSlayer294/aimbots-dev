@@ -10,7 +10,26 @@
 
 
 //TESTBENCH VELOCITY CONSTANTS -----------------------------------------------------------
+static constexpr CANBus VEL_BUS = CANBus::CAN_BUS1;
 
+static constexpr MotorID VEL_MOTOR_ID = MotorID::MOTOR1;
+static constexpr bool VEL_MOTOR_DIRECTION = false;
+
+
+
+static constexpr SmoothPIDConfig TESTBENCH_VELOCITY_PID_CONFIG = {
+    .kp = 500.0f,
+    .ki = 25.0f,
+    .kd = 0.0f,
+    .maxICumulative = 2000.0f,
+    .maxOutput = GM6020_MAX_OUTPUT,
+    .tQDerivativeKalman = 1.0f,
+    .tRDerivativeKalman = 1.0f,
+    .tQProportionalKalman = 1.0f,
+    .tRProportionalKalman = 1.0f,
+    .errDeadzone = 0.0f,
+    .errorDerivativeFloor = 0.0f,
+};
 
 //GIMBAL CONSTANTS -----------------------------------------------------------------------
 /**

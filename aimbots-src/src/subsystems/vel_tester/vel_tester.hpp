@@ -7,14 +7,36 @@
 #include "utils/ref_system/ref_helper_turreted.hpp"
 #include "utils/robot_specific_inc.hpp"
 
+#include "drivers.hpp"
+
 namespace src::Vel_Tester {
 
-class Vel_TesterSubsystem : public tap::control::subsystem {
+class Vel_TesterSubsystem : public tap::control::Subsystem {
 public:
-    Vel_TesterSubsystem(tap::Drivers* drivers);
+    Vel_TesterSubsystem(src::Drivers* drivers);
 
-    mockable void initialize() override;
+    void initialize() override;
+
+    void BuildVelTestMotor() {
+    }
     void refresh() override;
-    void setTargetRPM(MotorIndex motorIdx, float targetRPM);
-}
+    void setTargetRPM(float targetRPM);
+    void setDesiredOutput();
+
+    void updateMotorVelocityPID();
+
+
+    float getTargetRPM() const {return targetRPM; }
+
+    float getCurrentRPM() const {return vel_testerMotor.getShaftRPM();}
+
+    public: 
+        float desiredOutput;
+        DJIMotor vel_testerMotor;
+        float targetRPM;
+        SmoothPID velTesterPID;
+};
+
+
+
 }
