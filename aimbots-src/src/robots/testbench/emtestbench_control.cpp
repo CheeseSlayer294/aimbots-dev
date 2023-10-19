@@ -18,6 +18,7 @@
 #include "tap/control/toggle_command_mapping.hpp"
 //
 #include "subsystems/pos_tester/pos_tester.hpp"
+#include "subsystems/pos_tester/set_pos_command.hpp"
 
 //TODO: using namespace insertSubsystemNamespaceHere
 
@@ -49,14 +50,14 @@ src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSI
 // Configs -----------------------------------------------------------------
 
 // Define commands here ---------------------------------------------------
-//TODO: Commands
+SetPosCommand setPosCommand(drivers(), &posTester);
 
 // Define command mappings here -------------------------------------------
-
-// HoldCommandMapping rightClickMouse(
-//     drivers(),
-//     {&},
-//     RemoteMapState(RemoteMapState::MouseButton::LEFT));
+//RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN)
+HoldCommandMapping switchLeftUp(
+    drivers(),
+    {&setPosCommand},
+    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
 
 //TODO: Create Command Mappings
 
@@ -86,7 +87,7 @@ void startupCommands(src::Drivers *) {
 
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
-    //TODO: Register Command Mappings
+    drivers->commandMapper.addMap(&switchLeftUp);
 }
 
 }  // namespace CVTestbenchControl
