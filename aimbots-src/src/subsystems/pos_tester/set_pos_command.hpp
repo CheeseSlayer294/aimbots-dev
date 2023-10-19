@@ -1,8 +1,8 @@
 #pragma once
 
 #include "tap/control/subsystem.hpp"
+#include "tap/control/command.hpp"
 
-#include "subsystems/hopper/hopper.hpp"
 #include "utils/common_types.hpp"
 #include "utils/robot_specific_inc.hpp"
 

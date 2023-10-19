@@ -57,7 +57,7 @@ SetPosCommand setPosCommand(drivers(), &posTester);
 HoldCommandMapping switchLeftUp(
     drivers(),
     {&setPosCommand},
-    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
+    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP));
 
 //TODO: Create Command Mappings
 
@@ -72,8 +72,8 @@ void initializeSubsystems() {
 }
 
 // Set default command here -----------------------------------------------
-void setDefaultCommands(src::Drivers *) {
-    
+void setDefaultCommands(src::Drivers*) {
+    posTester.setDefaultCommand(&setPosCommand);
 }
 
 // Set commands scheduled on startup
@@ -87,7 +87,7 @@ void startupCommands(src::Drivers *) {
 
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
-    drivers->commandMapper.addMap(&switchLeftUp);
+    // drivers->commandMapper.addMap(&switchLeftUp);
 }
 
 }  // namespace CVTestbenchControl
