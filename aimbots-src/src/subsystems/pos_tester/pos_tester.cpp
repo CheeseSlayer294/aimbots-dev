@@ -16,26 +16,24 @@ void PosTesterSubsystem::initialize() {
     motor.setDesiredOutput(60);
 }
 
-float current_position_display = 0.0f;
-float wrapped_display = 0.0f;
+float posDisplay = 0.0f;
 
 void PosTesterSubsystem::refresh() {
+    posDisplay = getCurrentPos();
     setDesiredOutput();
-    wrapped_display = motor.getEncoderWrapped();
-    current_position_display = getCurrentPos();
 }
 
-float output_display = 0.0f;
+float outputDisplay = 0.0f;
 
 void PosTesterSubsystem::updateMotorPositionPID() {
     float err = targetPos - getCurrentPos();
     posPID.runControllerDerivateError(err);
     desiredOutput = posPID.getOutput();
-    output_display = desiredOutput;
+    outputDisplay = desiredOutput;
 }
 
 void PosTesterSubsystem::setDesiredOutput() {
-    motor.setDesiredOutput(static_cast<int32_t>(5000));
+    motor.setDesiredOutput(static_cast<int32_t>(desiredOutput));
 }
 
 void PosTesterSubsystem::setTargetPosition(float targetPos) {

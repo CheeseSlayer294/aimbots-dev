@@ -50,14 +50,26 @@ src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSI
 // Configs -----------------------------------------------------------------
 
 // Define commands here ---------------------------------------------------
-SetPosCommand setPosCommand(drivers(), &posTester);
+SetPosCommand setPosCommand1(drivers(), &posTester, 90);
+SetPosCommand setPosCommand2(drivers(), &posTester, 180);
+SetPosCommand setPosCommand3(drivers(), &posTester, 270);
 
 // Define command mappings here -------------------------------------------
 //RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN)
 HoldCommandMapping switchLeftUp(
     drivers(),
-    {&setPosCommand},
-    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP));
+    {&setPosCommand1},
+    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
+
+HoldCommandMapping switchLeftMiddle(
+    drivers(),
+    {&setPosCommand2},
+    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::MID));
+
+HoldCommandMapping switchLeftDown(
+    drivers(),
+    {&setPosCommand3},
+    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::DOWN));
 
 //TODO: Create Command Mappings
 
@@ -73,7 +85,7 @@ void initializeSubsystems() {
 
 // Set default command here -----------------------------------------------
 void setDefaultCommands(src::Drivers*) {
-    posTester.setDefaultCommand(&setPosCommand);
+    // posTester.setDefaultCommand(&setPosCommand);
 }
 
 // Set commands scheduled on startup
@@ -87,7 +99,9 @@ void startupCommands(src::Drivers *) {
 
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
-    // drivers->commandMapper.addMap(&switchLeftUp);
+    drivers->commandMapper.addMap(&switchLeftUp);
+    // drivers->commandMapper.addMap(&switchLeftMiddle);
+    // drivers->commandMapper.addMap(&switchLeftDown);
 }
 
 }  // namespace CVTestbenchControl

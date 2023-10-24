@@ -14,7 +14,7 @@ namespace src::PosTester {
 
 class SetPosCommand : public TapCommand {
 public:
-    SetPosCommand(Drivers*, PosTesterSubsystem*);
+    SetPosCommand(Drivers*, PosTesterSubsystem*, float angle);
 
     void initialize() override;
     void execute() override;
@@ -27,6 +27,7 @@ public:
 private:
     Drivers* drivers;
     PosTesterSubsystem* posTester;
+    float angle;
 };
 
 };

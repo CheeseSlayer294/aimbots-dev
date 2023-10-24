@@ -2,30 +2,23 @@
 
 namespace src::PosTester {
 
-SetPosCommand::SetPosCommand(Drivers* drivers, PosTesterSubsystem* posTester)
-    : drivers(drivers), posTester(posTester)
+SetPosCommand::SetPosCommand(Drivers* drivers, PosTesterSubsystem* posTester, float angle)
+    : drivers(drivers), posTester(posTester), angle(angle)
 {
     addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(posTester));
 }
 
-bool initialized_display = false;
-
-void SetPosCommand::initialize() {
-    initialized_display = true;
-}
-
-float angle = 90;
-bool isCommandRunning_display = false;
+void SetPosCommand::initialize() {}
 
 void SetPosCommand::execute() {
-    isCommandRunning_display = true;
-    posTester->setTargetPosition(angle);
+    float x = drivers->remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL);
+    float y = drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL);
+
+    posTester->setTargetPosition(atan2f(x, y));
     posTester->updateMotorPositionPID();
 }
 
-void SetPosCommand::end(bool interrupted) {
-    isCommandRunning_display = false;
-}
+void SetPosCommand::end(bool interrupted) {}
 
 bool SetPosCommand::isReady() { return true; }
 

@@ -8,10 +8,10 @@
 
 //TESTBENCH POSITION CONSTANTS -----------------------------------------------------------
 static constexpr SmoothPIDConfig EMTESTBENCH_POSITION_PID_CONFIG = {
-    .kp = 500.0f,
+    .kp = 60000.0f,
     .ki = 0.0f,
     .kd = 0.0f,
-    .maxICumulative = 10.0f,
+    .maxICumulative = 30000.0f,
     .maxOutput = GM6020_MAX_OUTPUT,
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 1.0f,
@@ -80,7 +80,7 @@ static constexpr SmoothPIDConfig YAW_POSITION_PID_CONFIG = {
 };
 
 static constexpr SmoothPIDConfig PITCH_POSITION_PID_CONFIG = {
-    .kp = 15'000.0f,
+    .kp = 15000.0f,
     .ki = 0.0f,
     .kd = 85.0f,
     .maxICumulative = 10.0f,
@@ -245,6 +245,6 @@ static constexpr float CIMU_CALIBRATION_EULER_Y = modm::toRadian(0.0f);
 static constexpr float CIMU_CALIBRATION_EULER_Z = modm::toRadian(180.0f);
 
 //-----------------
-static constexpr MotorID POS_MOTOR_ID = MotorID::MOTOR3;
+static constexpr MotorID POS_MOTOR_ID = MotorID::MOTOR5;
 static constexpr CANBus POS_MOTOR_BUS = CANBus::CAN_BUS1;
 static constexpr bool POS_MOTOR_DIRECTION = false;
