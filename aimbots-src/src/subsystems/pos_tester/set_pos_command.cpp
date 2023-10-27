@@ -11,10 +11,7 @@ SetPosCommand::SetPosCommand(Drivers* drivers, PosTesterSubsystem* posTester, fl
 void SetPosCommand::initialize() {}
 
 void SetPosCommand::execute() {
-    float x = drivers->remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL);
-    float y = drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL);
-
-    posTester->setTargetPosition(atan2f(x, y));
+    posTester->setTargetPosition(angle);
     posTester->updateMotorPositionPID();
 }
 

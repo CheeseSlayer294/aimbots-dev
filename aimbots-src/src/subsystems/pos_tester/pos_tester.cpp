@@ -13,23 +13,17 @@ PosTesterSubsystem::PosTesterSubsystem(Drivers* drivers)
 
 void PosTesterSubsystem::initialize() {
     motor.initialize();
-    motor.setDesiredOutput(60);
+    motor.setDesiredOutput(0);
 }
-
-float posDisplay = 0.0f;
 
 void PosTesterSubsystem::refresh() {
-    posDisplay = getCurrentPos();
     setDesiredOutput();
 }
-
-float outputDisplay = 0.0f;
 
 void PosTesterSubsystem::updateMotorPositionPID() {
     float err = targetPos - getCurrentPos();
     posPID.runControllerDerivateError(err);
     desiredOutput = posPID.getOutput();
-    outputDisplay = desiredOutput;
 }
 
 void PosTesterSubsystem::setDesiredOutput() {

@@ -100,8 +100,8 @@ void startupCommands(src::Drivers *) {
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
     drivers->commandMapper.addMap(&switchLeftUp);
-    // drivers->commandMapper.addMap(&switchLeftMiddle);
-    // drivers->commandMapper.addMap(&switchLeftDown);
+    drivers->commandMapper.addMap(&switchLeftMiddle);
+    drivers->commandMapper.addMap(&switchLeftDown);
 }
 
 }  // namespace CVTestbenchControl
