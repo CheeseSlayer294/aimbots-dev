@@ -19,6 +19,7 @@
 //
 #include "subsystems/pos_tester/pos_tester.hpp"
 #include "subsystems/pos_tester/set_pos_command.hpp"
+#include "subsystems/pos_tester/set_pos_throttle_command.hpp"
 
 //TODO: using namespace insertSubsystemNamespaceHere
 
@@ -50,26 +51,10 @@ src::Utils::Ballistics::BallisticsSolver ballisticsSolver(drivers(), BARREL_POSI
 // Configs -----------------------------------------------------------------
 
 // Define commands here ---------------------------------------------------
-SetPosCommand setPosCommand1(drivers(), &posTester, 90);
-SetPosCommand setPosCommand2(drivers(), &posTester, 180);
-SetPosCommand setPosCommand3(drivers(), &posTester, 270);
+SetPosThrottleCommand setPosThrottleCommand(drivers(), &posTester);
 
 // Define command mappings here -------------------------------------------
 //RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN)
-HoldCommandMapping switchLeftUp(
-    drivers(),
-    {&setPosCommand1},
-    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
-
-HoldCommandMapping switchLeftMiddle(
-    drivers(),
-    {&setPosCommand2},
-    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::MID));
-
-HoldCommandMapping switchLeftDown(
-    drivers(),
-    {&setPosCommand3},
-    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::DOWN));
 
 //TODO: Create Command Mappings
 
@@ -85,7 +70,7 @@ void initializeSubsystems() {
 
 // Set default command here -----------------------------------------------
 void setDefaultCommands(src::Drivers*) {
-    // posTester.setDefaultCommand(&setPosCommand);
+    posTester.setDefaultCommand(&setPosThrottleCommand);
 }
 
 // Set commands scheduled on startup
@@ -99,9 +84,6 @@ void startupCommands(src::Drivers *) {
 
 // Register IO mappings here -----------------------------------------------
 void registerIOMappings(src::Drivers *drivers) {
-    drivers->commandMapper.addMap(&switchLeftUp);
-    drivers->commandMapper.addMap(&switchLeftMiddle);
-    drivers->commandMapper.addMap(&switchLeftDown);
 }
 
 }  // namespace CVTestbenchControl
