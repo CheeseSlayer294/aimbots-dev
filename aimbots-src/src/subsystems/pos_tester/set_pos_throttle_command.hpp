@@ -14,7 +14,7 @@ namespace src::PosTester {
 
 class SetPosThrottleCommand : public TapCommand {
 public:
-    SetPosThrottleCommand(Drivers*, PosTesterSubsystem*) {}
+    SetPosThrottleCommand(Drivers*, PosTesterSubsystem*);
 
     void initialize() override;
     void execute() override;
