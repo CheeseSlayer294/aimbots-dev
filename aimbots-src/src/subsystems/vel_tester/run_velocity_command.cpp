@@ -10,9 +10,8 @@ Velocity_Control_Command::Velocity_Control_Command(
     {
         addSubsystemRequirement(dynamic_cast<tap::control::Subsystem*>(vel_tester));
     }
-
     bool isCommandRunningDisplay = false;
-    
+
     void Velocity_Control_Command::initialize(){
         vel_tester->setTargetRPM(0.0f);
     }
@@ -20,7 +19,8 @@ Velocity_Control_Command::Velocity_Control_Command(
     void Velocity_Control_Command::execute() {
         isCommandRunningDisplay = true;
         vel_tester->updateMotorVelocityPID();
-    }
+        vel_tester->setTargetRPM(20.0f);
+    } 
 
     void Velocity_Control_Command::end(bool) {
         vel_tester->setTargetRPM(0.0f);
