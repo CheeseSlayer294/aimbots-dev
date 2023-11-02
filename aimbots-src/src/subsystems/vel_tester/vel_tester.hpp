@@ -17,7 +17,7 @@ public:
 
     void updateMotorVelocityPID();
     void setDesiredOutput();
-    float setTargetRPM(float rpm);
+    float setTargetRPM(float);
     float getCurrentRPM() const { return testMotor.getShaftRPM(); }
 
 private:

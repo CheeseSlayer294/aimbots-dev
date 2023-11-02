@@ -7,7 +7,13 @@ Velocity_Control::Velocity_Control(src::Drivers* drivers)
       velPID(vel_PID_CONFIG),
       desiredOutput(0),
       testMotor(drivers, vel_ID, vel_BUS, vel_DIRECTION, "vel_tester Motor") {}
-void Velocity_Control::initialize() { testMotor.initialize(); }
+
+bool is_tester_CommandRunningDisplay = false;
+
+void Velocity_Control::initialize() { 
+    testMotor.initialize(); 
+    //testMotor.setDesiredOutput();
+}
 
 void Velocity_Control::refresh() {
     setDesiredOutput();
@@ -25,6 +31,5 @@ void Velocity_Control::setDesiredOutput() {
 
 float Velocity_Control::setTargetRPM(float rpm) {
     this->targetRPM = rpm;
-    return targetRPM;
 }
 }  // namespace src::vel_tester
