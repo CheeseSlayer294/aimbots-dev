@@ -12,13 +12,11 @@
 #include "tap/control/setpoint/commands/calibrate_command.hpp"
 #include "tap/control/toggle_command_mapping.hpp"
 //
-#include "subsystems/chassis/chassis.hpp"
-#include "subsystems/chassis/chassis_manual_drive_command.hpp"
+
 //
 #include "subsystems/gimbal/gimbal.hpp"
 
 
-using namespace src::Chassis;
 using namespace src::Gimbal;
 
 /*
@@ -35,23 +33,22 @@ using namespace tap::control;
 namespace EngineerControl {
 
 // Define subsystems here ------------------------------------------------
-ChassisSubsystem chassis(drivers());
+
 GimbalSubsystem gimbal(drivers());
 
 // Define commands here ---------------------------------------------------
-ChassisManualDriveCommand chassisManualDriveCommand(drivers(), &chassis);
 
 // Define command mappings here -------------------------------------------
-HoldCommandMapping leftSwitchUp(
+/*HoldCommandMapping leftSwitchUp(
     drivers(),
-    {&chassisManualDriveCommand},
-    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));
+    {&},
+    RemoteMapState(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP));*/
 
 // Register subsystems here -----------------------------------------------
-void registerSubsystems(src::Drivers *drivers) { drivers->commandScheduler.registerSubsystem(&chassis); }
+void registerSubsystems(src::Drivers *drivers) {  }
 
 // Initialize subsystems here ---------------------------------------------
-void initializeSubsystems() { chassis.initialize(); }
+void initializeSubsystems() {  }
 
 // Set default command here -----------------------------------------------
 void setDefaultCommands(src::Drivers *) {
@@ -68,7 +65,8 @@ void startupCommands(src::Drivers *drivers) {
 }
 
 // Register IO mappings here -----------------------------------------------
-void registerIOMappings(src::Drivers *drivers) { drivers->commandMapper.addMap(&leftSwitchUp); }
+void registerIOMappings(src::Drivers *drivers) { //drivers->commandMapper.addMap(&leftSwitchUp); 
+}
 
 }  // namespace EngineerControl
 

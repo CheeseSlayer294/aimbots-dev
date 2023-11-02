@@ -12,12 +12,6 @@
 // #define TURRET_HAS_IMU
 #define GIMBAL_UNTETHERED  // I don't think this refers to the gimbal subsystem itself but rather a behavior of the gimbal
 
-/**
- * @brief Defines the number of motors created for the chassis.
- */
-static constexpr uint8_t DRIVEN_WHEEL_COUNT = 4;
-static constexpr uint8_t MOTORS_PER_WHEEL = 1;
-
 static constexpr uint8_t SHOOTER_MOTOR_COUNT = 2;
 
 /**
@@ -205,20 +199,6 @@ const modm::interpolation::Linear<modm::Pair<float, float>> PITCH_VELOCITY_FEEDF
 
 static Vector3f IMU_MOUNT_POSITION{0.0992f, 0.0f, 0.0534f};
 
-static constexpr SmoothPIDConfig CHASSIS_VELOCITY_PID_CONFIG = {
-    .kp = 18.0f,
-    .ki = 0.0f,
-    .kd = 1.5f,
-    .maxICumulative = 10.0f,
-    .maxOutput = M3508_MAX_OUTPUT,
-    .tQDerivativeKalman = 1.0f,
-    .tRDerivativeKalman = 1.0f,
-    .tQProportionalKalman = 1.0f,
-    .tRProportionalKalman = 1.0f,
-    .errDeadzone = 0.0f,
-    .errorDerivativeFloor = 0.0f,
-};
-
 static constexpr SmoothPIDConfig WRIST_VELOCITY_PID_CONFIG = {
     .kp = 1.0f,
     .ki = 0.0f,
@@ -263,8 +243,6 @@ static constexpr SmoothPIDConfig SHOOTER_VELOCITY_PID_CONFIG = {
     .errorDerivativeFloor = 0.0f,
 };
 
-// 1 for no symmetry, 2 for 180 degree symmetry, 4 for 90 degree symmetry
-static constexpr uint8_t CHASSIS_SNAP_POSITIONS = 2;
 
 // clang-format off
 static constexpr uint16_t shooter_speed_array[6] = {  // ONLY TUNE WITH FULL BATTERY
@@ -281,13 +259,6 @@ static const Matrix<uint16_t, 3, 2> SHOOTER_SPEED_MATRIX(shooter_speed_array);
 static constexpr float FEEDER_DEFAULT_RPM = 4150.0f;  // 4500
 static constexpr int DEFAULT_BURST_LENGTH = 5;        // balls
 
-// CAN Bus 2
-static constexpr CANBus CHASSIS_BUS = CANBus::CAN_BUS2;
-
-static constexpr MotorID LEFT_BACK_WHEEL_ID = MotorID::MOTOR1;
-static constexpr MotorID LEFT_FRONT_WHEEL_ID = MotorID::MOTOR2;
-static constexpr MotorID RIGHT_FRONT_WHEEL_ID = MotorID::MOTOR3;
-static constexpr MotorID RIGHT_BACK_WHEEL_ID = MotorID::MOTOR4;
 
 // CAN Bus 1
 static constexpr CANBus SHOOTER_BUS = CANBus::CAN_BUS1;
@@ -345,17 +316,6 @@ static constexpr float POWER_LIMIT_SAFETY_FACTOR = 0.85f;
 static constexpr float STARTING_ENERGY_BUFFER = 60.0f;
 static constexpr float ENERGY_BUFFER_LIMIT_THRESHOLD = 60.0f;
 static constexpr float ENERGY_BUFFER_CRIT_THRESHOLD = 10.0f;
-
-/**
- * @brief Power constants for chassis
- */
-static constexpr int MIN_WHEEL_SPEED_SINGLE_MOTOR = 4000;
-static constexpr int MAX_WHEEL_SPEED_SINGLE_MOTOR = 8000;
-static constexpr int MIN_CHASSIS_POWER = 40;
-static constexpr int MAX_CHASSIS_POWER = 120;
-static constexpr int WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE =
-    (MAX_WHEEL_SPEED_SINGLE_MOTOR - MIN_WHEEL_SPEED_SINGLE_MOTOR) / (MAX_CHASSIS_POWER - MIN_CHASSIS_POWER);
-static_assert(WHEEL_SPEED_OVER_CHASSIS_POWER_SLOPE >= 0);
 
 /**
  * @brief Behavior constants for chassis
@@ -423,46 +383,4 @@ static constexpr float TIMU_CALIBRATION_EULER_X = modm::toRadian(0.0f);
 static constexpr float TIMU_CALIBRATION_EULER_Y = modm::toRadian(0.0f);
 static constexpr float TIMU_CALIBRATION_EULER_Z = modm::toRadian(0.0f);
 
-// This array holds the IDs of all speed monitor barrels on the robot
-static const std::array<BarrelID, 2> BARREL_IDS = {BarrelID::TURRET_17MM_1, BarrelID::TURRET_17MM_2};
-
 static constexpr size_t PROJECTILE_SPEED_QUEUE_SIZE = 10;
-
-/**
- * @brief Barrel Manager Constants
- */
-// These are offsets of the lead screw from the hard stop of the slide to lining up the barrel with the flywheels
-// A positive increase provides a bigger gap between hard stop and barrel
-static constexpr float HARD_STOP_OFFSET = 0.5;  // In mm
-
-// this is from edge to edge, aligned center to aligned center,
-static constexpr float BARREL_SWAP_DISTANCE_MM = 45.5;  // In mm
-
-// If the barrel is this close to the flywheel chamber, it is considered aligned
-static constexpr float BARRELS_ALIGNED_TOLERANCE = 2.0;  // In mm
-
-// Conversion ratio from motor encoder ticks to millimeters moved on the lead screw
-static constexpr float LEAD_SCREW_TICKS_PER_MM =
-    tap::motor::DjiMotor::ENC_RESOLUTION * 36.0 /
-    8.0;  //  X encoder ticks per rot. * 36 motor rotations / 8mm of lead ; // ticks/mm
-
-// The value that the torque needs to be greater than to detect running into a wall
-static constexpr int16_t LEAD_SCREW_CURRENT_SPIKE_TORQUE = 650;
-
-// The output to the motor while in calibration mode.
-// When adjusting, also change the constant above to find an appropriate match between the two
-static constexpr int16_t LEAD_SCREW_CALI_OUTPUT = 600;
-
-static constexpr SmoothPIDConfig BARREL_SWAP_POSITION_PID_CONFIG = {
-    .kp = 1000.0f,
-    .ki = 0.0f,
-    .kd = 0.5f,
-    .maxICumulative = 5.0f,
-    .maxOutput = M2006_MAX_OUTPUT,
-    .tQDerivativeKalman = 1.0f,
-    .tRDerivativeKalman = 1.0f,
-    .tQProportionalKalman = 1.0f,
-    .tRProportionalKalman = 1.0f,
-    .errDeadzone = 0.0f,
-    .errorDerivativeFloor = 0.0f,
-};
