@@ -11,7 +11,7 @@
 // TESTBENCH VELOCITY CONSTANTS -----------------------------------------------------------
 static constexpr SmoothPIDConfig vel_PID_CONFIG =
     {
-        .kp = 10000.0f,  // 40
+        .kp = 20000.0f,  // 40
         .ki = 0.0f,
         .kd = 0.0f,  // 0.01
         .maxICumulative = 30000.0f,
@@ -72,7 +72,7 @@ static constexpr float PITCH_AXIS_SOFTSTOP_HIGH = modm::toRadian(30.0f);
 static constexpr SmoothPIDConfig YAW_POSITION_PID_CONFIG = {
     .kp = 20'000.0f,
     .ki = 0.0f,
-    .kd = 100.0f,
+    .kd = 0.0f,
     .maxICumulative = 10.0f,
     .maxOutput = GM6020_MAX_OUTPUT,
     .tQDerivativeKalman = 1.0f,

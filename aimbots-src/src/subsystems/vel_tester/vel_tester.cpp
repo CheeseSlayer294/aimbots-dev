@@ -12,7 +12,6 @@ bool is_tester_CommandRunningDisplay = false;
 
 void Velocity_Control::initialize() { 
     testMotor.initialize(); 
-    //testMotor.setDesiredOutput();
 }
 
 void Velocity_Control::refresh() {
