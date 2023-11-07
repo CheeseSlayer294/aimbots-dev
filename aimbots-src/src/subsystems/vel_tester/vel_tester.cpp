@@ -18,8 +18,9 @@ void Velocity_Control::refresh() {
     setDesiredOutput();
 }
 
+
 void Velocity_Control::updateMotorVelocityPID() {
-    float err = targetRPM - testMotor.getShaftRPM();
+    float err = targetRPM - getCurrentRPM();
     velPID.runControllerDerivateError(err);
     desiredOutput = velPID.getOutput();
 }
