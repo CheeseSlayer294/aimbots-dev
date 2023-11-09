@@ -17,12 +17,21 @@ Velocity_Control_Command::Velocity_Control_Command(
     }
 
     void Velocity_Control_Command::execute() {
-        isCommandRunningDisplay = true;
-        vel_tester->updateMotorVelocityPID();
-        vel_tester->setTargetRPM(700.0f);
+        if (drivers->remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::UP) {
+            isCommandRunningDisplay = true;
+            //vel_tester->updateMotorVelocityPID();
+            vel_tester->setTargetRPM(700.0f);
+        }
+        else if (drivers->remote.getSwitch(Remote::Switch::RIGHT_SWITCH) == Remote::SwitchState::MID) {
+            isCommandRunningDisplay = true;
+            //vel_tester->updateMotorVelocityPID();
+            vel_tester->setTargetRPM(300.0f);
+        }
+
     } 
 
     void Velocity_Control_Command::end(bool) {
+        //vel_tester->updateMotorVelocityPID();
         vel_tester->setTargetRPM(0.0f);
         isCommandRunningDisplay = false;
     }

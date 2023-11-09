@@ -16,13 +16,21 @@ void Velocity_Control::initialize() {
 
 void Velocity_Control::refresh() {
     setDesiredOutput();
+    updateMotorVelocityPID();
 }
 
+float targetRPMdisplay;
+float currentRPMdisplay;
+float PIDoutputdisplay;
 
 void Velocity_Control::updateMotorVelocityPID() {
     float err = targetRPM - getCurrentRPM();
     velPID.runControllerDerivateError(err);
     desiredOutput = velPID.getOutput();
+
+    targetRPMdisplay = targetRPM;
+    currentRPMdisplay = getCurrentRPM();
+    PIDoutputdisplay = desiredOutput;
 }
 
 void Velocity_Control::setDesiredOutput() { 

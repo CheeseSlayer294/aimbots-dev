@@ -11,11 +11,11 @@
 // TESTBENCH VELOCITY CONSTANTS -----------------------------------------------------------
 static constexpr SmoothPIDConfig vel_PID_CONFIG =
     {
-        .kp = 20000.0f,  // 40
+        .kp = 15.0f,  // 40
         .ki = 0.0f,
-        .kd = 0.0f,  // 0.01
-        .maxICumulative = 30000.0f,
-        .maxOutput = M2006_MAX_OUTPUT,
+        .kd = 3.0f, 
+        .maxICumulative = 10.0f,
+        .maxOutput = M3508_MAX_OUTPUT,
         .tQDerivativeKalman = 1.0f,
         .tRDerivativeKalman = 1.0f,
         .tQProportionalKalman = 1.0f,
