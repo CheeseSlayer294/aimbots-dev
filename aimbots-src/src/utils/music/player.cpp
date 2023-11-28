@@ -17,11 +17,22 @@ static constexpr uint32_t NOTE_E = 659;
 static constexpr uint32_t NOTE_F = 699;
 static constexpr uint32_t NOTE_Gb = 740;
 static constexpr uint32_t NOTE_G = 784;
-static constexpr uint32_t NOTE_Ab2 = 880;
+static constexpr uint32_t NOTE_Ab = 830;
+static constexpr uint32_t NOTE_A2 = 880;
 static constexpr uint32_t NOTE_Bb2 = 932;
 static constexpr uint32_t NOTE_B2 = 988;
 static constexpr uint32_t NOTE_C2 = 1047;
 static constexpr uint32_t NOTE_Eb2 = 1244;
+
+static constexpr uint32_t NOTE_Gb5 = 740;
+static constexpr uint32_t NOTE_Ab5 = 830;
+static constexpr uint32_t NOTE_Bb5 = 932;
+static constexpr uint32_t NOTE_Cb6 = 987;
+static constexpr uint32_t NOTE_Db6 = 1108;
+static constexpr uint32_t NOTE_Eb6 = 1244;
+static constexpr uint32_t NOTE_F6 = 1397;
+static constexpr uint32_t NOTE_Gb6 = 1479;
+static constexpr uint32_t NOTE_Ab6 = 1661;
 
 static constexpr uint32_t XP_BPM = 110;
 static constexpr uint32_t XP_MS_PER_16th = (uint32_t)(((1.0f / XP_BPM) * 60.0f * 1000.0f) / 4.0f);
@@ -43,8 +54,8 @@ static MusicNote xpStartupNotes[16] = {
 
     {NOTE_Bb2},
     {0},
-    {NOTE_Ab2},
-    {NOTE_Ab2},
+    {NOTE_A2},
+    {NOTE_A2},
 
     {NOTE_Eb},
     {0},
@@ -155,6 +166,43 @@ void playPacMan(src::Drivers* drivers) {
         lastPMFreq = pacManNotes[currentPMNote].frequency;
         currentPMNote++;
         isPacManDone = currentPMNote == PM_NOTE_COUNT;
+    }
+}
+
+static bool isLGWashingMachineDone = false;
+
+// time signature 6/8
+static constexpr uint32_t LG_BPM = 92;
+static constexpr uint32_t LG_MS_PER_8TH = (uint32_t)(((1.0f / LG_BPM) * 60.0f * 1000.0f) / 3.0f);
+
+static uint32_t lastLGTime = 0;
+static uint32_t currentLGNote = 0;
+static uint32_t lastLGFreq = 0;
+
+static MusicNote LGNotes[] = {{NOTE_Db6}, {NOTE_Db6}, {NOTE_Db6}, {NOTE_Gb6}, {NOTE_F6}, {NOTE_Eb6}, 
+                              {NOTE_Db6}, {NOTE_Db6}, {NOTE_Db6}, {NOTE_Bb5}, {NOTE_Bb5}, {NOTE_Bb5},
+                              {NOTE_Cb6}, {NOTE_Db6}, {NOTE_Eb6}, {NOTE_Ab5}, {NOTE_Bb5}, {NOTE_Cb6},
+                              {NOTE_Bb5}, {NOTE_Bb5}, {NOTE_Bb5}, {NOTE_Db6}, {NOTE_Db6}, {NOTE_Db6},
+                              {NOTE_Db6}, {NOTE_Db6}, {NOTE_Db6}, {NOTE_Gb6}, {NOTE_F6}, {NOTE_Eb6},
+                              {NOTE_Db6}, {NOTE_Db6}, {NOTE_Db6}, {NOTE_Gb6}, {NOTE_Gb6}, {NOTE_Gb6},
+                              {NOTE_Gb6}, {NOTE_Ab6}, {NOTE_Gb6}, {NOTE_F6}, {NOTE_Eb6}, {NOTE_F6},
+                              {NOTE_Gb6}, {NOTE_Gb6}, {NOTE_Gb6}, {NOTE_Gb6}, {NOTE_Gb6}, {NOTE_Gb6},
+                              {}};
+
+static constexpr size_t LG_NOTE_COUNT = sizeof(LGNotes) / sizeof(MusicNote);
+
+void playLGWashingMachine(src::Drivers* drivers) {
+    if (isLGWashingMachineDone) return;
+    if (lastLGTime == 0) lastLGTime = tap::arch::clock::getTimeMilliseconds();
+    uint32_t currentTime = tap::arch::clock::getTimeMilliseconds();
+    uint32_t timeSinceLast = currentTime - lastLGTime;
+
+    if (timeSinceLast >= LG_MS_PER_8TH) {
+        lastLGTime = tap::arch::clock::getTimeMilliseconds();
+        if (lastLGFreq != pacManNotes[currentLGNote].frequency) tap::buzzer::playNote(&drivers->pwm, LGNotes[currentLGNote].frequency);
+        lastLGFreq = LGNotes[currentLGNote].frequency;
+        currentLGNote++;
+        isLGWashingMachineDone = currentLGNote == LG_NOTE_COUNT;
     }
 }
 

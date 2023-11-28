@@ -8,4 +8,6 @@ void continuePlayingXPStartupTune(src::Drivers* drivers);
 
 void playPacMan(src::Drivers* drivers);
 
+void playLGWashingMachine(src::Drivers* drivers);
+
 }
